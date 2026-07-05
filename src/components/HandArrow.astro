@@ -4,7 +4,7 @@
  * island "draws" them (stroke-dashoffset) when scrolled into view.
  */
 interface Props {
-  variant?: 'down' | 'curve-right' | 'curve-left' | 'loop';
+  variant?: 'down' | 'curve-right' | 'curve-left' | 'curve-up' | 'loop';
   class?: string;
 }
 const { variant = 'down', class: className = '' } = Astro.props;
@@ -32,6 +32,14 @@ const arrows: Record<string, { viewBox: string; paths: string[] }> = {
     paths: [
       'M114 10 C102 48, 58 62, 14 44',
       'M28 36 C23 39, 17 42, 11 43 C16 48, 21 54, 24 60',
+    ],
+  },
+  // rises from bottom-right, arrowhead pointing up at the top
+  'curve-up': {
+    viewBox: '0 0 70 90',
+    paths: [
+      'M62 84 C42 72, 30 52, 32 16',
+      'M22 28 C25 20, 28 13, 32 7 C36 13, 40 19, 43 25',
     ],
   },
   // playful loop then arrowhead to the right

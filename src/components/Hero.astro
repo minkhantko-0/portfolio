@@ -2,10 +2,11 @@
 import { profile } from '../data/resume';
 import HandArrow from './HandArrow.astro';
 import Doodle from './Doodle.astro';
+import WorldMap from './WorldMap.astro';
 ---
 
-<header class="relative mx-auto grid min-h-[92svh] max-w-6xl items-center gap-12 px-6 py-20 lg:grid-cols-[1.15fr_1fr]">
-  <div class="relative">
+<header class="relative mx-auto grid min-h-[92svh] max-w-6xl items-center gap-12 px-6 py-20 lg:grid-cols-[1fr_1.1fr]">
+  <div class="relative z-10">
     <p class="hand hero-in hero-greeting mb-3 text-2xl text-accent sm:text-3xl">hi, I’m</p>
 
     <h1 class="hero-in hero-name hand text-5xl font-bold sm:text-7xl">{profile.name}</h1>
@@ -16,15 +17,15 @@ import Doodle from './Doodle.astro';
     </svg>
 
     <p class="hero-in hero-tagline mt-6 max-w-2xl text-lg text-ink-soft sm:text-xl">
-      {profile.tagline}. I build the parts of the product users never see —
-      <span data-annotate="highlight">and notice immediately when they break</span>.
+      {profile.tagline}. I build products end-to-end —
+      <span data-annotate="highlight">and stick around until they work</span>.
     </p>
 
-    <div class="hero-in hero-cta mt-10 flex flex-wrap items-center gap-4">
+    <div class="hero-in hero-cta mt-10 flex flex-wrap items-center gap-5">
       <a
         href={profile.cvFile}
         download
-        class="hero-btn group inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-ink px-5 py-3 font-semibold text-paper shadow-[4px_4px_0_0_#d9480f] transition-transform duration-150 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_0_#d9480f] active:translate-y-0 active:shadow-[2px_2px_0_0_#d9480f]"
+        class="inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-ink px-5 py-3 font-semibold text-paper shadow-[4px_4px_0_0_#d9480f] transition-transform duration-150 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_0_#d9480f] active:translate-y-0 active:shadow-[2px_2px_0_0_#d9480f]"
       >
         <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M12 3v12m0 0-4-4m4 4 4-4M5 21h14" />
@@ -35,42 +36,40 @@ import Doodle from './Doodle.astro';
         href={profile.github}
         target="_blank"
         rel="noopener noreferrer"
-        class="hero-btn rounded-lg border-2 border-ink px-5 py-3 font-semibold transition-colors hover:bg-ink hover:text-paper"
+        aria-label="GitHub profile"
+        title="GitHub"
+        class="text-ink transition-all duration-150 hover:-translate-y-1 hover:text-accent"
       >
-        GitHub
+        <svg class="size-8" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.55v-2.17c-3.2.7-3.87-1.36-3.87-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.19 1.76 1.19 1.03 1.75 2.69 1.25 3.34.95.11-.74.4-1.25.73-1.53-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.16-1.18 3.16-1.18.63 1.59.24 2.76.12 3.05.74.81 1.18 1.83 1.18 3.09 0 4.41-2.68 5.38-5.24 5.66.41.36.78 1.05.78 2.13v3.16c0 .3.2.67.8.55A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z" />
+        </svg>
       </a>
       <a
         href={profile.linkedin}
         target="_blank"
         rel="noopener noreferrer"
-        class="hero-btn rounded-lg border-2 border-ink px-5 py-3 font-semibold transition-colors hover:bg-ink hover:text-paper"
+        aria-label="LinkedIn profile"
+        title="LinkedIn"
+        class="text-ink transition-all duration-150 hover:-translate-y-1 hover:text-accent"
       >
-        LinkedIn
+        <svg class="size-8" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12ZM7.12 20.45H3.56V9h3.56v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.72v20.55C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.72C24 .77 23.2 0 22.22 0Z" />
+        </svg>
       </a>
     </div>
 
-    <div class="hero-in hero-note mt-6 flex items-center gap-2 text-ink-soft">
-      <HandArrow variant="curve-left" class="h-8 w-14 -scale-y-100 text-accent" />
-      <p class="hand text-xl">grab the PDF version</p>
+    <div class="hero-in hero-note mt-4 flex items-end gap-1 text-ink-soft">
+      <HandArrow variant="curve-up" class="ml-8 h-14 w-11 text-accent" />
+      <p class="hand pb-1 text-xl">grab the PDF version</p>
     </div>
   </div>
 
-  <!-- doodle cluster: laptop talking to the cloud and the database -->
-  <div class="hero-in hero-doodles relative mx-auto hidden h-[26rem] w-full max-w-md lg:block" aria-hidden="true">
-    <!-- dashed "data flow" connectors (marching ants) -->
-    <svg class="connector absolute inset-0 h-full w-full text-ink-soft/60" viewBox="0 0 400 420" fill="none">
-      <path d="M200 160 C230 120, 260 100, 292 84" stroke="currentColor" stroke-width="2" stroke-dasharray="7 7" stroke-linecap="round" />
-      <path d="M170 250 C140 285, 115 305, 92 322" stroke="currentColor" stroke-width="2" stroke-dasharray="7 7" stroke-linecap="round" />
-    </svg>
-
-    <Doodle variant="cloud" class="absolute right-0 top-2 w-36 text-ink" draw={false} float />
-    <Doodle variant="laptop" class="absolute left-1/2 top-36 w-52 -translate-x-1/2 text-ink" draw={false} float />
-    <Doodle variant="database" class="absolute bottom-0 left-4 w-24 text-ink" draw={false} float />
-    <Doodle variant="coffee" class="absolute bottom-6 right-6 w-20 text-ink-soft" draw={false} float />
-
-    <Doodle variant="sparkle" class="twinkle absolute left-6 top-16 w-7 text-accent" draw={false} strokeWidth={3.5} />
-    <Doodle variant="sparkle" class="twinkle absolute right-10 top-44 w-5 text-accent" draw={false} strokeWidth={4} />
-    <Doodle variant="sparkle" class="twinkle absolute bottom-24 left-40 w-6 text-marker" draw={false} strokeWidth={4} />
+  <!-- hand-drawn world map: where the work went -->
+  <div class="hero-in hero-doodles relative mx-auto hidden w-full max-w-2xl lg:block" aria-hidden="false">
+    <WorldMap />
+    <Doodle variant="sparkle" class="twinkle absolute -left-2 top-2 w-6 text-accent" draw={false} strokeWidth={4} />
+    <Doodle variant="sparkle" class="twinkle absolute bottom-24 right-2 w-5 text-marker" draw={false} strokeWidth={4} />
+    <Doodle variant="plane" class="absolute -top-4 right-16 w-14 text-accent" draw={false} float />
   </div>
 
   <!-- scroll cue -->

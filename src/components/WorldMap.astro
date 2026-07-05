@@ -1,0 +1,77 @@
+---
+/**
+ * Hand-drawn world map. Continent strokes use .draw-path so the hero timeline
+ * draws them in; client pins pop in (.map-pin) and Thailand gets a pulsing
+ * "home base" ring. Marker coordinates live in resume.ts (equirect 800×400).
+ */
+import { mapMarkers } from '../data/resume';
+
+const { clients, home } = mapMarkers;
+---
+
+<svg viewBox="0 0 800 400" fill="none" class="w-full overflow-visible" aria-label="World map of client countries: Myanmar, Japan, Singapore, France, Israel — currently based in Thailand" role="img">
+  <g class="text-ink-soft/50" stroke-width="2">
+    <!-- North America -->
+    <path class="draw-path" d="M60 60 C90 42, 140 38, 175 50 C210 46, 240 58, 250 78 C238 92, 220 100, 214 118 C200 140, 186 152, 172 148 C178 162, 194 172, 203 186 C196 192, 186 190, 178 182 C164 170, 154 156, 146 140 C128 132, 104 120, 92 100 C76 90, 62 76, 60 60 Z" />
+    <!-- Greenland -->
+    <path class="draw-path" d="M270 30 C290 24, 310 28, 312 42 C300 52, 282 52, 272 44 C268 38, 267 33, 270 30 Z" />
+    <!-- South America -->
+    <path class="draw-path" d="M212 196 C236 186, 258 192, 262 212 C268 238, 258 268, 244 296 C236 316, 228 330, 220 326 C210 300, 205 270, 206 240 C202 220, 205 206, 212 196 Z" />
+    <!-- Europe -->
+    <path class="draw-path" d="M388 92 C396 76, 412 66, 428 62 C444 54, 462 52, 470 60 C464 72, 452 78, 448 88 C438 96, 428 100, 418 98 C406 106, 395 103, 388 92 Z" />
+    <!-- Africa -->
+    <path class="draw-path" d="M392 118 C412 108, 440 108, 462 118 C478 128, 482 146, 474 166 C466 190, 452 214, 440 240 C432 262, 420 272, 410 262 C400 240, 394 214, 390 190 C384 166, 384 140, 392 118 Z" />
+    <!-- Asia -->
+    <path class="draw-path" d="M470 60 C500 40, 560 32, 610 38 C660 32, 700 44, 720 62 C736 78, 730 96, 714 104 C702 116, 686 124, 670 126 C656 138, 640 146, 626 144 C616 152, 606 156, 598 152 C584 162, 566 162, 556 150 C540 156, 524 152, 518 140 C504 146, 488 142, 482 130 C472 120, 466 106, 470 94 C462 82, 462 68, 470 60 Z" />
+    <!-- India -->
+    <path class="draw-path" d="M560 142 C572 148, 578 162, 574 178 C568 188, 558 184, 553 168 C552 156, 554 146, 560 142 Z" />
+    <!-- Indochina + Malay peninsula, down to Singapore -->
+    <path class="draw-path" d="M604 148 C616 156, 623 168, 625 182 C628 192, 631 200, 630 207" />
+    <!-- Japan arc -->
+    <path class="draw-path" d="M700 108 C709 116, 713 128, 709 140" />
+    <path class="draw-path" d="M713 98 C717 104, 719 110, 718 117" />
+    <!-- Australia -->
+    <path class="draw-path" d="M640 260 C660 248, 690 246, 712 256 C726 266, 728 284, 716 296 C698 306, 672 308, 654 298 C642 288, 636 272, 640 260 Z" />
+    <!-- Indonesia, dashed -->
+    <path d="M600 222 C612 226, 624 228, 636 227 M646 230 C658 232, 668 230, 678 226" stroke="currentColor" stroke-dasharray="4 6" stroke-linecap="round" />
+  </g>
+
+  <!-- client pins -->
+  {
+    clients.map((c) => (
+      <g>
+        <circle class="map-pin" cx={c.x} cy={c.y} r="6" fill="#d9480f" stroke="#faf8f2" stroke-width="2" />
+        <text
+          class="map-label hand"
+          x={c.labelX}
+          y={c.labelY}
+          font-size="17"
+          fill="#5c554a"
+          style="font-family: var(--font-hand)"
+        >
+          {c.name}
+        </text>
+      </g>
+    ))
+  }
+
+  <!-- home base: Thailand -->
+  <circle class="pin-home-ring" cx={home.x} cy={home.y} r="10" stroke="#d9a90f" stroke-width="2.5" />
+  <circle class="map-pin" cx={home.x} cy={home.y} r="6.5" fill="#ffd43b" stroke="#26221b" stroke-width="2" />
+  <text
+    class="map-label hand"
+    x={home.labelX}
+    y={home.labelY}
+    font-size="18"
+    font-weight="600"
+    fill="#26221b"
+    style="font-family: var(--font-hand)"
+  >
+    {home.name} — I’m here!
+  </text>
+</svg>
+
+<p class="map-label hand mt-3 text-center text-lg text-ink-soft">
+  <span class="mx-1 inline-block size-3 rounded-full bg-accent align-baseline"></span> clients I’ve shipped for
+  <span class="mx-1 ml-5 inline-block size-3 rounded-full border-2 border-ink bg-marker align-baseline"></span> currently based
+</p>

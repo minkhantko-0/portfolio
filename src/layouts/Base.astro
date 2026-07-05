@@ -10,8 +10,8 @@ interface Props {
 }
 
 const {
-  title = 'Min Khant Ko — Back-End Developer',
-  description = 'Back-end developer with 4+ years building scalable cloud applications across fintech, healthcare, and SaaS. Node.js, TypeScript, PostgreSQL, AWS, and multi-cloud infrastructure.',
+  title = 'Min Khant Ko — Software Engineer',
+  description = 'Software engineer with 4+ years building web and mobile products end-to-end across fintech, healthcare, and SaaS. React, React Native, Node.js, Python, PostgreSQL, and AWS.',
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site);
@@ -26,13 +26,16 @@ const jsonLd = {
   url: Astro.site?.toString(),
   sameAs: [profile.github, profile.linkedin],
   knowsAbout: [
+    'React',
+    'React Native',
     'Node.js',
     'TypeScript',
-    'Nest.js',
+    'Python',
+    'FastAPI',
+    'LangChain',
     'PostgreSQL',
     'MongoDB',
     'AWS',
-    'Cloudflare',
     'Docker',
     'REST APIs',
     'Cloud Architecture',

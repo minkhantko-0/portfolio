@@ -1,15 +1,27 @@
 export const profile = {
   name: 'Min Khant Ko',
-  title: 'Back-End Developer',
-  tagline: 'Back-End Developer · 4+ years · fintech / healthcare / SaaS',
+  title: 'Software Engineer',
+  tagline: 'Software Engineer · 4+ years · full-stack across fintech / healthcare / SaaS',
   summary:
-    'I design, build, and ship scalable cloud-based applications across fintech, healthcare, SaaS, and e-commerce. Node.js and TypeScript are home base, PostgreSQL is my happy place, and I’m comfortable owning everything from API design to cloud infrastructure — across AWS, Azure, GCP, and Cloudflare.',
+    'I build and ship web and mobile products end-to-end — React and React Native up front, Node.js and Python behind the scenes, AWS and multi-cloud underneath. Four-plus years across fintech, healthcare, SaaS, and e-commerce, leading small teams, integrating AI services, and delivering production-ready products under tight deadlines. Currently based in Thailand, working remotely.',
   email: 'minkhant5771@gmail.com',
   phone: '+66951045725',
-  linkedin: 'https://linkedin.com/in/minn-khant-ko-b846b0247',
+  linkedin: 'https://www.linkedin.com/in/min-khant-ko-b846b0247/',
   github: 'https://github.com/minkhantko-0',
-  cvFile: '/minkhantko_cv_backend_engineer.pdf',
-  location: 'Remote · SEA timezone',
+  cvFile: '/minkhantko_cv_fullstack_engineer.pdf',
+  location: 'Thailand · working remotely',
+};
+
+/** approx equirectangular positions on the 800×400 hero map */
+export const mapMarkers = {
+  clients: [
+    { name: 'Myanmar', x: 610, y: 150, labelX: 545, labelY: 143 },
+    { name: 'Japan', x: 708, y: 122, labelX: 722, labelY: 118 },
+    { name: 'Singapore', x: 630, y: 205, labelX: 644, labelY: 216 },
+    { name: 'France', x: 403, y: 93, labelX: 342, labelY: 84 },
+    { name: 'Israel', x: 478, y: 122, labelX: 466, labelY: 145 },
+  ],
+  home: { name: 'Thailand', x: 622, y: 168, labelX: 640, labelY: 160 },
 };
 
 export const highlights = [
@@ -163,24 +175,28 @@ export const projects: Project[] = [
 ];
 
 export const skills: { group: string; items: string[]; note?: string }[] = [
-  { group: 'Languages', items: ['JavaScript', 'TypeScript', 'C#', 'SQL'] },
+  { group: 'Languages', items: ['JavaScript', 'TypeScript', 'Python', 'C#', 'SQL'] },
   {
-    group: 'Back-End',
-    items: ['Node.js', 'Nest.js', 'Express.js', 'Hono', 'Bun', '.NET Core'],
-    note: 'home turf',
-  },
-  {
-    group: 'Front-End',
+    group: 'Front-End & Mobile',
     items: ['React', 'React Native', 'Next.js', 'Angular 8+'],
   },
   {
+    group: 'Back-End',
+    items: ['Node.js', 'Nest.js', 'Express.js', 'FastAPI', 'Hono', 'Bun', '.NET Core'],
+    note: 'home turf',
+  },
+  {
+    group: 'AI & LLM',
+    items: ['LangChain', 'LangGraph', 'AWS Bedrock', 'S3 Vector Store'],
+  },
+  {
     group: 'Databases',
-    items: ['PostgreSQL', 'MySQL', 'MSSQL', 'MongoDB', 'DynamoDB', 'Firestore', 'Redis', 'S3 Vector Store'],
+    items: ['PostgreSQL', 'MySQL', 'MSSQL', 'MongoDB', 'DynamoDB', 'Firestore', 'Redis'],
     note: 'ask me about stored procedures',
   },
   {
     group: 'Cloud & DevOps',
-    items: ['AWS (Bedrock, Lambda, ECS, RDS…)', 'Azure', 'GCP', 'Cloudflare', 'Docker', 'CI/CD'],
+    items: ['AWS (Lambda, ECS, RDS…)', 'Azure', 'GCP', 'Cloudflare', 'Docker', 'CI/CD'],
   },
   {
     group: 'Observability',
@@ -188,7 +204,7 @@ export const skills: { group: string; items: string[]; note?: string }[] = [
   },
   {
     group: 'Practices',
-    items: ['REST APIs', 'tRPC', 'OpenAPI/Swagger', 'Code Review', 'Agile/Scrum', 'Database Security', 'SEO'],
+    items: ['REST APIs', 'tRPC', 'OpenAPI/Swagger', 'Code Review', 'Agile/Scrum', 'SEO'],
   },
 ];
 

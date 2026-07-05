@@ -27,6 +27,8 @@ if (!prefersReducedMotion) {
   // (hover lift), and CSS transitions fight GSAP's per-tick transform writes
   gsap.set('.hero-cta', { y: 34, scale: 0.95 });
   gsap.set('.hero-note', { x: -24 });
+  gsap.set('.map-pin', { scale: 0, transformOrigin: '50% 50%' });
+  gsap.set('.map-label, .pin-home-ring', { opacity: 0 });
 
   // ---------- hero entrance (runs once fonts are ready so SplitText measures right) ----------
   document.fonts.ready.then(() => {
@@ -58,7 +60,22 @@ if (!prefersReducedMotion) {
       .to('.hero-cta', { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: 'back.out(1.8)' }, '-=0.3')
       .to('.hero-doodles', { opacity: 1, duration: 0.01 }, '-=0.7')
       .to(doodlePaths, { strokeDashoffset: 0, duration: 1, stagger: 0.05, ease: 'power1.inOut' }, '<')
+      .to('.map-pin', { scale: 1, duration: 0.45, stagger: 0.13, ease: 'back.out(2.5)' }, '-=0.6')
+      .to('.map-label', { opacity: 1, duration: 0.4, stagger: 0.08 }, '-=0.6')
+      .to('.pin-home-ring', { opacity: 1, duration: 0.3 }, '-=0.3')
       .to('.hero-note', { opacity: 1, x: 0, duration: 0.5 }, '-=0.5');
+
+    // "you are here" pulse on the Thailand ring
+    gsap.to('.pin-home-ring', {
+      scale: 1.7,
+      opacity: 0,
+      transformOrigin: '50% 50%',
+      duration: 1.6,
+      ease: 'power1.out',
+      repeat: -1,
+      repeatDelay: 0.4,
+      delay: 4,
+    });
 
     // continuous life after the entrance
     gsap.to('[data-float]', {
