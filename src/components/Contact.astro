@@ -1,0 +1,51 @@
+---
+import { profile } from '../data/resume';
+import HandArrow from './HandArrow.astro';
+---
+
+<footer class="mx-auto max-w-4xl px-6 pb-16 pt-24" aria-labelledby="contact">
+  <div class="reveal relative rounded-2xl border-2 border-ink bg-white/70 p-8 sm:p-12">
+    <div class="pointer-events-none absolute -top-14 left-6 hidden sm:block">
+      <p class="hand -rotate-3 text-3xl text-accent">let’s build something</p>
+      <HandArrow variant="down" class="ml-24 h-10 w-6 text-accent" />
+    </div>
+
+    <h2 id="contact" class="text-3xl font-bold tracking-tight sm:text-4xl">
+      <span data-annotate="highlight">Get in touch</span>
+    </h2>
+    <p class="mt-4 max-w-xl text-lg text-ink-soft">
+      Open to back-end and full-stack roles, remote-friendly. The fastest way to reach me is email —
+      I actually reply.
+    </p>
+
+    <div class="mt-8 flex flex-wrap items-center gap-4">
+      <a
+        href={`mailto:${profile.email}`}
+        class="inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-ink px-5 py-3 font-semibold text-paper shadow-[4px_4px_0_0_#d9480f] transition-transform duration-150 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_0_#d9480f]"
+      >
+        {profile.email}
+      </a>
+      <a
+        href={profile.cvFile}
+        download
+        class="rounded-lg border-2 border-ink px-5 py-3 font-semibold transition-colors hover:bg-ink hover:text-paper"
+      >
+        Download CV
+      </a>
+    </div>
+
+    <ul class="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-ink-soft">
+      <li>
+        <a href={profile.github} target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-accent">GitHub</a>
+      </li>
+      <li>
+        <a href={profile.linkedin} target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-accent">LinkedIn</a>
+      </li>
+      <li>{profile.phone}</li>
+    </ul>
+  </div>
+
+  <p class="hand mt-10 text-center text-xl text-ink-soft">
+    hand-drawn with care · © {new Date().getFullYear()} {profile.name}
+  </p>
+</footer>

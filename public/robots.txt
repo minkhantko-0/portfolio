@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://minkhantko.pages.dev/sitemap-index.xml

@@ -1,0 +1,60 @@
+---
+import { experience } from '../data/resume';
+import SectionHeading from './SectionHeading.astro';
+
+/** wrap annotated phrases in <span data-annotate> for rough-notation */
+function annotateBullet(bullet: string, annotations?: { phrase: string; type: string }[]) {
+  if (!annotations) return bullet;
+  let html = bullet;
+  for (const a of annotations) {
+    if (html.includes(a.phrase)) {
+      html = html.replace(a.phrase, `<span data-annotate="${a.type}">${a.phrase}</span>`);
+    }
+  }
+  return html;
+}
+---
+
+<section class="mx-auto max-w-4xl px-6 py-24" aria-labelledby="experience">
+  <SectionHeading id="experience" label="Experience" aside="4+ years and counting…" />
+
+  <div class="relative">
+    <!-- hand-drawn timeline that draws itself as you scroll -->
+    <svg
+      class="absolute left-[7px] top-2 hidden h-[calc(100%-1rem)] w-4 sm:block"
+      viewBox="0 0 16 800"
+      preserveAspectRatio="none"
+      fill="none"
+      aria-hidden="true"
+      data-draw-scrub
+    >
+      <path
+        class="draw-path text-accent"
+        stroke-width="2.5"
+        d="M8 0 C4 100, 12 200, 8 300 C4 400, 12 500, 8 600 C5 670, 11 740, 8 800"
+      />
+    </svg>
+
+    <ol class="space-y-14 sm:pl-12">
+      {
+        experience.map((job) => (
+          <li class="reveal relative">
+            <span class="absolute -left-[45px] top-2 hidden size-4 rounded-full border-2 border-accent bg-paper sm:block" aria-hidden="true" />
+            <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+              <h3 class="text-xl font-bold sm:text-2xl">{job.role}</h3>
+              <span class="hand text-xl text-accent">@ {job.company}</span>
+            </div>
+            <p class="mt-1 text-sm text-ink-soft">
+              {job.period} · {job.location}
+            </p>
+            <ul class="mt-4 list-disc space-y-2 pl-5 text-ink-soft marker:text-accent">
+              {job.bullets.map((b) => (
+                <li set:html={annotateBullet(b, job.annotate)} />
+              ))}
+            </ul>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>

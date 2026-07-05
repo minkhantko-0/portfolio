@@ -1,0 +1,21 @@
+---
+import { education, languages } from '../data/resume';
+import SectionHeading from './SectionHeading.astro';
+---
+
+<section class="mx-auto max-w-4xl px-6 py-24" aria-labelledby="education">
+  <SectionHeading id="education" label="Education & Languages" aside="where it started" />
+
+  <div class="reveal rounded-xl border border-line bg-white/60 p-6">
+    <h3 class="text-lg font-bold">{education.degree}</h3>
+    <p class="mt-1 text-sm text-ink-soft">
+      {education.school} · {education.period}
+    </p>
+    <ul class="mt-4 list-disc space-y-1 pl-5 text-ink-soft marker:text-accent">
+      {education.notes.map((n) => <li>{n}</li>)}
+    </ul>
+    <p class="mt-5 text-ink-soft">
+      <span class="font-semibold text-ink">Languages:</span> {languages.join(', ')}
+    </p>
+  </div>
+</section>

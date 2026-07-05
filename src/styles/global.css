@@ -1,0 +1,64 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-hand: 'Caveat Variable', 'Comic Sans MS', cursive;
+
+  --color-paper: #faf8f2;
+  --color-ink: #26221b;
+  --color-ink-soft: #5c554a;
+  --color-accent: #d9480f;
+  --color-marker: #ffd43b;
+  --color-line: #e6e0d4;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  /* subtle paper grain, pure SVG — no image request */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+}
+
+.hand {
+  font-family: var(--font-hand);
+}
+
+/* elements revealed by GSAP; visible by default so no-JS/reduced-motion still shows content */
+@media (prefers-reduced-motion: no-preference) {
+  .js .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+
+/* hand-drawn SVG strokes get "drawn" by GSAP; keep visible without JS */
+.draw-path {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* sticky-note tape strip */
+.tape::before {
+  content: '';
+  position: absolute;
+  top: -0.7rem;
+  left: 50%;
+  width: 5.5rem;
+  height: 1.4rem;
+  transform: translateX(-50%) rotate(-2deg);
+  background: rgba(233, 200, 120, 0.45);
+  border-left: 1px dashed rgba(0, 0, 0, 0.08);
+  border-right: 1px dashed rgba(0, 0, 0, 0.08);
+}
+
+::selection {
+  background: var(--color-marker);
+  color: var(--color-ink);
+}

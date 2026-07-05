@@ -1,0 +1,58 @@
+---
+/**
+ * Hand-drawn SVG arrow. Paths use .draw-path and data-draw so the animation
+ * island "draws" them (stroke-dashoffset) when scrolled into view.
+ */
+interface Props {
+  variant?: 'down' | 'curve-right' | 'curve-left' | 'loop';
+  class?: string;
+}
+const { variant = 'down', class: className = '' } = Astro.props;
+
+const arrows: Record<string, { viewBox: string; paths: string[] }> = {
+  // squiggly arrow pointing down
+  down: {
+    viewBox: '0 0 40 90',
+    paths: [
+      'M20 4 C14 16, 27 24, 20 36 C13 48, 26 56, 20 70',
+      'M10 60 C13 65, 17 72, 20 78 C23 72, 28 66, 31 61',
+    ],
+  },
+  // sweeping curve that ends pointing right
+  'curve-right': {
+    viewBox: '0 0 120 70',
+    paths: [
+      'M6 10 C18 48, 62 62, 106 44',
+      'M92 36 C97 39, 103 42, 109 43 C104 48, 99 54, 96 60',
+    ],
+  },
+  // sweeping curve that ends pointing left
+  'curve-left': {
+    viewBox: '0 0 120 70',
+    paths: [
+      'M114 10 C102 48, 58 62, 14 44',
+      'M28 36 C23 39, 17 42, 11 43 C16 48, 21 54, 24 60',
+    ],
+  },
+  // playful loop then arrowhead to the right
+  loop: {
+    viewBox: '0 0 130 70',
+    paths: [
+      'M6 40 C22 12, 44 8, 46 26 C48 44, 26 50, 30 34 C34 16, 78 12, 112 30',
+      'M98 20 C103 24, 108 27, 114 31 C107 33, 101 37, 96 42',
+    ],
+  },
+};
+
+const { viewBox, paths } = arrows[variant];
+---
+
+<svg
+  viewBox={viewBox}
+  class={`pointer-events-none ${className}`}
+  fill="none"
+  aria-hidden="true"
+  data-draw
+>
+  {paths.map((d) => <path class="draw-path" d={d} stroke-width="2.5" />)}
+</svg>

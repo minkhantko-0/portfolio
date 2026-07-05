@@ -1,0 +1,58 @@
+---
+import { profile } from '../data/resume';
+import HandArrow from './HandArrow.astro';
+---
+
+<header class="relative mx-auto flex min-h-[92svh] max-w-4xl flex-col justify-center px-6 py-20">
+  <p class="hand reveal mb-3 text-2xl text-accent sm:text-3xl">hi, I’m</p>
+
+  <h1 class="reveal text-5xl font-extrabold tracking-tight sm:text-7xl">
+    <span data-annotate="circle" data-annotate-color="#d9480f">{profile.name}</span>
+  </h1>
+
+  <p class="reveal mt-6 max-w-2xl text-lg text-ink-soft sm:text-xl">
+    {profile.tagline}. I build the parts of the product users never see —
+    <span data-annotate="highlight">and notice immediately when they break</span>.
+  </p>
+
+  <div class="reveal mt-10 flex flex-wrap items-center gap-4">
+    <a
+      href={profile.cvFile}
+      download
+      class="group inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-ink px-5 py-3 font-semibold text-paper shadow-[4px_4px_0_0_#d9480f] transition-transform duration-150 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_0_#d9480f] active:translate-y-0 active:shadow-[2px_2px_0_0_#d9480f]"
+    >
+      <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 3v12m0 0-4-4m4 4 4-4M5 21h14" />
+      </svg>
+      Download CV
+    </a>
+    <a
+      href={profile.github}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="rounded-lg border-2 border-ink px-5 py-3 font-semibold transition-colors hover:bg-ink hover:text-paper"
+    >
+      GitHub
+    </a>
+    <a
+      href={profile.linkedin}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="rounded-lg border-2 border-ink px-5 py-3 font-semibold transition-colors hover:bg-ink hover:text-paper"
+    >
+      LinkedIn
+    </a>
+  </div>
+
+  <!-- handwritten margin note pointing at the CV button -->
+  <div class="reveal pointer-events-none absolute bottom-40 right-8 hidden md:block lg:right-16">
+    <p class="hand -rotate-6 text-2xl text-ink-soft">grab the PDF version →</p>
+    <HandArrow variant="curve-left" class="ml-2 mt-1 h-14 w-24 text-accent" />
+  </div>
+
+  <!-- scroll cue -->
+  <div class="absolute bottom-8 left-1/2 -translate-x-1/2 text-center">
+    <p class="hand text-xl text-ink-soft">scroll down</p>
+    <HandArrow variant="down" class="mx-auto h-16 w-8 text-ink-soft" />
+  </div>
+</header>
