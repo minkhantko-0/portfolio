@@ -9,7 +9,7 @@ import SectionHeading from './SectionHeading.astro';
   <div class="columns-1 gap-6 sm:columns-2 lg:columns-3">
     {
       skills.map((group) => (
-        <div class="reveal mb-6 break-inside-avoid rounded-xl border border-line bg-white/60 p-5">
+        <div data-reveal="pop" class="mb-6 break-inside-avoid rounded-xl border border-line bg-white/60 p-5">
           <div class="flex items-baseline justify-between gap-2">
             <h3 class="font-bold">{group.group}</h3>
             {group.note && <p class="hand text-lg text-accent">{group.note}</p>}

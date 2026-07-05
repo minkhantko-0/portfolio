@@ -1,0 +1,24 @@
+---
+/**
+ * Full-width divider: a paper plane flies along a dashed doodle route,
+ * scrubbed by scroll (MotionPathPlugin in animations.ts).
+ */
+---
+
+<div id="plane-divider" class="pointer-events-none mx-auto max-w-6xl overflow-visible px-6" aria-hidden="true">
+  <svg viewBox="0 0 1200 160" fill="none" class="w-full overflow-visible">
+    <path
+      id="plane-route"
+      d="M30 40 C200 140, 380 20, 560 90 C740 160, 900 30, 1170 100"
+      stroke="#5c554a"
+      stroke-opacity="0.45"
+      stroke-width="2"
+      stroke-dasharray="8 9"
+      stroke-linecap="round"
+    />
+    <g id="plane" class="text-accent">
+      <path class="draw-path" stroke-width="3" d="M4 25 C20 19, 38 12, 54 6 C47 18, 41 30, 34 42 C31 37, 29 33, 26 28 C19 27, 11 26, 4 25 Z" />
+      <path class="draw-path" stroke-width="3" d="M26 28 C35 21, 45 13, 54 6" />
+    </g>
+  </svg>
+</div>

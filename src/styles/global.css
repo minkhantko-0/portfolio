@@ -1,8 +1,8 @@
 @import 'tailwindcss';
 
 @theme {
-  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
-  --font-hand: 'Caveat Variable', 'Comic Sans MS', cursive;
+  --font-sans: 'Nunito Variable', ui-rounded, ui-sans-serif, system-ui, sans-serif;
+  --font-hand: 'Shantell Sans Variable', 'Comic Sans MS', cursive;
 
   --color-paper: #faf8f2;
   --color-ink: #26221b;
@@ -14,6 +14,12 @@
 
 html {
   scroll-behavior: smooth;
+}
+
+/* slide-in reveal states start offscreen; never let them widen the page */
+html,
+body {
+  overflow-x: clip;
 }
 
 body {
@@ -28,15 +34,16 @@ body {
   font-family: var(--font-hand);
 }
 
-/* elements revealed by GSAP; visible by default so no-JS/reduced-motion still shows content */
+/* animated elements start hidden only when JS runs and motion is allowed,
+   so no-JS / reduced-motion visitors always see the full page */
 @media (prefers-reduced-motion: no-preference) {
-  .js .reveal {
+  .js [data-reveal],
+  .js .hero-in {
     opacity: 0;
-    transform: translateY(24px);
   }
 }
 
-/* hand-drawn SVG strokes get "drawn" by GSAP; keep visible without JS */
+/* hand-drawn SVG strokes get "drawn" by GSAP; visible without JS */
 .draw-path {
   fill: none;
   stroke: currentColor;

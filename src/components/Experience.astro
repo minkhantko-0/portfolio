@@ -37,8 +37,8 @@ function annotateBullet(bullet: string, annotations?: { phrase: string; type: st
 
     <ol class="space-y-14 sm:pl-12">
       {
-        experience.map((job) => (
-          <li class="reveal relative">
+        experience.map((job, i) => (
+          <li class="relative" data-reveal={i % 2 ? 'right' : 'up'}>
             <span class="absolute -left-[45px] top-2 hidden size-4 rounded-full border-2 border-accent bg-paper sm:block" aria-hidden="true" />
             <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
               <h3 class="text-xl font-bold sm:text-2xl">{job.role}</h3>

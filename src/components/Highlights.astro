@@ -1,25 +1,30 @@
 ---
 import { profile, highlights } from '../data/resume';
 import SectionHeading from './SectionHeading.astro';
+import Doodle from './Doodle.astro';
 
 const rotations = ['-rotate-2', 'rotate-1', '-rotate-1', 'rotate-2', '-rotate-1'];
 ---
 
-<section class="mx-auto max-w-5xl px-6 py-24" aria-labelledby="about">
+<section class="relative mx-auto max-w-5xl px-6 py-24" aria-labelledby="about">
   <SectionHeading id="about" label="About" aside="the short version" />
 
-  <p class="reveal max-w-3xl text-lg leading-relaxed text-ink-soft">
-    {profile.summary}
-  </p>
+  <div class="flex flex-wrap items-start gap-8">
+    <p class="max-w-3xl flex-1 basis-96 text-lg leading-relaxed text-ink-soft" data-reveal="up">
+      {profile.summary}
+    </p>
+    <Doodle variant="gear" class="mt-2 w-20 shrink-0 text-ink-soft max-sm:hidden" float />
+  </div>
 
   <div class="mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
     {
       highlights.map((h, i) => (
         <article
-          class={`reveal tape relative border border-line bg-white/70 p-6 shadow-[2px_3px_10px_rgba(38,34,27,0.08)] ${rotations[i % rotations.length]}`}
+          class={`tape relative border border-line bg-white/70 p-6 shadow-[2px_3px_10px_rgba(38,34,27,0.08)] ${rotations[i % rotations.length]}`}
+          data-reveal="pop"
         >
           <p class="leading-relaxed">{h.text}</p>
-          <p class="hand mt-3 text-xl text-accent">— {h.note}</p>
+          <p class="hand mt-3 text-lg text-accent">— {h.note}</p>
         </article>
       ))
     }

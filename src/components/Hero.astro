@@ -1,58 +1,81 @@
 ---
 import { profile } from '../data/resume';
 import HandArrow from './HandArrow.astro';
+import Doodle from './Doodle.astro';
 ---
 
-<header class="relative mx-auto flex min-h-[92svh] max-w-4xl flex-col justify-center px-6 py-20">
-  <p class="hand reveal mb-3 text-2xl text-accent sm:text-3xl">hi, I’m</p>
+<header class="relative mx-auto grid min-h-[92svh] max-w-6xl items-center gap-12 px-6 py-20 lg:grid-cols-[1.15fr_1fr]">
+  <div class="relative">
+    <p class="hand hero-in hero-greeting mb-3 text-2xl text-accent sm:text-3xl">hi, I’m</p>
 
-  <h1 class="reveal text-5xl font-extrabold tracking-tight sm:text-7xl">
-    <span data-annotate="circle" data-annotate-color="#d9480f">{profile.name}</span>
-  </h1>
+    <h1 class="hero-in hero-name hand text-5xl font-bold sm:text-7xl">{profile.name}</h1>
+    <!-- hand-drawn double underline, drawn after the letters land -->
+    <svg id="hero-underline" viewBox="0 0 420 26" class="mt-1 h-6 w-full max-w-xl text-accent" fill="none" aria-hidden="true">
+      <path class="draw-path" stroke-width="3.5" d="M6 10 C80 4, 200 4, 300 8 C350 10, 390 12, 414 14" />
+      <path class="draw-path" stroke-width="3" d="M40 20 C130 15, 250 15, 380 20" />
+    </svg>
 
-  <p class="reveal mt-6 max-w-2xl text-lg text-ink-soft sm:text-xl">
-    {profile.tagline}. I build the parts of the product users never see —
-    <span data-annotate="highlight">and notice immediately when they break</span>.
-  </p>
+    <p class="hero-in hero-tagline mt-6 max-w-2xl text-lg text-ink-soft sm:text-xl">
+      {profile.tagline}. I build the parts of the product users never see —
+      <span data-annotate="highlight">and notice immediately when they break</span>.
+    </p>
 
-  <div class="reveal mt-10 flex flex-wrap items-center gap-4">
-    <a
-      href={profile.cvFile}
-      download
-      class="group inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-ink px-5 py-3 font-semibold text-paper shadow-[4px_4px_0_0_#d9480f] transition-transform duration-150 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_0_#d9480f] active:translate-y-0 active:shadow-[2px_2px_0_0_#d9480f]"
-    >
-      <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M12 3v12m0 0-4-4m4 4 4-4M5 21h14" />
-      </svg>
-      Download CV
-    </a>
-    <a
-      href={profile.github}
-      target="_blank"
-      rel="noopener noreferrer"
-      class="rounded-lg border-2 border-ink px-5 py-3 font-semibold transition-colors hover:bg-ink hover:text-paper"
-    >
-      GitHub
-    </a>
-    <a
-      href={profile.linkedin}
-      target="_blank"
-      rel="noopener noreferrer"
-      class="rounded-lg border-2 border-ink px-5 py-3 font-semibold transition-colors hover:bg-ink hover:text-paper"
-    >
-      LinkedIn
-    </a>
+    <div class="hero-in hero-cta mt-10 flex flex-wrap items-center gap-4">
+      <a
+        href={profile.cvFile}
+        download
+        class="hero-btn group inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-ink px-5 py-3 font-semibold text-paper shadow-[4px_4px_0_0_#d9480f] transition-transform duration-150 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_0_#d9480f] active:translate-y-0 active:shadow-[2px_2px_0_0_#d9480f]"
+      >
+        <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 3v12m0 0-4-4m4 4 4-4M5 21h14" />
+        </svg>
+        Download CV
+      </a>
+      <a
+        href={profile.github}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="hero-btn rounded-lg border-2 border-ink px-5 py-3 font-semibold transition-colors hover:bg-ink hover:text-paper"
+      >
+        GitHub
+      </a>
+      <a
+        href={profile.linkedin}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="hero-btn rounded-lg border-2 border-ink px-5 py-3 font-semibold transition-colors hover:bg-ink hover:text-paper"
+      >
+        LinkedIn
+      </a>
+    </div>
+
+    <div class="hero-in hero-note mt-6 flex items-center gap-2 text-ink-soft">
+      <HandArrow variant="curve-left" class="h-8 w-14 -scale-y-100 text-accent" />
+      <p class="hand text-xl">grab the PDF version</p>
+    </div>
   </div>
 
-  <!-- handwritten margin note pointing at the CV button -->
-  <div class="reveal pointer-events-none absolute bottom-40 right-8 hidden md:block lg:right-16">
-    <p class="hand -rotate-6 text-2xl text-ink-soft">grab the PDF version →</p>
-    <HandArrow variant="curve-left" class="ml-2 mt-1 h-14 w-24 text-accent" />
+  <!-- doodle cluster: laptop talking to the cloud and the database -->
+  <div class="hero-in hero-doodles relative mx-auto hidden h-[26rem] w-full max-w-md lg:block" aria-hidden="true">
+    <!-- dashed "data flow" connectors (marching ants) -->
+    <svg class="connector absolute inset-0 h-full w-full text-ink-soft/60" viewBox="0 0 400 420" fill="none">
+      <path d="M200 160 C230 120, 260 100, 292 84" stroke="currentColor" stroke-width="2" stroke-dasharray="7 7" stroke-linecap="round" />
+      <path d="M170 250 C140 285, 115 305, 92 322" stroke="currentColor" stroke-width="2" stroke-dasharray="7 7" stroke-linecap="round" />
+    </svg>
+
+    <Doodle variant="cloud" class="absolute right-0 top-2 w-36 text-ink" draw={false} float />
+    <Doodle variant="laptop" class="absolute left-1/2 top-36 w-52 -translate-x-1/2 text-ink" draw={false} float />
+    <Doodle variant="database" class="absolute bottom-0 left-4 w-24 text-ink" draw={false} float />
+    <Doodle variant="coffee" class="absolute bottom-6 right-6 w-20 text-ink-soft" draw={false} float />
+
+    <Doodle variant="sparkle" class="twinkle absolute left-6 top-16 w-7 text-accent" draw={false} strokeWidth={3.5} />
+    <Doodle variant="sparkle" class="twinkle absolute right-10 top-44 w-5 text-accent" draw={false} strokeWidth={4} />
+    <Doodle variant="sparkle" class="twinkle absolute bottom-24 left-40 w-6 text-marker" draw={false} strokeWidth={4} />
   </div>
 
   <!-- scroll cue -->
-  <div class="absolute bottom-8 left-1/2 -translate-x-1/2 text-center">
+  <div class="scroll-cue absolute bottom-6 left-1/2 -translate-x-1/2 text-center">
     <p class="hand text-xl text-ink-soft">scroll down</p>
-    <HandArrow variant="down" class="mx-auto h-16 w-8 text-ink-soft" />
+    <HandArrow variant="down" class="mx-auto h-14 w-7 text-ink-soft" />
   </div>
 </header>

@@ -1,16 +1,20 @@
 ---
 import { profile } from '../data/resume';
 import HandArrow from './HandArrow.astro';
+import Doodle from './Doodle.astro';
 ---
 
 <footer class="mx-auto max-w-4xl px-6 pb-16 pt-24" aria-labelledby="contact">
-  <div class="reveal relative rounded-2xl border-2 border-ink bg-white/70 p-8 sm:p-12">
+  <div class="relative rounded-2xl border-2 border-ink bg-white/70 p-8 sm:p-12" data-reveal="pop">
     <div class="pointer-events-none absolute -top-14 left-6 hidden sm:block">
-      <p class="hand -rotate-3 text-3xl text-accent">let’s build something</p>
+      <p class="hand -rotate-3 text-2xl text-accent">let’s build something</p>
       <HandArrow variant="down" class="ml-24 h-10 w-6 text-accent" />
     </div>
 
-    <h2 id="contact" class="text-3xl font-bold tracking-tight sm:text-4xl">
+    <Doodle variant="envelope" class="absolute right-8 top-8 hidden w-28 text-ink-soft sm:block" float />
+    <Doodle variant="plane" class="absolute bottom-8 right-10 hidden w-16 text-accent sm:block" float />
+
+    <h2 id="contact" class="hand text-3xl font-bold sm:text-4xl">
       <span data-annotate="highlight">Get in touch</span>
     </h2>
     <p class="mt-4 max-w-xl text-lg text-ink-soft">
@@ -45,7 +49,7 @@ import HandArrow from './HandArrow.astro';
     </ul>
   </div>
 
-  <p class="hand mt-10 text-center text-xl text-ink-soft">
+  <p class="hand mt-10 text-center text-lg text-ink-soft">
     hand-drawn with care · © {new Date().getFullYear()} {profile.name}
   </p>
 </footer>

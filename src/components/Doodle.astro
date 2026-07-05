@@ -1,0 +1,95 @@
+---
+/**
+ * Hand-drawn line-art illustrations. Strokes use .draw-path so the animation
+ * island can "draw" them in. `draw` adds data-draw (draw-on-scroll); hero
+ * doodles set draw={false} because the hero timeline drives them itself.
+ * `float` marks the doodle for the gentle floating loop.
+ */
+interface Props {
+  variant: 'laptop' | 'cloud' | 'database' | 'coffee' | 'envelope' | 'plane' | 'sparkle' | 'gear';
+  class?: string;
+  draw?: boolean;
+  float?: boolean;
+  strokeWidth?: number;
+}
+const { variant, class: className = '', draw = true, float = false, strokeWidth = 3 } = Astro.props;
+
+const doodles: Record<string, { viewBox: string; paths: string[] }> = {
+  laptop: {
+    viewBox: '0 0 160 120',
+    paths: [
+      'M24 14 C60 9, 100 9, 136 14 C138 36, 137 58, 134 78 C96 83, 62 83, 26 79 C23 57, 22 36, 24 14 Z',
+      'M14 84 C60 80, 102 80, 146 83 C144 89, 141 94, 137 97 C97 101, 63 101, 25 97 C20 93, 17 89, 14 84 Z',
+      'M62 32 C57 37, 52 42, 48 47 C53 51, 58 56, 62 60',
+      'M98 32 C103 37, 108 42, 112 47 C107 51, 102 56, 98 60',
+      'M86 28 C82 39, 78 51, 75 63',
+    ],
+  },
+  cloud: {
+    viewBox: '0 0 140 90',
+    paths: [
+      'M32 66 C14 66, 8 46, 25 40 C22 24, 42 14, 55 24 C60 8, 88 8, 94 24 C112 16, 128 32, 119 48 C132 52, 127 67, 112 66 C86 71, 54 71, 32 66 Z',
+      'M46 78 C54 80, 62 80, 70 79',
+      'M84 78 C90 79, 96 79, 102 78',
+    ],
+  },
+  database: {
+    viewBox: '0 0 100 120',
+    paths: [
+      'M16 24 C16 11, 84 11, 84 24 C84 37, 16 37, 16 24 Z',
+      'M16 24 C15 47, 15 70, 17 93 C18 106, 82 106, 83 93 C85 70, 85 47, 84 24',
+      'M16 50 C17 62, 83 62, 84 50',
+      'M17 74 C18 86, 82 86, 83 74',
+    ],
+  },
+  coffee: {
+    viewBox: '0 0 110 120',
+    paths: [
+      'M22 50 C21 74, 24 94, 32 102 C50 108, 64 106, 72 100 C79 88, 81 68, 80 50 C60 46, 42 46, 22 50 Z',
+      'M80 58 C97 53, 102 76, 82 84',
+      'M40 36 C36 28, 44 24, 40 14',
+      'M58 38 C54 30, 62 26, 58 16',
+    ],
+  },
+  envelope: {
+    viewBox: '0 0 140 100',
+    paths: [
+      'M13 20 C55 15, 90 15, 127 20 C130 45, 130 65, 127 84 C85 89, 50 89, 15 84 C11 62, 11 41, 13 20 Z',
+      'M15 22 C35 42, 55 56, 70 56 C85 56, 107 40, 125 22',
+    ],
+  },
+  plane: {
+    viewBox: '0 0 60 48',
+    paths: [
+      'M4 25 C20 19, 38 12, 54 6 C47 18, 41 30, 34 42 C31 37, 29 33, 26 28 C19 27, 11 26, 4 25 Z',
+      'M26 28 C35 21, 45 13, 54 6',
+    ],
+  },
+  sparkle: {
+    viewBox: '0 0 40 40',
+    paths: [
+      'M20 3 C22 12, 25 16, 34 20 C25 24, 22 28, 20 37 C18 28, 15 24, 6 20 C15 16, 18 12, 20 3 Z',
+    ],
+  },
+  gear: {
+    viewBox: '0 0 90 90',
+    paths: [
+      'M45 16 C52 16, 55 10, 55 10 C60 12, 65 15, 69 19 C69 19, 65 25, 69 30 C73 35, 80 34, 80 34 C81 39, 81 46, 80 51 C80 51, 73 51, 70 56 C67 61, 70 67, 70 67 C66 71, 61 74, 56 76 C56 76, 52 70, 45 70 C38 70, 34 76, 34 76 C29 74, 24 71, 20 67 C20 67, 24 61, 20 56 C17 51, 10 51, 10 51 C9 46, 9 39, 10 34 C10 34, 17 35, 21 30 C24 25, 21 19, 21 19 C25 15, 30 12, 35 10 C35 10, 38 16, 45 16 Z',
+      'M45 34 C52 34, 57 39, 57 45 C57 51, 51 56, 45 56 C39 56, 33 51, 33 45 C33 39, 38 34, 45 34 Z',
+    ],
+  },
+};
+
+const { viewBox, paths } = doodles[variant];
+---
+
+<svg
+  viewBox={viewBox}
+  class={`pointer-events-none ${className}`}
+  fill="none"
+  aria-hidden="true"
+  {...draw ? { 'data-draw': '' } : {}}
+  {...float ? { 'data-float': '' } : {}}
+>
+  {paths.map((d) => <path class="draw-path" d={d} stroke-width={strokeWidth} />)}
+</svg>

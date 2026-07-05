@@ -42,7 +42,7 @@ export interface Job {
   location: string;
   bullets: string[];
   /** phrases inside bullets to hand-annotate; type maps to rough-notation */
-  annotate?: { phrase: string; type: 'circle' | 'underline' | 'highlight' }[];
+  annotate?: { phrase: string; type: 'box' | 'underline' | 'highlight' }[];
 }
 
 export const experience: Job[] = [
@@ -98,7 +98,7 @@ export const experience: Job[] = [
       'Led full-stack maintenance of the YCare POS system — critical bug fixes, SQL optimisation, new features end-to-end.',
       'Sole developer on a cross-platform React Native app with a tRPC back-end for a Japanese client.',
     ],
-    annotate: [{ phrase: 'Sole developer', type: 'circle' }],
+    annotate: [{ phrase: 'Sole developer', type: 'highlight' }],
   },
 ];
 
