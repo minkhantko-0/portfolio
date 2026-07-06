@@ -6,7 +6,19 @@
  * `float` marks the doodle for the gentle floating loop.
  */
 interface Props {
-  variant: 'laptop' | 'cloud' | 'database' | 'coffee' | 'envelope' | 'plane' | 'sparkle' | 'gear';
+  variant:
+    | 'laptop'
+    | 'cloud'
+    | 'database'
+    | 'coffee'
+    | 'envelope'
+    | 'plane'
+    | 'sparkle'
+    | 'gear'
+    | 'rocket'
+    | 'lightbulb'
+    | 'gradcap'
+    | 'brackets';
   class?: string;
   draw?: boolean;
   float?: boolean;
@@ -69,6 +81,43 @@ const doodles: Record<string, { viewBox: string; paths: string[] }> = {
     viewBox: '0 0 40 40',
     paths: [
       'M20 3 C22 12, 25 16, 34 20 C25 24, 22 28, 20 37 C18 28, 15 24, 6 20 C15 16, 18 12, 20 3 Z',
+    ],
+  },
+  rocket: {
+    viewBox: '0 0 100 140',
+    paths: [
+      'M50 8 C62 24, 68 48, 66 76 C60 84, 40 84, 34 76 C32 48, 38 24, 50 8 Z',
+      'M50 32 C56 32, 60 37, 60 42 C60 48, 55 52, 50 52 C45 52, 40 48, 40 42 C40 37, 44 32, 50 32 Z',
+      'M34 70 C24 78, 20 92, 22 104 C28 95, 34 90, 37 85',
+      'M66 70 C76 78, 80 92, 78 104 C72 95, 66 90, 63 85',
+      'M44 92 C46 103, 48 112, 50 122 C52 112, 54 103, 56 92',
+    ],
+  },
+  lightbulb: {
+    viewBox: '0 0 90 120',
+    paths: [
+      'M45 12 C64 12, 75 27, 73 44 C71 57, 62 63, 58 74 C50 76, 40 76, 32 74 C28 63, 19 57, 17 44 C15 27, 26 12, 45 12 Z',
+      'M35 85 C42 87, 49 87, 55 85',
+      'M37 95 C42 97, 48 97, 53 95',
+      'M8 42 C11 42, 14 42, 17 42',
+      'M73 42 C76 42, 79 42, 82 42',
+      'M45 0 C45 3, 45 5, 45 8',
+    ],
+  },
+  gradcap: {
+    viewBox: '0 0 120 90',
+    paths: [
+      'M60 10 C78 17, 95 25, 112 34 C95 42, 78 50, 60 57 C42 50, 25 42, 8 34 C25 25, 42 17, 60 10 Z',
+      'M36 46 C36 60, 44 69, 60 69 C76 69, 84 60, 84 46',
+      'M112 34 C112 42, 112 50, 112 57 C112 62, 109 66, 105 68',
+    ],
+  },
+  brackets: {
+    viewBox: '0 0 120 80',
+    paths: [
+      'M42 8 C30 10, 32 25, 26 32 C22 36, 18 38, 15 40 C18 42, 22 44, 26 48 C32 55, 30 68, 42 72',
+      'M78 8 C90 10, 88 25, 94 32 C98 36, 102 38, 105 40 C102 42, 98 44, 94 48 C88 55, 90 68, 78 72',
+      'M66 14 C61 30, 57 47, 53 66',
     ],
   },
   gear: {

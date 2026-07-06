@@ -1,6 +1,7 @@
 ---
 import { experience } from '../data/resume';
 import SectionHeading from './SectionHeading.astro';
+import Doodle from './Doodle.astro';
 
 /** wrap annotated phrases in <span data-annotate> for rough-notation */
 function annotateBullet(bullet: string, annotations?: { phrase: string; type: string }[]) {
@@ -15,7 +16,10 @@ function annotateBullet(bullet: string, annotations?: { phrase: string; type: st
 }
 ---
 
-<section class="mx-auto max-w-4xl px-6 py-24" aria-labelledby="experience">
+<section class="relative mx-auto max-w-4xl px-6 py-24" aria-labelledby="experience">
+  <div data-parallax="16" class="absolute -top-2 right-8 hidden lg:block">
+    <Doodle variant="rocket" class="w-16 rotate-12 text-ink-soft" float />
+  </div>
   <SectionHeading id="experience" label="Experience" aside="4+ years and counting…" />
 
   <div class="relative">
@@ -38,7 +42,7 @@ function annotateBullet(bullet: string, annotations?: { phrase: string; type: st
     <ol class="space-y-14 sm:pl-12">
       {
         experience.map((job, i) => (
-          <li class="group relative" data-reveal={i % 2 ? "right" : "left"}>
+          <li class="group relative" data-reveal={i % 2 ? "arc-right" : "arc-left"}>
             <span
               class="absolute -left-[45px] top-2 hidden size-4 rounded-full border-2 border-accent bg-paper transition-all duration-200 group-hover:scale-150 group-hover:bg-accent sm:block"
               aria-hidden="true"

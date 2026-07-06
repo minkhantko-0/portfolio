@@ -15,13 +15,13 @@ export const profile = {
 /** lon/lat markers for the hero map (projected at build time); dx/dy are label offsets in px */
 export const mapMarkers = {
   clients: [
-    { name: 'Myanmar', id: '104', lon: 96.0, lat: 21.0, dx: -74, dy: -8 },
-    { name: 'Japan', id: '392', lon: 138.2, lat: 36.2, dx: 14, dy: -4 },
-    { name: 'Singapore', id: '702', lon: 103.8, lat: 1.35, dx: 12, dy: 18 },
-    { name: 'France', id: '250', lon: 2.2, lat: 46.6, dx: -64, dy: -10 },
-    { name: 'Israel', id: '376', lon: 34.9, lat: 31.4, dx: -16, dy: 26 },
+    { name: 'Myanmar', id: '104', lon: 96.0, lat: 21.0, dx: -84, dy: -10, client: 'KBZ Bank · MyanCare' },
+    { name: 'Japan', id: '392', lon: 138.2, lat: 36.2, dx: 16, dy: -4, client: 'a private client' },
+    { name: 'Singapore', id: '702', lon: 103.8, lat: 1.35, dx: 14, dy: 20, client: 'Partipost' },
+    { name: 'France', id: '250', lon: 2.2, lat: 46.6, dx: 14, dy: -10, client: 'B4Purpose' },
+    { name: 'Israel', id: '376', lon: 34.9, lat: 31.4, dx: -18, dy: 28, client: 'TwoSteps.ai' },
   ],
-  home: { name: 'Thailand', id: '764', lon: 100.9, lat: 15.3, dx: 16, dy: -6 },
+  home: { name: 'Thailand', id: '764', lon: 100.9, lat: 15.3, dx: -64, dy: 40, client: 'I’m currently here' },
 };
 
 export const highlights = [

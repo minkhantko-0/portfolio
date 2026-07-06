@@ -107,42 +107,76 @@ if (!prefersReducedMotion) {
     gsap.to('.scroll-cue', { y: 9, duration: 0.8, ease: 'sine.inOut', yoyo: true, repeat: -1 });
   });
 
-  // ---------- scroll reveals: batched so groups cascade in together ----------
-  const reveals: Record<string, gsap.TweenVars> = {
-    up: { y: 90, rotation: 2 },
-    left: { x: -110, rotation: -3 },
-    right: { x: 110, rotation: 3 },
-    pop: { scale: 0.5, rotation: -8, y: 50 },
+  // ---------- scroll reveals: per-variant choreography, not one straight slide ----------
+  const initialPose: Record<string, () => gsap.TweenVars> = {
+    up: () => ({ y: gsap.utils.random(55, 100), rotation: gsap.utils.random(-3, 3) }),
+    left: () => ({ x: -110, skewX: 7, rotation: -2 }),
+    right: () => ({ x: 110, skewX: -7, rotation: 2 }),
+    'arc-left': () => ({ x: -130, y: 80, rotation: -6 }),
+    'arc-right': () => ({ x: 130, y: 80, rotation: 6 }),
+    pop: () => ({ scale: 0.5, rotation: -8, y: 50 }),
+    flip: () => ({ rotationX: -60, transformPerspective: 700, transformOrigin: '50% 0%', y: 40 }),
   };
   gsap.utils.toArray<HTMLElement>('[data-reveal]').forEach((el) => {
-    gsap.set(el, { opacity: 0, ...reveals[el.dataset.reveal || 'up'] });
+    gsap.set(el, { opacity: 0, ...(initialPose[el.dataset.reveal || 'up'] || initialPose.up)() });
   });
+
+  function revealIn(el: HTMLElement, delay: number) {
+    const variant = el.dataset.reveal || 'up';
+    if (variant === 'arc-left' || variant === 'arc-right') {
+      // curved entry: overshoot past the resting point, then swing back
+      const dir = variant === 'arc-right' ? 1 : -1;
+      gsap
+        .timeline({ delay })
+        .to(el, { opacity: 1, x: dir * -14, y: -14, rotation: dir * -2, duration: 0.65, ease: 'power2.out' })
+        .to(el, { x: 0, y: 0, rotation: 0, duration: 0.45, ease: 'power3.out' });
+    } else if (variant === 'flip') {
+      gsap.to(el, { opacity: 1, rotationX: 0, y: 0, duration: 1.1, delay, ease: 'power4.out' });
+    } else if (variant === 'pop') {
+      gsap.to(el, { opacity: 1, scale: 1, rotation: 0, y: 0, duration: 0.9, delay, ease: 'back.out(1.9)' });
+    } else {
+      gsap.to(el, { opacity: 1, x: 0, y: 0, rotation: 0, skewX: 0, duration: 1, delay, ease: 'power4.out' });
+    }
+    // child choreography: skill icons wind up and spin in, chips scatter-cascade
+    el.querySelectorAll<SVGElement>('.skill-icon').forEach((icon) => {
+      gsap.fromTo(
+        icon,
+        { rotation: -140, scale: 0, transformOrigin: '50% 50%' },
+        { rotation: 0, scale: 1, duration: 1.2, delay: delay + 0.15, ease: 'elastic.out(1, 0.45)' }
+      );
+    });
+    const chips = el.querySelectorAll('.chip-pop');
+    if (chips.length) {
+      gsap.fromTo(
+        chips,
+        { scale: 0, y: 14, rotation: () => gsap.utils.random(-10, 10) },
+        {
+          scale: 1,
+          y: 0,
+          rotation: 0,
+          duration: 0.5,
+          delay: delay + 0.2,
+          ease: 'back.out(2.4)',
+          stagger: { each: 0.035, from: 'random' },
+        }
+      );
+    }
+  }
+
   ScrollTrigger.batch('[data-reveal]', {
     start: 'top 88%',
     once: true,
-    onEnter: (batch) =>
-      batch.forEach((el, i) => {
-        const variant = (el as HTMLElement).dataset.reveal || 'up';
-        gsap.to(el, {
-          opacity: 1,
-          x: 0,
-          y: 0,
-          scale: 1,
-          rotation: 0,
-          duration: 0.9,
-          delay: i * 0.1,
-          ease: variant === 'pop' ? 'back.out(1.9)' : 'power3.out',
-        });
-      }),
+    onEnter: (batch) => batch.forEach((el, i) => revealIn(el as HTMLElement, i * 0.1)),
   });
 
   // ---------- scrub-settled elements: fly in tied to scroll, reversible ----------
   gsap.utils.toArray<HTMLElement>('[data-settle]').forEach((el, i) => {
     gsap.fromTo(
       el,
-      { y: 100, rotation: i % 2 ? 8 : -8, scale: 0.9, opacity: 0 },
+      { y: 110, x: i % 2 ? 44 : -44, rotation: i % 2 ? 9 : -9, scale: 0.88, opacity: 0 },
       {
         y: 0,
+        x: 0,
         rotation: 0,
         scale: 1,
         opacity: 1,
@@ -230,6 +264,39 @@ if (!prefersReducedMotion) {
       scrollTrigger: { trigger: '#plane-divider', start: 'top 95%', end: 'top 20%', scrub: 0.6 },
     });
   }
+}
+
+// ---------- map tooltip: hover a country/pin to see who I shipped for ----------
+const tip = document.getElementById('map-tip');
+const tipWrap = document.querySelector<HTMLElement>('.hero-doodles');
+if (tip && tipWrap) {
+  const countryEl = tip.querySelector<HTMLElement>('[data-tip-country]')!;
+  const clientEl = tip.querySelector<HTMLElement>('[data-tip-client]')!;
+  const xTo = gsap.quickTo(tip, 'x', { duration: 0.18, ease: 'power2.out' });
+  const yTo = gsap.quickTo(tip, 'y', { duration: 0.18, ease: 'power2.out' });
+  gsap.set(tip, { scale: 0.6, transformOrigin: 'left top', rotation: -3 });
+
+  document.querySelectorAll<SVGElement>('[data-client]').forEach((el) => {
+    el.addEventListener('mouseenter', () => {
+      countryEl.textContent = el.dataset.country || '';
+      clientEl.textContent = el.dataset.client || '';
+      gsap.to(tip, {
+        autoAlpha: 1,
+        scale: 1,
+        rotation: 0,
+        duration: prefersReducedMotion ? 0 : 0.25,
+        ease: 'back.out(2.2)',
+      });
+    });
+    el.addEventListener('mouseleave', () => {
+      gsap.to(tip, { autoAlpha: 0, scale: 0.6, rotation: -3, duration: prefersReducedMotion ? 0 : 0.18 });
+    });
+    el.addEventListener('mousemove', (e) => {
+      const r = tipWrap.getBoundingClientRect();
+      xTo((e as MouseEvent).clientX - r.left + 16);
+      yTo((e as MouseEvent).clientY - r.top + 18);
+    });
+  });
 }
 
 // ---------- rough-notation: hand-drawn underlines/highlights on key phrases ----------

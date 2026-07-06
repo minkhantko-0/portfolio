@@ -44,6 +44,18 @@ body {
   }
 }
 
+/* countries with clients invite a hover */
+.map-country[data-client] {
+  cursor: pointer;
+  transition: stroke-width 0.15s ease;
+}
+.map-country[data-client]:hover {
+  stroke-width: 2.6;
+}
+g.map-pin[data-client] {
+  cursor: pointer;
+}
+
 /* map pins grow on hover (GSAP owns the <g>, CSS owns the dot) */
 .pin-dot {
   transform-box: fill-box;

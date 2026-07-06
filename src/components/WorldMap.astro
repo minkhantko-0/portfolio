@@ -1,49 +1,68 @@
 ---
 /**
- * Real-geometry world map (world-atlas 110m TopoJSON + d3-geo), projected and
- * rendered to static SVG at BUILD time — the browser downloads plain markup,
- * no map library ships to the client. A turbulence-displacement filter gives
- * the strokes a scratchy hand-inked look; highlighted countries get a hatch
- * fill. Pins/labels animate via .map-pin/.map-label in the hero timeline;
- * countries fade in with .map-country.
+ * Real-geometry map (world-atlas 110m + d3-geo), projected at BUILD time to
+ * static SVG — no map library ships to the client. Cropped to the
+ * Europe→Asia→Oceania band where the clients are, so countries render big.
+ * Scratchy ink via displacement filter; hatch fills on highlighted countries.
+ * Countries/pins with data-client get a hover tooltip (wired in animations.ts).
  */
-import { geoNaturalEarth1, geoPath } from 'd3-geo';
+import { geoNaturalEarth1, geoPath, geoCentroid } from 'd3-geo';
 import { feature } from 'topojson-client';
 // @ts-ignore - json module
 import world110m from 'world-atlas/countries-110m.json';
 import { mapMarkers } from '../data/resume';
 
 const W = 800;
-const H = 430;
+
+// crop window: western Europe to Japan, north Africa to Australia
+const region = {
+  type: 'Polygon',
+  coordinates: [[[-10, 62], [155, 62], [155, -14], [-10, -14], [-10, 62]]],
+} as never;
+
+const projection = geoNaturalEarth1();
+projection.fitWidth(W, region);
+let toPath = geoPath(projection);
+// shift so the crop window's top-left sits at the SVG origin
+const b = toPath.bounds(region);
+const H = Math.ceil(b[1][1] - b[0][1]);
+const [tx, ty] = projection.translate();
+projection.translate([tx - b[0][0], ty - b[0][1]]);
+toPath = geoPath(projection);
 
 // @ts-ignore - topojson types
 const countries = (
   feature(world110m, world110m.objects.countries).features as Array<{
     id: string;
+    properties: { name: string };
     geometry: object;
   }>
-).filter((c) => String(c.id) !== '010'); // skip Antarctica
-
-const projection = geoNaturalEarth1().fitSize([W, H], {
-  type: 'FeatureCollection',
-  features: countries,
-} as never);
-const toPath = geoPath(projection);
+).filter((c) => {
+  const [lon, lat] = geoCentroid(c as never);
+  return lon > -12 && lon < 172 && lat > -15 && lat < 68;
+});
 
 // trim path precision — halves the inline SVG payload
 const round = (d: string) => d.replace(/\d+\.\d+/g, (m) => (+m).toFixed(1));
 
-const clientIds = new Set(mapMarkers.clients.map((c) => c.id));
+const markerById = new Map(
+  [...mapMarkers.clients, mapMarkers.home].map((m) => [m.id, m])
+);
 const homeId = mapMarkers.home.id;
 
 const shapes = countries
   .map((c) => {
     const d = toPath(c as never);
     if (!d) return null;
-    const kind = String(c.id) === homeId ? 'home' : clientIds.has(String(c.id)) ? 'client' : 'base';
-    return { d: round(d), kind };
+    const marker = markerById.get(String(c.id));
+    const kind = !marker ? 'base' : String(c.id) === homeId ? 'home' : 'client';
+    return { d: round(d), kind, marker };
   })
-  .filter(Boolean) as { d: string; kind: 'home' | 'client' | 'base' }[];
+  .filter(Boolean) as {
+  d: string;
+  kind: 'home' | 'client' | 'base';
+  marker?: (typeof mapMarkers.clients)[number];
+}[];
 
 const project = (m: { lon: number; lat: number }) => {
   const [x, y] = projection([m.lon, m.lat]) ?? [0, 0];
@@ -54,84 +73,89 @@ const pins = mapMarkers.clients.map((m) => ({ ...m, ...project(m) }));
 const home = { ...mapMarkers.home, ...project(mapMarkers.home) };
 ---
 
-<svg
-  viewBox={`0 0 ${W} ${H}`}
-  fill="none"
-  class="w-full overflow-visible"
-  aria-label="World map of client countries: Myanmar, Japan, Singapore, France, Israel — currently based in Thailand"
-  role="img"
->
-  <defs>
-    <!-- scratchy ink: jitter every stroke with fractal noise -->
-    <filter id="scratch" x="-5%" y="-5%" width="110%" height="110%">
-      <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="3" seed="7" result="noise" />
-      <feDisplacementMap in="SourceGraphic" in2="noise" scale="4" />
-    </filter>
-    <!-- hand-hatched fills -->
-    <pattern id="hatch-client" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(-42)">
-      <path d="M0 0v6" stroke="#d9480f" stroke-width="1.6" opacity="0.75" />
-    </pattern>
-    <pattern id="hatch-home" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(38)">
-      <path d="M0 0v5" stroke="#e5a50a" stroke-width="2" opacity="0.9" />
-    </pattern>
-  </defs>
+<div class="overflow-hidden">
+  <svg
+    viewBox={`0 0 ${W} ${H}`}
+    fill="none"
+    class="w-full"
+    aria-label="Map of client countries: Myanmar, Japan, Singapore, France, Israel — currently based in Thailand"
+    role="img"
+  >
+    <defs>
+      <!-- scratchy ink: jitter every stroke with fractal noise -->
+      <filter id="scratch" x="-5%" y="-5%" width="110%" height="110%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="3" seed="7" result="noise" />
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="4" />
+      </filter>
+      <!-- hand-hatched fills -->
+      <pattern id="hatch-client" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(-42)">
+        <path d="M0 0v7" stroke="#d9480f" stroke-width="1.8" opacity="0.75" />
+      </pattern>
+      <pattern id="hatch-home" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(38)">
+        <path d="M0 0v6" stroke="#e5a50a" stroke-width="2.2" opacity="0.9" />
+      </pattern>
+    </defs>
 
-  <g filter="url(#scratch)">
-    {
-      shapes.map((s) =>
-        s.kind === 'base' ? (
-          <path class="map-country" d={s.d} fill="#ffffff66" stroke="#5c554a" stroke-opacity="0.55" stroke-width="0.7" />
-        ) : (
-          <path
-            class="map-country"
-            d={s.d}
-            fill={s.kind === 'home' ? 'url(#hatch-home)' : 'url(#hatch-client)'}
-            stroke={s.kind === 'home' ? '#26221b' : '#d9480f'}
-            stroke-width="1.4"
-          />
+    <g filter="url(#scratch)">
+      {
+        shapes.map((s) =>
+          s.kind === 'base' ? (
+            <path class="map-country" d={s.d} fill="#ffffff66" stroke="#5c554a" stroke-opacity="0.55" stroke-width="0.8" />
+          ) : (
+            <path
+              class="map-country"
+              data-country={s.marker!.name}
+              data-client={s.marker!.client}
+              d={s.d}
+              fill={s.kind === 'home' ? 'url(#hatch-home)' : 'url(#hatch-client)'}
+              stroke={s.kind === 'home' ? '#26221b' : '#d9480f'}
+              stroke-width="1.6"
+            />
+          )
         )
-      )
+      }
+    </g>
+
+    <!-- client pins -->
+    {
+      pins.map((c) => (
+        <g class="map-pin" data-country={c.name} data-client={c.client}>
+          <circle class="pin-dot" cx={c.x} cy={c.y} r="7" fill="#d9480f" stroke="#faf8f2" stroke-width="2" />
+          <text
+            class="map-label hand"
+            x={c.x + c.dx}
+            y={c.y + c.dy}
+            font-size="19"
+            fill="#5c554a"
+            style="font-family: var(--font-hand)"
+          >
+            {c.name}
+          </text>
+        </g>
+      ))
     }
-  </g>
 
-  <!-- client pins -->
-  {
-    pins.map((c) => (
-      <g class="map-pin">
-        <circle class="pin-dot" cx={c.x} cy={c.y} r="6" fill="#d9480f" stroke="#faf8f2" stroke-width="2" />
-        <text
-          class="map-label hand"
-          x={c.x + c.dx}
-          y={c.y + c.dy}
-          font-size="17"
-          fill="#5c554a"
-          style="font-family: var(--font-hand)"
-        >
-          {c.name}
-        </text>
-      </g>
-    ))
-  }
-
-  <!-- home base: Thailand -->
-  <circle class="pin-home-ring" cx={home.x} cy={home.y} r="11" stroke="#d9a90f" stroke-width="2.5" />
-  <g class="map-pin">
-    <circle class="pin-dot" cx={home.x} cy={home.y} r="6.5" fill="#ffd43b" stroke="#26221b" stroke-width="2" />
-    <text
-      class="map-label hand"
-      x={home.x + home.dx}
-      y={home.y + home.dy}
-      font-size="18"
-      font-weight="600"
-      fill="#26221b"
-      style="font-family: var(--font-hand)"
-    >
-      {home.name} — I’m here!
-    </text>
-  </g>
-</svg>
+    <!-- home base: Thailand -->
+    <circle class="pin-home-ring" cx={home.x} cy={home.y} r="12" stroke="#d9a90f" stroke-width="2.5" />
+    <g class="map-pin" data-country={home.name} data-client={home.client}>
+      <circle class="pin-dot" cx={home.x} cy={home.y} r="7.5" fill="#ffd43b" stroke="#26221b" stroke-width="2" />
+      <text
+        class="map-label hand"
+        x={home.x + home.dx}
+        y={home.y + home.dy}
+        font-size="20"
+        font-weight="600"
+        fill="#26221b"
+        style="font-family: var(--font-hand)"
+      >
+        {home.name} — I’m here!
+      </text>
+    </g>
+  </svg>
+</div>
 
 <p class="map-label hand mt-3 text-center text-lg text-ink-soft">
   <span class="mx-1 inline-block size-3 rounded-full bg-accent align-baseline"></span> clients I’ve shipped for
   <span class="mx-1 ml-5 inline-block size-3 rounded-full border-2 border-ink bg-marker align-baseline"></span> currently based
+  <span class="ml-3 text-base">(hover a country!)</span>
 </p>

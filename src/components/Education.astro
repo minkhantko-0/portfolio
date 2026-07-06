@@ -1,9 +1,13 @@
 ---
 import { education, languages } from '../data/resume';
 import SectionHeading from './SectionHeading.astro';
+import Doodle from './Doodle.astro';
 ---
 
-<section class="mx-auto max-w-4xl px-6 py-24" aria-labelledby="education">
+<section class="relative mx-auto max-w-4xl px-6 py-24" aria-labelledby="education">
+  <div data-parallax="14" class="absolute right-10 top-10 hidden lg:block">
+    <Doodle variant="gradcap" class="w-20 rotate-6 text-ink-soft" float />
+  </div>
   <SectionHeading id="education" label="Education & Languages" aside="where it started" />
 
   <div data-reveal="up">

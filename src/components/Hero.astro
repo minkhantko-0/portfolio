@@ -5,11 +5,11 @@ import Doodle from './Doodle.astro';
 import WorldMap from './WorldMap.astro';
 ---
 
-<header class="relative mx-auto grid min-h-[92svh] max-w-6xl items-center gap-12 px-6 py-20 lg:grid-cols-[1fr_1.1fr]">
+<header class="relative mx-auto grid min-h-[92svh] max-w-6xl items-center gap-10 px-6 pb-32 pt-20 lg:grid-cols-[0.85fr_1.15fr]">
   <div class="relative z-10">
     <p class="hand hero-in hero-greeting mb-3 text-2xl text-accent sm:text-3xl">hi, I’m</p>
 
-    <h1 class="hero-in hero-name hand text-5xl font-bold sm:text-7xl">{profile.name}</h1>
+    <h1 class="hero-in hero-name hand whitespace-nowrap text-[clamp(2.6rem,4.6vw,4rem)] font-bold leading-tight">{profile.name}</h1>
     <!-- hand-drawn double underline, drawn after the letters land -->
     <svg id="hero-underline" viewBox="0 0 420 26" class="mt-1 h-6 w-full max-w-xl text-accent" fill="none" aria-hidden="true">
       <path class="draw-path" stroke-width="3.5" d="M6 10 C80 4, 200 4, 300 8 C350 10, 390 12, 414 14" />
@@ -65,11 +65,16 @@ import WorldMap from './WorldMap.astro';
   </div>
 
   <!-- hand-drawn world map: where the work went -->
-  <div class="hero-in hero-doodles relative mx-auto hidden w-full max-w-2xl lg:block" data-parallax="7" aria-hidden="false">
+  <div class="hero-in hero-doodles relative mx-auto hidden w-full lg:block" data-parallax="7" aria-hidden="false">
     <WorldMap />
     <Doodle variant="sparkle" class="twinkle absolute -left-2 top-2 w-6 text-accent" draw={false} strokeWidth={4} />
     <Doodle variant="sparkle" class="twinkle absolute bottom-24 right-2 w-5 text-marker" draw={false} strokeWidth={4} />
     <Doodle variant="plane" class="absolute -top-4 right-16 w-14 text-accent" draw={false} float />
+    <!-- hover tooltip for map countries; positioned by animations.ts -->
+    <div id="map-tip" class="pointer-events-none invisible absolute left-0 top-0 z-20 rounded-lg border border-line bg-white/95 px-3 py-2 opacity-0 shadow-[3px_4px_12px_rgba(38,34,27,0.15)]">
+      <p class="hand text-base font-semibold text-accent" data-tip-country></p>
+      <p class="hand text-lg text-ink" data-tip-client></p>
+    </div>
   </div>
 
   <!-- scroll cue -->
