@@ -205,6 +205,19 @@ if (!prefersReducedMotion) {
     );
   });
 
+  // ---------- scroll ball: rolls down its dashed track with page progress ----------
+  const ballTrack = document.getElementById('scroll-track');
+  const ball = document.getElementById('scroll-ball');
+  if (ballTrack && ball) {
+    gsap.to(ball, {
+      y: () => ballTrack.clientHeight - ball.clientHeight,
+      rotation: 1080,
+      transformOrigin: '50% 50%',
+      ease: 'none',
+      scrollTrigger: { start: 0, end: 'max', scrub: 0.4, invalidateOnRefresh: true },
+    });
+  }
+
   // ---------- velocity skew: the page leans with fast scrolling ----------
   const skewSetter = gsap.quickSetter('main', 'skewY', 'deg');
   const skewClamp = gsap.utils.clamp(-1.6, 1.6);

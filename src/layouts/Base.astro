@@ -67,7 +67,7 @@ const jsonLd = {
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
 
-    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
     <script is:inline>
       // mark JS availability before first paint so .reveal hiding only applies with JS
       document.documentElement.classList.add('js');

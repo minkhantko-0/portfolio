@@ -1,0 +1,18 @@
+---
+/**
+ * Fixed dashed track at the right edge; a hand-drawn ball rolls down it as
+ * the visitor scrolls (position + spin scrubbed in animations.ts).
+ */
+import Doodle from './Doodle.astro';
+---
+
+<div
+  id="scroll-track"
+  class="pointer-events-none fixed right-5 top-[13vh] z-40 hidden h-[72vh] w-7 lg:block"
+  aria-hidden="true"
+>
+  <div class="absolute left-1/2 h-full -translate-x-1/2 border-l-2 border-dashed border-line"></div>
+  <div id="scroll-ball" class="absolute left-0 top-0 w-7">
+    <Doodle variant="ball" class="w-7 text-accent" draw={false} strokeWidth={3} />
+  </div>
+</div>

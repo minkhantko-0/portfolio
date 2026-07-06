@@ -15,6 +15,7 @@ interface Props {
     | 'plane'
     | 'sparkle'
     | 'gear'
+    | 'ball'
     | 'rocket'
     | 'lightbulb'
     | 'gradcap'
@@ -81,6 +82,14 @@ const doodles: Record<string, { viewBox: string; paths: string[] }> = {
     viewBox: '0 0 40 40',
     paths: [
       'M20 3 C22 12, 25 16, 34 20 C25 24, 22 28, 20 37 C18 28, 15 24, 6 20 C15 16, 18 12, 20 3 Z',
+    ],
+  },
+  ball: {
+    viewBox: '0 0 40 40',
+    paths: [
+      'M20 3 C30 3, 37 10, 37 20 C37 30, 30 37, 20 37 C10 37, 3 30, 3 20 C3 10, 10 3, 20 3 Z',
+      'M6 13 C14 19, 26 19, 34 13',
+      'M6 27 C14 21, 26 21, 34 27',
     ],
   },
   rocket: {
