@@ -29,6 +29,10 @@ if (!prefersReducedMotion) {
   gsap.set('.hero-note', { x: -24 });
   gsap.set('.map-pin', { scale: 0, transformOrigin: '50% 50%' });
   gsap.set('.map-label, .pin-home-ring', { opacity: 0 });
+  gsap.set('.map-country', { opacity: 0 });
+  // main gets a transform NOW so rough-notation SVGs anchor to it from the
+  // start (the velocity skew below would otherwise re-anchor them later)
+  gsap.set('main', { skewY: 0.001, transformOrigin: '50% 50%', force3D: true });
 
   // ---------- hero entrance (runs once fonts are ready so SplitText measures right) ----------
   document.fonts.ready.then(() => {
@@ -60,6 +64,8 @@ if (!prefersReducedMotion) {
       .to('.hero-cta', { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: 'back.out(1.8)' }, '-=0.3')
       .to('.hero-doodles', { opacity: 1, duration: 0.01 }, '-=0.7')
       .to(doodlePaths, { strokeDashoffset: 0, duration: 1, stagger: 0.05, ease: 'power1.inOut' }, '<')
+      // countries scratch in, in random order, like quick pen strokes
+      .to('.map-country', { opacity: 1, duration: 0.3, stagger: { each: 0.006, from: 'random' } }, '<')
       .to('.map-pin', { scale: 1, duration: 0.45, stagger: 0.13, ease: 'back.out(2.5)' }, '-=0.6')
       .to('.map-label', { opacity: 1, duration: 0.4, stagger: 0.08 }, '-=0.6')
       .to('.pin-home-ring', { opacity: 1, duration: 0.3 }, '-=0.3')
@@ -103,10 +109,10 @@ if (!prefersReducedMotion) {
 
   // ---------- scroll reveals: batched so groups cascade in together ----------
   const reveals: Record<string, gsap.TweenVars> = {
-    up: { y: 64, rotation: 1.5 },
-    left: { x: -80, rotation: -1.5 },
-    right: { x: 80, rotation: 1.5 },
-    pop: { scale: 0.6, rotation: -5, y: 30 },
+    up: { y: 90, rotation: 2 },
+    left: { x: -110, rotation: -3 },
+    right: { x: 110, rotation: 3 },
+    pop: { scale: 0.5, rotation: -8, y: 50 },
   };
   gsap.utils.toArray<HTMLElement>('[data-reveal]').forEach((el) => {
     gsap.set(el, { opacity: 0, ...reveals[el.dataset.reveal || 'up'] });
@@ -123,11 +129,66 @@ if (!prefersReducedMotion) {
           y: 0,
           scale: 1,
           rotation: 0,
-          duration: 0.8,
-          delay: i * 0.09,
-          ease: variant === 'pop' ? 'back.out(1.7)' : 'power3.out',
+          duration: 0.9,
+          delay: i * 0.1,
+          ease: variant === 'pop' ? 'back.out(1.9)' : 'power3.out',
         });
       }),
+  });
+
+  // ---------- scrub-settled elements: fly in tied to scroll, reversible ----------
+  gsap.utils.toArray<HTMLElement>('[data-settle]').forEach((el, i) => {
+    gsap.fromTo(
+      el,
+      { y: 100, rotation: i % 2 ? 8 : -8, scale: 0.9, opacity: 0 },
+      {
+        y: 0,
+        rotation: 0,
+        scale: 1,
+        opacity: 1,
+        ease: 'none',
+        scrollTrigger: { trigger: el, start: 'top 98%', end: 'top 55%', scrub: 0.6 },
+      }
+    );
+  });
+
+  // ---------- parallax drift for decorative layers ----------
+  gsap.utils.toArray<HTMLElement>('[data-parallax]').forEach((el) => {
+    const strength = parseFloat(el.dataset.parallax || '12');
+    gsap.fromTo(
+      el,
+      { yPercent: strength },
+      {
+        yPercent: -strength,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: el.closest('section, header, footer') || el,
+          start: 'top bottom',
+          end: 'bottom top',
+          scrub: 0.6,
+        },
+      }
+    );
+  });
+
+  // ---------- velocity skew: the page leans with fast scrolling ----------
+  const skewSetter = gsap.quickSetter('main', 'skewY', 'deg');
+  const skewClamp = gsap.utils.clamp(-1.6, 1.6);
+  const skewProxy = { skew: 0 };
+  ScrollTrigger.create({
+    onUpdate(self) {
+      const skew = skewClamp(self.getVelocity() / -400);
+      if (Math.abs(skew) > Math.abs(skewProxy.skew)) {
+        skewProxy.skew = skew;
+        gsap.to(skewProxy, {
+          skew: 0,
+          duration: 0.8,
+          ease: 'power3.out',
+          overwrite: true,
+          onUpdate: () => skewSetter(skewProxy.skew),
+        });
+      }
+    },
   });
 
   // ---------- hand-drawn arrows & doodles: draw strokes on entering viewport ----------

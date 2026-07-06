@@ -13,51 +13,55 @@ const rest = projects.filter((p) => !p.flagship);
 
   {
     flagship && (
-      <article class="relative mb-14 rounded-xl border-2 border-accent bg-white/70 p-6 sm:p-8" data-reveal="pop">
+      <article class="relative mb-14 rounded-xl border-2 border-accent bg-white/70" data-reveal="pop">
         <div class="pointer-events-none absolute -top-12 right-4 hidden sm:block">
           <p class="hand rotate-3 text-xl text-accent">{flagship.note}</p>
           <HandArrow variant="down" class="ml-16 h-10 w-6 text-accent" />
         </div>
         <Doodle variant="sparkle" class="twinkle absolute -left-4 -top-4 w-8 text-marker" strokeWidth={4} draw={false} />
         <Doodle variant="sparkle" class="twinkle absolute -bottom-3 right-10 w-6 text-accent" strokeWidth={4} draw={false} />
-        <h3 class="text-xl font-bold sm:text-2xl">{flagship.name}</h3>
-        <p class="mt-3 max-w-3xl leading-relaxed text-ink-soft">{flagship.description}</p>
-        <ul class="mt-4 flex flex-wrap gap-2">
-          {flagship.tech.map((t) => (
-            <li class="rounded-full border border-line bg-paper px-3 py-1 text-xs font-medium text-ink-soft">{t}</li>
-          ))}
-        </ul>
+        <div class="p-6 transition-transform duration-200 hover:-translate-y-1 sm:p-8">
+          <h3 class="text-xl font-bold sm:text-2xl">{flagship.name}</h3>
+          <p class="mt-3 max-w-3xl leading-relaxed text-ink-soft">{flagship.description}</p>
+          <ul class="mt-4 flex flex-wrap gap-2">
+            {flagship.tech.map((t) => (
+              <li class="chip rounded-full border border-line bg-paper px-3 py-1 text-xs font-medium text-ink-soft">{t}</li>
+            ))}
+          </ul>
+        </div>
       </article>
     )
   }
 
   <div class="grid gap-x-12 sm:grid-cols-2">
     {
-      rest.map((p) => (
-        <article class="border-b border-dashed border-line py-6" data-reveal="up">
-          <div class="flex flex-wrap items-baseline gap-x-3">
-            <h3 class="text-lg font-bold">
-              {p.link ? (
-                <a
-                  href={p.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="underline decoration-accent decoration-2 underline-offset-4 hover:text-accent"
-                >
-                  {p.name} ↗
-                </a>
-              ) : (
-                p.name
-              )}
-            </h3>
-            {p.note && <p class="hand text-base text-accent">{p.note}!</p>}
+      rest.map((p, i) => (
+        <article class="group border-b border-dashed border-line py-6" data-reveal={i % 2 ? 'right' : 'left'}>
+          <div class="transition-transform duration-200 group-hover:translate-x-2">
+            <div class="flex flex-wrap items-baseline gap-x-3">
+              <h3 class="text-lg font-bold">
+                {p.link ? (
+                  <a
+                    href={p.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="underline decoration-accent decoration-2 underline-offset-4 transition-colors hover:text-accent"
+                  >
+                    {p.name} ↗
+                  </a>
+                ) : (
+                  <span class="transition-colors group-hover:text-accent">{p.name}</span>
+                )}
+              </h3>
+              {p.note && <p class="hand text-base text-accent">{p.note}!</p>}
+            </div>
+            <p class="mt-2 leading-relaxed text-ink-soft">{p.description}</p>
+            <ul class="mt-3 flex flex-wrap gap-2">
+              {p.tech.map((t) => (
+                <li class="chip rounded-full border border-line px-3 py-1 text-xs font-medium text-ink-soft">{t}</li>
+              ))}
+            </ul>
           </div>
-          <p class="mt-2 leading-relaxed text-ink-soft">{p.description}</p>
-          <ul class="mt-3 flex flex-wrap gap-2">
-            {p.tech.map((t) => (
-              <li class="rounded-full border border-line px-3 py-1 text-xs font-medium text-ink-soft">{t}</li>
-            ))}
-          </ul>
         </article>
       ))
     }

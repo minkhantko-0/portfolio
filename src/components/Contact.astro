@@ -11,8 +11,12 @@ import Doodle from './Doodle.astro';
       <HandArrow variant="down" class="ml-24 h-10 w-6 text-accent" />
     </div>
 
-    <Doodle variant="envelope" class="absolute right-8 top-8 hidden w-28 text-ink-soft sm:block" float />
-    <Doodle variant="plane" class="absolute bottom-8 right-10 hidden w-16 text-accent sm:block" float />
+    <div data-parallax="10" class="absolute right-8 top-8 hidden sm:block">
+      <Doodle variant="envelope" class="w-28 text-ink-soft" float />
+    </div>
+    <div data-parallax="20" class="absolute bottom-8 right-10 hidden sm:block">
+      <Doodle variant="plane" class="w-16 text-accent" float />
+    </div>
 
     <h2 id="contact" class="hand text-3xl font-bold sm:text-4xl">
       <span data-annotate="highlight">Get in touch</span>

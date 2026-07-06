@@ -38,9 +38,35 @@ body {
    so no-JS / reduced-motion visitors always see the full page */
 @media (prefers-reduced-motion: no-preference) {
   .js [data-reveal],
+  .js [data-settle],
   .js .hero-in {
     opacity: 0;
   }
+}
+
+/* map pins grow on hover (GSAP owns the <g>, CSS owns the dot) */
+.pin-dot {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 0.15s ease;
+}
+g.map-pin:hover .pin-dot {
+  transform: scale(1.45);
+}
+
+/* skill / tech chips perk up on hover */
+.chip {
+  transition:
+    transform 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+.chip:hover {
+  transform: translateY(-3px) rotate(-1deg);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  box-shadow: 2px 3px 0 0 color-mix(in srgb, var(--color-accent) 25%, transparent);
 }
 
 /* hand-drawn SVG strokes get "drawn" by GSAP; visible without JS */

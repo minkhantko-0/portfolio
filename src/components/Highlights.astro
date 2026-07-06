@@ -13,19 +13,22 @@ const rotations = ['-rotate-2', 'rotate-1', '-rotate-1', 'rotate-2', '-rotate-1'
     <p class="max-w-3xl flex-1 basis-96 text-lg leading-relaxed text-ink-soft" data-reveal="up">
       {profile.summary}
     </p>
-    <Doodle variant="gear" class="mt-2 w-20 shrink-0 text-ink-soft max-sm:hidden" float />
+    <div data-parallax="16" class="shrink-0 max-sm:hidden">
+      <Doodle variant="gear" class="mt-2 w-20 text-ink-soft" float />
+    </div>
   </div>
 
   <div class="mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
     {
       highlights.map((h, i) => (
-        <article
-          class={`tape relative border border-line bg-white/70 p-6 shadow-[2px_3px_10px_rgba(38,34,27,0.08)] ${rotations[i % rotations.length]}`}
-          data-reveal="pop"
-        >
-          <p class="leading-relaxed">{h.text}</p>
-          <p class="hand mt-3 text-lg text-accent">— {h.note}</p>
-        </article>
+        <div data-settle>
+          <article
+            class={`tape relative border border-line bg-white/70 p-6 shadow-[2px_3px_10px_rgba(38,34,27,0.08)] transition-all duration-200 hover:rotate-0 hover:-translate-y-1.5 hover:shadow-[4px_8px_18px_rgba(38,34,27,0.14)] ${rotations[i % rotations.length]}`}
+          >
+            <p class="leading-relaxed">{h.text}</p>
+            <p class="hand mt-3 text-lg text-accent">— {h.note}</p>
+          </article>
+        </div>
       ))
     }
   </div>
