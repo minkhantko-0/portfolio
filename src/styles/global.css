@@ -4,12 +4,13 @@
   --font-sans: 'Nunito Variable', ui-rounded, ui-sans-serif, system-ui, sans-serif;
   --font-hand: 'Shantell Sans Variable', 'Comic Sans MS', cursive;
 
-  --color-paper: #faf8f2;
-  --color-ink: #26221b;
-  --color-ink-soft: #5c554a;
-  --color-accent: #d9480f;
-  --color-marker: #ffd43b;
-  --color-line: #e6e0d4;
+  --color-paper: #f6f5ef;
+  --color-ink: #22302e;
+  --color-ink-soft: #55645f;
+  --color-accent: #0f766e;
+  --color-marker: #fcc419;
+  --color-home: #e0a80d;
+  --color-line: #dce0d5;
 }
 
 html {

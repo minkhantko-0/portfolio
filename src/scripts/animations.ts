@@ -7,6 +7,13 @@ import type { RoughAnnotationType } from 'rough-notation/lib/model';
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+// theme colors come from the CSS custom properties so the palette lives in one place
+const themeVar = (name: string, fallback: string) =>
+  getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
+const ACCENT = themeVar('--color-accent', '#0f766e');
+const MARKER = themeVar('--color-marker', '#fcc419');
+const HOME = themeVar('--color-home', '#e0a80d');
+
 /** set a path up to be "drawn" (hidden stroke, revealed by dashoffset → 0) */
 function prepDraw(path: SVGPathElement) {
   const len = path.getTotalLength();
@@ -205,17 +212,18 @@ if (!prefersReducedMotion) {
     );
   });
 
-  // ---------- scroll ball: rolls down its dashed track with page progress ----------
-  const ballTrack = document.getElementById('scroll-track');
+  // ---------- scroll ball: weaves across the page background with scroll ----------
   const ball = document.getElementById('scroll-ball');
-  if (ballTrack && ball) {
-    gsap.to(ball, {
-      y: () => ballTrack.clientHeight - ball.clientHeight,
-      rotation: 1080,
-      transformOrigin: '50% 50%',
-      ease: 'none',
-      scrollTrigger: { start: 0, end: 'max', scrub: 0.4, invalidateOnRefresh: true },
-    });
+  if (ball) {
+    gsap
+      .timeline({
+        defaults: { ease: 'sine.inOut', transformOrigin: '50% 50%' },
+        scrollTrigger: { start: 0, end: 'max', scrub: 0.6, invalidateOnRefresh: true },
+      })
+      .to(ball, { x: '80vw', y: '16vh', rotation: 420 })
+      .to(ball, { x: '10vw', y: '38vh', rotation: 840 })
+      .to(ball, { x: '72vw', y: '58vh', rotation: 1260 })
+      .to(ball, { x: '20vw', y: '82vh', rotation: 1680 });
   }
 
   // ---------- velocity skew: the page leans with fast scrolling ----------
@@ -293,6 +301,8 @@ if (tip && tipWrap) {
     el.addEventListener('mouseenter', () => {
       countryEl.textContent = el.dataset.country || '';
       clientEl.textContent = el.dataset.client || '';
+      // home base gets the "currently based" gold; clients keep the accent
+      countryEl.style.color = 'home' in el.dataset ? HOME : ACCENT;
       gsap.to(tip, {
         autoAlpha: 1,
         scale: 1,
@@ -315,9 +325,9 @@ if (tip && tipWrap) {
 // ---------- rough-notation: hand-drawn underlines/highlights on key phrases ----------
 // Runs even with reduced motion (duration 0 = static ink, no animation).
 const colors: Record<string, string> = {
-  underline: '#d9480f',
-  highlight: '#ffd43b',
-  box: '#d9480f',
+  underline: ACCENT,
+  highlight: MARKER,
+  box: ACCENT,
 };
 
 const annotated = new WeakSet<Element>();
@@ -330,7 +340,7 @@ const observer = new IntersectionObserver(
       const type = (el.dataset.annotate || 'underline') as RoughAnnotationType;
       const annotation = annotate(el, {
         type,
-        color: el.dataset.annotateColor || colors[type] || '#d9480f',
+        color: el.dataset.annotateColor || colors[type] || ACCENT,
         strokeWidth: 2,
         padding: 3,
         multiline: true,

@@ -1,18 +1,14 @@
 ---
 /**
- * Fixed dashed track at the right edge; a hand-drawn ball rolls down it as
- * the visitor scrolls (position + spin scrubbed in animations.ts).
+ * A hand-drawn ball that wanders across the whole page in the background —
+ * weaving left and right down the viewport as the visitor scrolls
+ * (keyframed path scrubbed in animations.ts). Sits behind all content.
  */
 import Doodle from './Doodle.astro';
 ---
 
-<div
-  id="scroll-track"
-  class="pointer-events-none fixed right-5 top-[13vh] z-40 hidden h-[72vh] w-7 lg:block"
-  aria-hidden="true"
->
-  <div class="absolute left-1/2 h-full -translate-x-1/2 border-l-2 border-dashed border-line"></div>
-  <div id="scroll-ball" class="absolute left-0 top-0 w-7">
-    <Doodle variant="ball" class="w-7 text-accent" draw={false} strokeWidth={3} />
+<div id="scroll-stage" class="pointer-events-none fixed inset-0 -z-10 hidden overflow-hidden lg:block" aria-hidden="true">
+  <div id="scroll-ball" class="absolute left-[4vw] top-[6vh] w-12 opacity-40">
+    <Doodle variant="ball" class="w-12 text-accent" draw={false} strokeWidth={3} />
   </div>
 </div>

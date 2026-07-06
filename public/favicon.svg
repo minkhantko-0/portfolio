@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="14" fill="#faf8f2"/>
-  <path d="M10 34 C16 12, 30 10, 33 26 C35 38, 22 44, 24 32 C26 18, 44 12, 55 28" fill="none" stroke="#d9480f" stroke-width="4" stroke-linecap="round"/>
-  <path d="M45 22 C49 24, 52 26, 56 29 C51 31, 47 34, 44 38" fill="none" stroke="#d9480f" stroke-width="4" stroke-linecap="round"/>
-  <text x="32" y="56" font-family="ui-sans-serif, system-ui, sans-serif" font-size="17" font-weight="800" fill="#26221b" text-anchor="middle">MK</text>
+  <rect width="64" height="64" rx="14" fill="#f6f5ef"/>
+  <path d="M10 34 C16 12, 30 10, 33 26 C35 38, 22 44, 24 32 C26 18, 44 12, 55 28" fill="none" stroke="#0f766e" stroke-width="4" stroke-linecap="round"/>
+  <path d="M45 22 C49 24, 52 26, 56 29 C51 31, 47 34, 44 38" fill="none" stroke="#0f766e" stroke-width="4" stroke-linecap="round"/>
+  <text x="32" y="56" font-family="ui-sans-serif, system-ui, sans-serif" font-size="17" font-weight="800" fill="#22302e" text-anchor="middle">MK</text>
 </svg>
