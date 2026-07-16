@@ -14,6 +14,9 @@ const ACCENT = themeVar('--color-accent', '#0f766e');
 const MARKER = themeVar('--color-marker', '#fcc419');
 const HOME = themeVar('--color-home', '#e0a80d');
 
+// reveal elements whose entrance animation has fully settled (annotations wait on this)
+const revealDone = new WeakSet<Element>();
+
 /** set a path up to be "drawn" (hidden stroke, revealed by dashoffset → 0) */
 function prepDraw(path: SVGPathElement) {
   const len = path.getTotalLength();
@@ -112,6 +115,10 @@ if (!prefersReducedMotion) {
     });
     gsap.to('.connector path', { strokeDashoffset: -28, duration: 1.4, ease: 'none', repeat: -1 });
     gsap.to('.scroll-cue', { y: 9, duration: 0.8, ease: 'sine.inOut', yoyo: true, repeat: -1 });
+
+    // the font swap changes layout heights, so trigger positions computed at
+    // module load are stale — recompute now instead of waiting for window load
+    ScrollTrigger.refresh();
   });
 
   // ---------- scroll reveals: per-variant choreography, not one straight slide ----------
@@ -130,19 +137,25 @@ if (!prefersReducedMotion) {
 
   function revealIn(el: HTMLElement, delay: number) {
     const variant = el.dataset.reveal || 'up';
+    // rough-notation measures text when it draws, so annotations inside this
+    // element must wait until the transform (esp. scale/rotation) settles
+    const done = () => {
+      revealDone.add(el);
+      el.dispatchEvent(new Event('reveal:done'));
+    };
     if (variant === 'arc-left' || variant === 'arc-right') {
       // curved entry: overshoot past the resting point, then swing back
       const dir = variant === 'arc-right' ? 1 : -1;
       gsap
-        .timeline({ delay })
+        .timeline({ delay, onComplete: done })
         .to(el, { opacity: 1, x: dir * -14, y: -14, rotation: dir * -2, duration: 0.65, ease: 'power2.out' })
         .to(el, { x: 0, y: 0, rotation: 0, duration: 0.45, ease: 'power3.out' });
     } else if (variant === 'flip') {
-      gsap.to(el, { opacity: 1, rotationX: 0, y: 0, duration: 1.1, delay, ease: 'power4.out' });
+      gsap.to(el, { opacity: 1, rotationX: 0, y: 0, duration: 1.1, delay, ease: 'power4.out', onComplete: done });
     } else if (variant === 'pop') {
-      gsap.to(el, { opacity: 1, scale: 1, rotation: 0, y: 0, duration: 0.9, delay, ease: 'back.out(1.9)' });
+      gsap.to(el, { opacity: 1, scale: 1, rotation: 0, y: 0, duration: 0.9, delay, ease: 'back.out(1.9)', onComplete: done });
     } else {
-      gsap.to(el, { opacity: 1, x: 0, y: 0, rotation: 0, skewX: 0, duration: 1, delay, ease: 'power4.out' });
+      gsap.to(el, { opacity: 1, x: 0, y: 0, rotation: 0, skewX: 0, duration: 1, delay, ease: 'power4.out', onComplete: done });
     }
     // child choreography: skill icons wind up and spin in, chips scatter-cascade
     el.querySelectorAll<SVGElement>('.skill-icon').forEach((icon) => {
@@ -347,9 +360,16 @@ const observer = new IntersectionObserver(
         iterations: 2,
         animationDuration: prefersReducedMotion ? 0 : 900,
       });
-      // wait out the reveal tween (~0.9s incl. batch stagger): rough-notation
-      // measures the text at show() time, and a mid-pop scale shrinks the rect
-      setTimeout(() => annotation.show(), prefersReducedMotion ? 0 : 1000);
+      // rough-notation measures the text at show() time, so drawing while an
+      // ancestor is still mid-scale/rotation lands the ink in the wrong place
+      // (was viewport-width dependent). Wait for the reveal to actually finish.
+      const show = () => setTimeout(() => annotation.show(), prefersReducedMotion ? 0 : 350);
+      const host = prefersReducedMotion ? null : el.closest('[data-reveal]');
+      if (host && !revealDone.has(host)) {
+        host.addEventListener('reveal:done', show, { once: true });
+      } else {
+        show();
+      }
       observer.unobserve(el);
     }
   },
