@@ -89,16 +89,17 @@ const storeIcons = {
               </ul>
               {p.stores && (
                 <span class="ml-1 inline-flex items-center gap-2">
+                  <span class="hand text-sm text-ink-soft">get the app →</span>
                   {p.stores.ios && (
                     <a
                       href={p.stores.ios}
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label={`${p.name} on the App Store`}
-                      title="App Store"
-                      class="text-ink-soft transition-all duration-150 hover:-translate-y-0.5 hover:text-accent"
+                      class="chip inline-flex items-center gap-1.5 rounded-full border border-ink-soft/60 px-2.5 py-1 text-xs font-semibold text-ink"
                     >
-                      <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" set:html={storeIcons.ios} />
+                      <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" set:html={storeIcons.ios} />
+                      App Store
                     </a>
                   )}
                   {p.stores.android && (
@@ -107,10 +108,10 @@ const storeIcons = {
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label={`${p.name} on Google Play`}
-                      title="Google Play"
-                      class="text-ink-soft transition-all duration-150 hover:-translate-y-0.5 hover:text-accent"
+                      class="chip inline-flex items-center gap-1.5 rounded-full border border-ink-soft/60 px-2.5 py-1 text-xs font-semibold text-ink"
                     >
-                      <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" set:html={storeIcons.android} />
+                      <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" set:html={storeIcons.android} />
+                      Google Play
                     </a>
                   )}
                 </span>

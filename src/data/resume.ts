@@ -256,7 +256,7 @@ export const projects: Project[] = [
       "A national non-governmental healthcare organization operating in Myanmar since 2022.",
     description:
       "Web development consultant across multiple projects — advising on and delivering websites and web tooling for the organization.",
-    tech: ["Web Development", "Consulting"],
+    tech: ["Web Development", "Consulting", "React", "Express.js", "Node.js", "MongoDB"],
     link: "https://schmyanmar.org/",
   },
   {
@@ -265,7 +265,7 @@ export const projects: Project[] = [
       "A longevity and preventive-wellness platform blending evidence-based primary care with lifestyle medicine and health-optimization technology.",
     description:
       "Revamped the landing page website and rebuilt the customer registration workflow.",
-    tech: ["Web Development", "UX"],
+    tech: ["Web Development", "UX", "SEO", "Next.js", "Google Cloud"],
     link: "https://oya.health/",
   },
   {
@@ -274,7 +274,7 @@ export const projects: Project[] = [
       "A digital and technology company helping businesses grow, scale, and reach their full potential.",
     description:
       "Built an AI-powered daily email digest that summarizes incoming mail, so potential high-value inquiries never get lost in a crowded inbox.",
-    tech: ["AI", "Automation"],
+    tech: ["AI", "Automation", "n8n", "OpenAI", "LLM", "Outlook Mail API", "Hostinger Cloud"],
     link: "https://social-lady.com/",
   },
   {
