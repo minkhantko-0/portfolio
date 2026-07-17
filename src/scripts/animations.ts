@@ -300,6 +300,22 @@ if (!prefersReducedMotion) {
   }
 }
 
+// ---------- email button: mailto can silently no-op without a mail client,
+// so clicking also copies the address and confirms it ----------
+const emailBtn = document.getElementById('email-btn');
+const emailCopied = document.getElementById('email-copied');
+emailBtn?.addEventListener('click', () => {
+  navigator.clipboard?.writeText(emailBtn.dataset.email || '').catch(() => {});
+  if (emailCopied) {
+    gsap.fromTo(
+      emailCopied,
+      { autoAlpha: 0, y: 6 },
+      { autoAlpha: 1, y: 0, duration: prefersReducedMotion ? 0 : 0.25, ease: 'back.out(2)' }
+    );
+    gsap.to(emailCopied, { autoAlpha: 0, delay: 1.6, duration: prefersReducedMotion ? 0 : 0.3 });
+  }
+});
+
 // ---------- map tooltip: hover a country/pin to see who I shipped for ----------
 const tip = document.getElementById('map-tip');
 const tipWrap = document.querySelector<HTMLElement>('.hero-doodles');

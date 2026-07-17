@@ -11,10 +11,10 @@ import Doodle from './Doodle.astro';
       <HandArrow variant="down" class="ml-24 h-10 w-6 text-accent" />
     </div>
 
-    <div data-parallax="10" class="absolute right-8 top-8 hidden sm:block">
+    <div data-parallax="10" class="pointer-events-none absolute right-8 top-8 hidden sm:block">
       <Doodle variant="envelope" class="w-28 text-ink-soft" float />
     </div>
-    <div data-parallax="20" class="absolute bottom-8 right-10 hidden sm:block">
+    <div data-parallax="20" class="pointer-events-none absolute bottom-8 right-10 hidden sm:block">
       <Doodle variant="plane" class="w-16 text-accent" float />
     </div>
 
@@ -27,12 +27,24 @@ import Doodle from './Doodle.astro';
     </p>
 
     <div class="mt-8 flex flex-wrap items-center gap-4">
-      <a
-        href={`mailto:${profile.email}`}
-        class="inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-ink px-5 py-3 font-semibold text-paper shadow-[4px_4px_0_0_var(--color-accent)] transition-transform duration-150 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_0_var(--color-accent)]"
-      >
-        {profile.email}
-      </a>
+      <span class="relative inline-block">
+        <span
+          id="email-copied"
+          class="hand pointer-events-none invisible absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap text-lg text-accent opacity-0"
+          aria-hidden="true"
+        >
+          copied!
+        </span>
+        <a
+          id="email-btn"
+          href={`mailto:${profile.email}`}
+          data-email={profile.email}
+          title="Opens your mail app — and copies the address"
+          class="inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-ink px-5 py-3 font-semibold text-paper shadow-[4px_4px_0_0_var(--color-accent)] transition-transform duration-150 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_0_var(--color-accent)]"
+        >
+          {profile.email}
+        </a>
+      </span>
       <a
         href={profile.cvFile}
         download
@@ -49,7 +61,18 @@ import Doodle from './Doodle.astro';
       <li>
         <a href={profile.linkedin} target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-accent">LinkedIn</a>
       </li>
-      <li>{profile.phone}</li>
+      <li class="flex items-center gap-1.5">
+        {profile.phone}
+        <HandArrow variant="curve-left" class="h-4 w-8 shrink-0 text-accent" />
+        <a
+          href={`https://wa.me/${profile.phone.replace(/[^0-9]/g, '')}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="hand text-lg text-accent underline-offset-4 hover:underline"
+        >
+          also on WhatsApp!
+        </a>
+      </li>
     </ul>
   </div>
 
