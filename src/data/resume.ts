@@ -103,6 +103,8 @@ export const highlights = [
 export interface Job {
   role: string;
   company: string;
+  /** company website */
+  url?: string;
   period: string;
   location: string;
   bullets: string[];
@@ -114,20 +116,22 @@ export const experience: Job[] = [
   {
     role: "Web Development Consultant",
     company: "Voix Advisory",
+    url: "https://www.voixadvisory.com/",
     period: "Jun 2026 – Present",
     location: "Remote",
     bullets: [
-      "Provide web development consulting to businesses, NGOs, and non-profit healthcare organizations — scoping requirements and translating business goals into technical roadmaps.",
+      "Provide web development consulting to businesses, NGOs, and non-profit organizations — scoping requirements and translating business goals into technical roadmaps.",
       "Design, build, and ship client web projects end-to-end: landing pages, customer registration workflows, and AI-powered automations.",
       "Advise on technology selection, performance, SEO, and deployment strategy, with ongoing maintenance and support.",
     ],
     annotate: [
-      { phrase: "non-profit healthcare organizations", type: "highlight" },
+      { phrase: "non-profit organizations", type: "highlight" },
     ],
   },
   {
     role: "Product Engineer",
     company: "Partipost",
+    url: "https://www.partipost.com/",
     period: "Mar 2026 – Present",
     location: "Singapore (Remote)",
     bullets: [
@@ -140,6 +144,7 @@ export const experience: Job[] = [
   {
     role: "Supervising Full Stack Developer",
     company: "KBZ Bank",
+    url: "https://www.kbzbank.com/en/",
     period: "Oct 2024 – Mar 2026",
     location: "Myanmar",
     bullets: [
@@ -154,6 +159,7 @@ export const experience: Job[] = [
   {
     role: "Cloud & DevOps Consultant / Full Stack Developer",
     company: "TwoSteps.ai",
+    url: "https://twosteps.ai/",
     period: "Apr 2024 – Oct 2024",
     location: "Remote (Contract)",
     bullets: [
@@ -168,6 +174,7 @@ export const experience: Job[] = [
   {
     role: "Full Stack Developer",
     company: "MyanCare Telemedicine",
+    url: "https://myancare.org/",
     period: "Feb 2022 – Oct 2024",
     location: "Myanmar",
     bullets: [
