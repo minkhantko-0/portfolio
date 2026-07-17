@@ -6,6 +6,13 @@ import Doodle from './Doodle.astro';
 
 const flagship = projects.find((p) => p.flagship);
 const rest = projects.filter((p) => !p.flagship);
+
+/** app-store icons, same stroke style as the skills icons (24×24, stroke currentColor) */
+const storeIcons = {
+  android:
+    '<path d="M7 10h10v6a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v-6Z" stroke-linejoin="round"/><path d="M7 10a5 5 0 0 1 10 0" stroke-linejoin="round"/><path d="M9.3 6.8 8 4.8M14.7 6.8 16 4.8" stroke-linecap="round"/><path d="M10 8.6h.01M14 8.6h.01" stroke-linecap="round"/><path d="M9.5 18v2.2M14.5 18v2.2M4.8 11v3.4M19.2 11v3.4" stroke-linecap="round"/>',
+  ios: '<path d="M15.3 8.6c1.9 0 3.6 1.4 3.6 4.1 0 3.3-2.3 7.1-4.3 7.1-.9 0-1.4-.6-2.6-.6s-1.8.6-2.6.6c-2 0-4.3-3.8-4.3-7.1 0-2.7 1.7-4.1 3.6-4.1 1.1 0 2 .7 3.3.7s2.2-.7 3.3-.7Z" stroke-linejoin="round"/><path d="M12 8.2c-.1-1.9 1.2-3.6 3-4-.1 1.9-1.3 3.6-3 4Z" stroke-linejoin="round"/>',
+};
 ---
 
 <section class="relative mx-auto max-w-5xl px-6 py-24" aria-labelledby="projects">
@@ -24,7 +31,21 @@ const rest = projects.filter((p) => !p.flagship);
         <Doodle variant="sparkle" class="twinkle absolute -left-4 -top-4 w-8 text-marker" strokeWidth={4} draw={false} />
         <Doodle variant="sparkle" class="twinkle absolute -bottom-3 right-10 w-6 text-accent" strokeWidth={4} draw={false} />
         <div class="p-6 transition-transform duration-200 hover:-translate-y-1 sm:p-8">
-          <h3 class="text-xl font-bold sm:text-2xl">{flagship.name}</h3>
+          <h3 class="text-xl font-bold sm:text-2xl">
+            {flagship.link ? (
+              <a
+                href={flagship.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="underline decoration-accent decoration-2 underline-offset-4 transition-colors hover:text-accent"
+              >
+                {flagship.name} ↗
+              </a>
+            ) : (
+              flagship.name
+            )}
+          </h3>
+          {flagship.about && <p class="hand mt-2 max-w-3xl text-lg leading-snug text-accent">{flagship.about}</p>}
           <p class="mt-3 max-w-3xl leading-relaxed text-ink-soft">{flagship.description}</p>
           <ul class="mt-4 flex flex-wrap gap-2">
             {flagship.tech.map((t) => (
@@ -58,12 +79,43 @@ const rest = projects.filter((p) => !p.flagship);
               </h3>
               {p.note && <p class="hand text-base text-accent">{p.note}!</p>}
             </div>
+            {p.about && <p class="hand mt-1.5 text-base leading-snug text-accent/90">{p.about}</p>}
             <p class="mt-2 leading-relaxed text-ink-soft">{p.description}</p>
-            <ul class="mt-3 flex flex-wrap gap-2">
-              {p.tech.map((t) => (
-                <li class="chip-pop"><span class="chip inline-block rounded-full border border-line px-3 py-1 text-xs font-medium text-ink-soft">{t}</span></li>
-              ))}
-            </ul>
+            <div class="mt-3 flex flex-wrap items-center gap-2">
+              <ul class="flex flex-wrap gap-2">
+                {p.tech.map((t) => (
+                  <li class="chip-pop"><span class="chip inline-block rounded-full border border-line px-3 py-1 text-xs font-medium text-ink-soft">{t}</span></li>
+                ))}
+              </ul>
+              {p.stores && (
+                <span class="ml-1 inline-flex items-center gap-2">
+                  {p.stores.ios && (
+                    <a
+                      href={p.stores.ios}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`${p.name} on the App Store`}
+                      title="App Store"
+                      class="text-ink-soft transition-all duration-150 hover:-translate-y-0.5 hover:text-accent"
+                    >
+                      <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" set:html={storeIcons.ios} />
+                    </a>
+                  )}
+                  {p.stores.android && (
+                    <a
+                      href={p.stores.android}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`${p.name} on Google Play`}
+                      title="Google Play"
+                      class="text-ink-soft transition-all duration-150 hover:-translate-y-0.5 hover:text-accent"
+                    >
+                      <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" set:html={storeIcons.android} />
+                    </a>
+                  )}
+                </span>
+              )}
+            </div>
           </div>
         </article>
       ))

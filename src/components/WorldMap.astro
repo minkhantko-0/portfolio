@@ -70,7 +70,7 @@ function buildRegion(win: [number, number, number, number], width: number, marke
 
 const main = buildRegion([58, 52, 152, -12], 800, ['Myanmar', 'Japan', 'Singapore', 'Thailand']);
 const france = buildRegion([-9, 53, 15, 40], 220, ['France']);
-const israel = buildRegion([28, 37, 45, 25], 220, ['Israel']);
+const usa = buildRegion([-128, 51, -64, 23], 220, ['USA']);
 ---
 
 <div class="relative">
@@ -79,7 +79,7 @@ const israel = buildRegion([28, 37, 45, 25], 220, ['Israel']);
       viewBox={`0 0 ${main.width} ${main.height}`}
       fill="none"
       class="w-full"
-      aria-label="Map of client countries: Myanmar, Japan, Singapore — currently based in Thailand"
+      aria-label="Map of client countries: Myanmar, Japan, Singapore, France, USA — currently based in Thailand"
       role="img"
     >
       <defs>
@@ -154,7 +154,7 @@ const israel = buildRegion([28, 37, 45, 25], 220, ['Israel']);
   {
     [
       { region: france, name: 'France', rot: '-rotate-3', pos: 'bottom-16 left-1' },
-      { region: israel, name: 'Israel', rot: 'rotate-2', pos: 'bottom-2 left-40' },
+      { region: usa, name: 'USA', rot: 'rotate-2', pos: 'bottom-2 left-40' },
     ].map(({ region, name, rot, pos }) => (
       <div class={`tape absolute ${pos} ${rot} w-36 border border-line bg-white/85 p-1.5 pb-0.5 shadow-[2px_3px_10px_rgba(38,34,27,0.12)]`}>
         <div class="overflow-hidden">

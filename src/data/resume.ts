@@ -4,7 +4,7 @@ export const profile = {
   tagline:
     "Software Engineer · 4+ years · full-stack across fintech / healthcare / SaaS",
   summary:
-    "I build and ship web and mobile products end-to-end — React and React Native up front, Node.js and Python behind the scenes, AWS and multi-cloud underneath. Four-plus years across fintech, healthcare, SaaS, and e-commerce, leading small teams, integrating AI services, and delivering production-ready products under tight deadlines. Currently based in Thailand, working remotely.",
+    "I build and ship web and mobile products end-to-end — React and React Native up front, Node.js and Python behind the scenes, AWS and multi-cloud underneath. Four-plus years across fintech, healthcare, SaaS, and e-commerce, working with multiple NGOs and non-profit healthcare organizations along the way — leading small teams, integrating AI services, and delivering production-ready products under tight deadlines. Currently based in Thailand, working remotely.",
   email: "th.minkhantko@gmail.com",
   phone: "+66951045725",
   linkedin: "https://www.linkedin.com/in/min-khant-ko-b846b0247/",
@@ -53,13 +53,13 @@ export const mapMarkers = {
       client: "B4Purpose",
     },
     {
-      name: "Israel",
-      id: "376",
-      lon: 34.9,
-      lat: 31.4,
+      name: "USA",
+      id: "840",
+      lon: -98.5,
+      lat: 39.8,
       dx: -18,
       dy: 28,
-      client: "TwoSteps.ai",
+      client: "OYA Health · Social Lady",
     },
   ],
   home: {
@@ -94,6 +94,10 @@ export const highlights = [
     text: "Delivered a digital banking MVP (React Native + Node.js) in 2 weeks — and its admin panel in under 2 days.",
     note: "yes, really → 2 weeks",
   },
+  {
+    text: "Worked with NGOs and non-profits in healthcare, such as Sun Community Health Myanmar.",
+    note: "tech for good",
+  },
 ];
 
 export interface Job {
@@ -107,6 +111,20 @@ export interface Job {
 }
 
 export const experience: Job[] = [
+  {
+    role: "Web Development Consultant",
+    company: "Voix Advisory",
+    period: "Jun 2026 – Present",
+    location: "Remote",
+    bullets: [
+      "Provide web development consulting to businesses, NGOs, and non-profit healthcare organizations — scoping requirements and translating business goals into technical roadmaps.",
+      "Design, build, and ship client web projects end-to-end: landing pages, customer registration workflows, and AI-powered automations.",
+      "Advise on technology selection, performance, SEO, and deployment strategy, with ongoing maintenance and support.",
+    ],
+    annotate: [
+      { phrase: "non-profit healthcare organizations", type: "highlight" },
+    ],
+  },
   {
     role: "Product Engineer",
     company: "Partipost",
@@ -165,16 +183,22 @@ export const experience: Job[] = [
 
 export interface Project {
   name: string;
+  /** what the business/product is */
+  about?: string;
+  /** what I did on it */
   description: string;
   tech: string[];
   link?: string;
+  stores?: { ios?: string; android?: string };
   flagship?: boolean;
   note?: string;
 }
 
 export const projects: Project[] = [
   {
-    name: "KBZ Bank — AI-Integrated Loan Platform",
+    name: "KBZ Wiki — AI-Powered Bank Agent",
+    about:
+      "An AI-powered bank agent that answers anything about KBZ Bank — always up to date on policies, announcements, loan changes, and new releases.",
     description:
       "Led back-end architecture and cloud infrastructure for the bank’s first AI product. RESTful APIs, business logic, and end-to-end front-end team delivery.",
     tech: [
@@ -185,13 +209,16 @@ export const projects: Project[] = [
       "React",
       "PostgreSQL",
     ],
+    link: "https://kbzwiki.kbzbank.com/",
     flagship: true,
     note: "this one’s my favourite",
   },
   {
-    name: "Benchmarkps — Performance Monitoring",
+    name: "Benchmark — Clinical Performance Platform",
+    about:
+      "A clinical performance platform that lets physiotherapists objectively measure patient progress, benchmark results, and generate data-driven rehabilitation plans.",
     description:
-      "Back-end API services, ELK-based observability stack, and multi-cloud infrastructure for an internal performance-monitoring system. Team of 4.",
+      "Back-end API services, ELK-based observability stack, and multi-cloud infrastructure. Team of 4.",
     tech: [
       "Nest.js",
       "PostgreSQL",
@@ -201,17 +228,12 @@ export const projects: Project[] = [
       "AWS",
       "Azure",
     ],
-  },
-  {
-    name: "Meral Myanmar — Digital Banking",
-    description:
-      "Designed the Node.js/Express + PostgreSQL API layer. Led a junior dev to ship the React Native MVP in 2 weeks; built the Next.js admin panel in under 2 days.",
-    tech: ["React Native", "Next.js", "Express.js", "PostgreSQL", "Clerk"],
-    link: "https://www.meralmyanmar.com",
-    note: "MVP in 2 weeks",
+    link: "https://www.benchmarkps.org/",
   },
   {
     name: "MyanCare TeleHealth App",
+    about:
+      "Myanmar’s leading telehealth app — advice, diagnosis, treatment, and prescriptions from home, with 700+ top-rated doctors across specialties via video, audio, and text.",
     description:
       "Owned the full back-end: REST API design, PostgreSQL schema and stored procedures, RBAC, and data-encryption policies. Contributed to the React front-end too.",
     tech: [
@@ -222,26 +244,83 @@ export const projects: Project[] = [
       "React Native",
       "tRPC",
     ],
+    link: "https://myancare.org/",
+    stores: {
+      android: "https://play.google.com/store/apps/details?id=com.myancare&hl=en",
+      ios: "https://apps.apple.com/us/app/myancare-telehealth/id1396490288",
+    },
+  },
+  {
+    name: "Sun Community Health — NGO",
+    about:
+      "A national non-governmental healthcare organization operating in Myanmar since 2022.",
+    description:
+      "Web development consultant across multiple projects — advising on and delivering websites and web tooling for the organization.",
+    tech: ["Web Development", "Consulting"],
+    link: "https://schmyanmar.org/",
+  },
+  {
+    name: "OYA Health",
+    about:
+      "A longevity and preventive-wellness platform blending evidence-based primary care with lifestyle medicine and health-optimization technology.",
+    description:
+      "Revamped the landing page website and rebuilt the customer registration workflow.",
+    tech: ["Web Development", "UX"],
+    link: "https://oya.health/",
+  },
+  {
+    name: "Social Lady",
+    about:
+      "A digital and technology company helping businesses grow, scale, and reach their full potential.",
+    description:
+      "Built an AI-powered daily email digest that summarizes incoming mail, so potential high-value inquiries never get lost in a crowded inbox.",
+    tech: ["AI", "Automation"],
+    link: "https://social-lady.com/",
+  },
+  {
+    name: "Meral Myanmar — Digital Banking",
+    about: "A digital banking startup building the future of finance in Myanmar.",
+    description:
+      "Designed the Node.js/Express + PostgreSQL API layer. Led a junior dev to ship the React Native MVP in 2 weeks; built the Next.js admin panel in under 2 days.",
+    tech: ["React Native", "Next.js", "Express.js", "PostgreSQL", "Clerk"],
+    note: "MVP in 2 weeks",
   },
   {
     name: "Myanmar Ahla Gallery",
+    about:
+      "A vibrant art gallery in the heart of Yangon, showcasing emerging and established Myanmar artists.",
     description:
       "Hono-based back-end API and admin dashboard built under contract, plus the front-end landing page.",
     tech: ["Next.js", "Hono", "PostgreSQL", "Vercel"],
     link: "https://www.myanmarahla.com",
   },
   {
-    name: "Magical Face Aesthetic Clinic",
+    name: "Magical Face Luxury Aesthetic Complex",
+    about:
+      "Myanmar’s biggest luxury aesthetic complex, providing facial and body aesthetic health services.",
     description:
       "Sole developer: REST API and MongoDB schema design, back-end business logic, and the React Native front-end. Delivered on schedule.",
     tech: ["React Native", "Node.js", "Express.js", "MongoDB"],
-    link: "https://proxclinic.com",
+    link: "https://proxclinic.com/clinic/magical-face-luxury-aesthetic",
+    stores: {
+      android:
+        "https://play.google.com/store/apps/details?id=com.myancare.magicalface&hl=en",
+      ios: "https://apps.apple.com/us/app/magical-face-aesthetic/id6739198220",
+    },
   },
   {
     name: "Z8 Real Estate",
+    about:
+      "Myanmar’s smartest real-estate technology platform for agents, companies, and individuals.",
     description:
-      "Nest.js back-end with PostgreSQL alongside the React Native front-end. Shipped Android and iOS MVPs with a teammate and a UI/UX designer.",
-    tech: ["React Native", "TypeScript", "Nest.js", "PostgreSQL"],
+      "Nest.js back-end with PostgreSQL alongside the React Native app — plus the platform website. Shipped Android and iOS MVPs with a teammate and a UI/UX designer.",
+    tech: ["React Native", "Next.js", "TypeScript", "Nest.js", "PostgreSQL"],
+    link: "https://z8-re.com/",
+    stores: {
+      android:
+        "https://play.google.com/store/apps/details?id=com.mc.z8realestate&hl=en",
+      ios: "https://apps.apple.com/us/app/z8/id6748935878",
+    },
   },
 ];
 
