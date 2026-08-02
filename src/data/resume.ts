@@ -53,6 +53,15 @@ export const mapMarkers = {
       client: "B4Purpose",
     },
     {
+      name: "Czechia",
+      id: "203",
+      lon: 14.4,
+      lat: 50.1,
+      dx: 14,
+      dy: -10,
+      client: "Voix Advisory · Prague",
+    },
+    {
       name: "USA",
       id: "840",
       lon: -98.5,
@@ -118,7 +127,7 @@ export const experience: Job[] = [
     company: "Voix Advisory",
     url: "https://www.voixadvisory.com/",
     period: "Jun 2026 – Present",
-    location: "Remote",
+    location: "Prague, Czechia (Remote)",
     bullets: [
       "Provide web development consulting to businesses, NGOs, and non-profit organizations — scoping requirements and translating business goals into technical roadmaps.",
       "Design, build, and ship client web projects end-to-end: landing pages, customer registration workflows, and AI-powered automations.",
