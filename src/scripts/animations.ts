@@ -1,8 +1,6 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { SplitText } from 'gsap/SplitText';
 import { MotionPathPlugin } from 'gsap/MotionPathPlugin';
-import { annotate } from 'rough-notation';
 import type { RoughAnnotationType } from 'rough-notation/lib/model';
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -25,18 +23,15 @@ function prepDraw(path: SVGPathElement) {
 }
 
 if (!prefersReducedMotion) {
-  gsap.registerPlugin(ScrollTrigger, SplitText, MotionPathPlugin);
+  gsap.registerPlugin(ScrollTrigger, MotionPathPlugin);
 
   // Initial hidden states are applied up front, before any rough-notation SVG
   // attaches. Its absolutely-positioned SVGs anchor to the nearest transformed
   // ancestor, so adding a transform later would re-anchor them and shift the
   // drawn ink. Transforms must exist from t=0 and never be cleared.
-  gsap.set('.hero-greeting', { y: -18 });
-  gsap.set('.hero-tagline', { y: 26 });
-  // container-level tween: the buttons carry their own CSS transitions
-  // (hover lift), and CSS transitions fight GSAP's per-tick transform writes
-  gsap.set('.hero-cta', { y: 34, scale: 0.95 });
-  gsap.set('.hero-note', { x: -24 });
+  // NOTE: the hero text (greeting / name / tagline / cta / note) is animated
+  // in CSS now — see global.css. GSAP must not touch it, or its per-tick
+  // transform writes would fight the running CSS animation.
   gsap.set('.map-pin', { scale: 0, transformOrigin: '50% 50%' });
   gsap.set('.map-label, .pin-home-ring', { opacity: 0 });
   gsap.set('.map-country', { opacity: 0 });
@@ -44,42 +39,27 @@ if (!prefersReducedMotion) {
   // start (the velocity skew below would otherwise re-anchor them later)
   gsap.set('main', { skewY: 0.001, transformOrigin: '50% 50%', force3D: true });
 
-  // ---------- hero entrance (runs once fonts are ready so SplitText measures right) ----------
-  document.fonts.ready.then(() => {
-    const nameEl = document.querySelector<HTMLElement>('.hero-name');
+  // ---------- hero decoration (drawn paths + map) ----------
+  // No longer gated on `document.fonts.ready`: nothing here measures text, and
+  // waiting on the fonts used to hold up the whole hero. The delay picks up
+  // roughly where the CSS text entrance leaves off, preserving the choreography.
+  {
     const underlinePaths = document.querySelectorAll<SVGPathElement>('#hero-underline .draw-path');
     const doodlePaths = document.querySelectorAll<SVGPathElement>('.hero-doodles .draw-path');
 
     underlinePaths.forEach(prepDraw);
     doodlePaths.forEach(prepDraw);
 
-    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+    const tl = gsap.timeline({ defaults: { ease: 'power3.out' }, delay: 0.85 });
 
-    tl.to('.hero-greeting', { opacity: 1, y: 0, duration: 0.5 });
-
-    if (nameEl) {
-      // words wrapper keeps line wrapping at word boundaries on small screens
-      const split = new SplitText(nameEl, { type: 'chars,words' });
-      gsap.set(split.chars, { yPercent: 115, rotation: () => gsap.utils.random(-14, 14) });
-      gsap.set(nameEl, { opacity: 1 });
-      tl.to(
-        split.chars,
-        { yPercent: 0, rotation: 0, duration: 0.9, stagger: 0.045, ease: 'back.out(1.6)' },
-        '-=0.2'
-      );
-    }
-
-    tl.to(underlinePaths, { strokeDashoffset: 0, duration: 0.7, stagger: 0.15, ease: 'power1.inOut' }, '-=0.35')
-      .to('.hero-tagline', { opacity: 1, y: 0, duration: 0.6 }, '-=0.4')
-      .to('.hero-cta', { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: 'back.out(1.8)' }, '-=0.3')
-      .to('.hero-doodles', { opacity: 1, duration: 0.01 }, '-=0.7')
+    tl.to(underlinePaths, { strokeDashoffset: 0, duration: 0.7, stagger: 0.15, ease: 'power1.inOut' })
+      .to('.hero-doodles', { opacity: 1, duration: 0.01 }, '-=0.4')
       .to(doodlePaths, { strokeDashoffset: 0, duration: 1, stagger: 0.05, ease: 'power1.inOut' }, '<')
       // countries scratch in, in random order, like quick pen strokes
       .to('.map-country', { opacity: 1, duration: 0.3, stagger: { each: 0.006, from: 'random' } }, '<')
       .to('.map-pin', { scale: 1, duration: 0.45, stagger: 0.13, ease: 'back.out(2.5)' }, '-=0.6')
       .to('.map-label', { opacity: 1, duration: 0.4, stagger: 0.08 }, '-=0.6')
-      .to('.pin-home-ring', { opacity: 1, duration: 0.3 }, '-=0.3')
-      .to('.hero-note', { opacity: 1, x: 0, duration: 0.5 }, '-=0.5');
+      .to('.pin-home-ring', { opacity: 1, duration: 0.3 }, '-=0.3');
 
     // "you are here" pulse on the Thailand ring
     gsap.to('.pin-home-ring', {
@@ -115,11 +95,12 @@ if (!prefersReducedMotion) {
     });
     gsap.to('.connector path', { strokeDashoffset: -28, duration: 1.4, ease: 'none', repeat: -1 });
     gsap.to('.scroll-cue', { y: 9, duration: 0.8, ease: 'sine.inOut', yoyo: true, repeat: -1 });
+  }
 
-    // the font swap changes layout heights, so trigger positions computed at
-    // module load are stale — recompute now instead of waiting for window load
-    ScrollTrigger.refresh();
-  });
+  // the font swap changes layout heights, so trigger positions computed at
+  // module load are stale — recompute once the swap has actually happened.
+  // This still waits on the fonts, but nothing visible is blocked behind it.
+  document.fonts.ready.then(() => ScrollTrigger.refresh());
 
   // ---------- scroll reveals: per-variant choreography, not one straight slide ----------
   const initialPose: Record<string, () => gsap.TweenVars> = {
@@ -359,6 +340,9 @@ const colors: Record<string, string> = {
   box: ACCENT,
 };
 
+// assigned by the lazy import below, before anything is ever observed
+let annotate: typeof import('rough-notation').annotate;
+
 const annotated = new WeakSet<Element>();
 const observer = new IntersectionObserver(
   (entries) => {
@@ -393,7 +377,13 @@ const observer = new IntersectionObserver(
 );
 
 // observe only after webfonts load — rough-notation measures text, and drawing
-// against fallback-font metrics leaves the ink strokes misplaced after the swap
-document.fonts.ready.then(() => {
-  document.querySelectorAll('[data-annotate]').forEach((el) => observer.observe(el));
+// against fallback-font metrics leaves the ink strokes misplaced after the swap.
+// The library itself is imported lazily here rather than at module scope: no ink
+// is drawn until fonts are ready anyway, so it has no business in the bundle
+// that gates first render.
+document.fonts.ready.then(async () => {
+  const targets = document.querySelectorAll('[data-annotate]');
+  if (!targets.length) return;
+  ({ annotate } = await import('rough-notation'));
+  targets.forEach((el) => observer.observe(el));
 });

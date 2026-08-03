@@ -36,12 +36,101 @@ body {
 }
 
 /* animated elements start hidden only when JS runs and motion is allowed,
-   so no-JS / reduced-motion visitors always see the full page */
+   so no-JS / reduced-motion visitors always see the full page.
+   NOTE: the hero *text* is deliberately not in this list. Hiding it here meant
+   it could not paint until the JS bundle had loaded and animated it back in,
+   which pushed LCP out to several seconds. It now animates from CSS below,
+   starting at first paint. Only `.hero-in` — the decorative map column, which
+   genuinely needs JS to draw its paths — still starts hidden. */
 @media (prefers-reduced-motion: no-preference) {
   .js [data-reveal],
   .js [data-settle],
   .js .hero-in {
     opacity: 0;
+  }
+}
+
+/* ---------- hero entrance: CSS-driven, so it never waits on JS or webfonts ----------
+   These run for every visitor (no `.js` gate) — with JS off the animation still
+   plays and still ends visible, and reduced-motion skips it entirely. */
+@media (prefers-reduced-motion: no-preference) {
+  .hero-greeting {
+    animation: hero-drop 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  /* the name paints immediately at full opacity; only the glyphs move, so it
+     is a valid LCP candidate from the very first frame */
+  /* deliberately NOT `overflow: hidden` — glyphs stay visible while they swing
+     up (matching the previous SplitText behaviour), and a clipped-away LCP
+     element risks not counting as painted at all */
+  .hero-word {
+    display: inline-block;
+  }
+  .hero-char {
+    display: inline-block;
+    animation: hero-char 0.9s cubic-bezier(0.34, 1.36, 0.64, 1) both;
+    animation-delay: calc(0.25s + var(--i) * 0.045s);
+  }
+
+  /* opacity only, no transform: rough-notation anchors its absolutely
+     positioned ink to the nearest transformed ancestor, and the highlight in
+     this paragraph must keep anchoring to `main` (which holds a permanent
+     transform) rather than briefly re-anchoring to the paragraph itself */
+  .hero-tagline {
+    animation: hero-fade 0.5s ease-out 0.75s both;
+  }
+  .hero-cta {
+    animation: hero-rise 0.5s cubic-bezier(0.34, 1.5, 0.64, 1) 0.95s both;
+  }
+  .hero-note {
+    animation: hero-slide 0.45s cubic-bezier(0.22, 1, 0.36, 1) 1.25s both;
+  }
+}
+
+@keyframes hero-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes hero-char {
+  from {
+    transform: translateY(115%) rotate(var(--tilt));
+  }
+  to {
+    transform: translateY(0) rotate(0deg);
+  }
+}
+@keyframes hero-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(34px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes hero-slide {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 

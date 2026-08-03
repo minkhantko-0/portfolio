@@ -3,25 +3,65 @@ import { profile } from '../data/resume';
 import HandArrow from './HandArrow.astro';
 import Doodle from './Doodle.astro';
 import WorldMap from './WorldMap.astro';
+
+// The name is split into per-character spans HERE, at build time, so its
+// entrance runs as a pure CSS animation. It used to be split client-side by
+// GSAP SplitText behind `document.fonts.ready`, which meant the largest text
+// in the viewport stayed invisible until the JS bundle AND both webfonts had
+// loaded — that wait was the site's Largest Contentful Paint.
+// Tilt is derived from the index rather than Math.random() so builds stay
+// byte-identical between runs.
+// hashed rather than plain sin(i): consecutive letters need uncorrelated tilts,
+// or the row reads as one smooth wave instead of scattered handwriting
+const scatter = (i: number) => {
+  const x = Math.sin((i + 1) * 12.9898) * 43758.5453;
+  return +((x - Math.floor(x)) * 28 - 14).toFixed(1);
+};
+
+let charIndex = -1;
+const nameWords = profile.name.split(' ').map((word) => ({
+  chars: [...word].map((ch) => {
+    const i = ++charIndex;
+    return { ch, i, tilt: scatter(i) };
+  }),
+}));
 ---
 
 <header class="relative mx-auto grid min-h-[92svh] max-w-6xl items-center gap-10 px-6 pb-32 pt-20 lg:grid-cols-[0.85fr_1.15fr]">
   <div class="relative z-10">
-    <p class="hand hero-in hero-greeting mb-3 text-2xl text-accent sm:text-3xl">hi, I’m</p>
+    <p class="hand hero-greeting mb-3 text-2xl text-accent sm:text-3xl">hi, I’m</p>
 
-    <h1 class="hero-in hero-name hand whitespace-nowrap text-[clamp(2.6rem,4.6vw,4rem)] font-bold leading-tight">{profile.name}</h1>
+    <h1
+      class="hero-name hand whitespace-nowrap text-[clamp(2.6rem,4.6vw,4rem)] font-bold leading-tight"
+      aria-label={profile.name}
+    >
+      {
+        nameWords.map((word, w) => (
+          <>
+            {w > 0 && ' '}
+            <span class="hero-word" aria-hidden="true">
+              {word.chars.map((c) => (
+                <span class="hero-char" style={`--i:${c.i};--tilt:${c.tilt}deg`}>
+                  {c.ch}
+                </span>
+              ))}
+            </span>
+          </>
+        ))
+      }
+    </h1>
     <!-- hand-drawn double underline, drawn after the letters land -->
     <svg id="hero-underline" viewBox="0 0 420 26" class="mt-1 h-6 w-full max-w-xl text-accent" fill="none" aria-hidden="true">
       <path class="draw-path" stroke-width="3.5" d="M6 10 C80 4, 200 4, 300 8 C350 10, 390 12, 414 14" />
       <path class="draw-path" stroke-width="3" d="M40 20 C130 15, 250 15, 380 20" />
     </svg>
 
-    <p class="hero-in hero-tagline mt-6 max-w-2xl text-lg text-ink-soft sm:text-xl">
+    <p class="hero-tagline mt-6 max-w-2xl text-lg text-ink-soft sm:text-xl">
       {profile.tagline}. I build products end-to-end —
       <span data-annotate="highlight">and stick around until they work</span>.
     </p>
 
-    <div class="hero-in hero-cta mt-10 flex flex-wrap items-center gap-5">
+    <div class="hero-cta mt-10 flex flex-wrap items-center gap-5">
       <a
         href={profile.cvFile}
         download
@@ -58,7 +98,7 @@ import WorldMap from './WorldMap.astro';
       </a>
     </div>
 
-    <div class="hero-in hero-note mt-4 flex items-end gap-1 text-ink-soft">
+    <div class="hero-note mt-4 flex items-end gap-1 text-ink-soft">
       <HandArrow variant="curve-up" class="ml-8 h-14 w-11 text-accent" />
       <p class="hand pb-1 text-xl">grab the PDF version</p>
     </div>
