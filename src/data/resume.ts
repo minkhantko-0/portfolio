@@ -125,7 +125,7 @@ export const experience: Job[] = [
   {
     role: "Web Development Consultant",
     company: "Voix Advisory",
-    url: "https://www.voixadvisory.com/",
+    url: "https://www.voiximpact.com/",
     period: "Jun 2026 – Present",
     location: "Prague, Czechia (Remote)",
     bullets: [
