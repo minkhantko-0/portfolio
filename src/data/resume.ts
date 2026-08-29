@@ -10,7 +10,6 @@ export const profile = {
   linkedin: "https://www.linkedin.com/in/min-khant-ko-b846b0247/",
   github: "https://github.com/minkhantko-0",
   cvFile: "/minkhantko_cv_fullstack_engineer.pdf",
-  location: "Thailand · working remotely",
 };
 
 /** lon/lat markers for the hero map (projected at build time); dx/dy are label offsets in px */
@@ -118,7 +117,7 @@ export interface Job {
   location: string;
   bullets: string[];
   /** phrases inside bullets to hand-annotate; type maps to rough-notation */
-  annotate?: { phrase: string; type: "box" | "underline" | "highlight" }[];
+  annotate?: { phrase: string; type: "underline" | "highlight" }[];
 }
 
 export const experience: Job[] = [

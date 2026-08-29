@@ -401,7 +401,6 @@ if (tip && tipWrap) {
 const colors: Record<string, string> = {
   underline: ACCENT,
   highlight: MARKER,
-  box: ACCENT,
 };
 
 // assigned by the lazy import below, before anything is ever observed
