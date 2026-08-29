@@ -406,15 +406,15 @@ export const skills: { group: string; items: string[]; note?: string }[] = [
 ];
 
 export const education = {
-  /** attended, not completed — see the coup note below. Do not reword to a
+  /** attended, not completed — see the closing note. Do not reword to a
       completed degree without also restoring `alumniOf` in Base.astro. */
   degree: "Studied Information and Communication Technology",
   school: "University of Technology (Yadanapon Cyber City)",
-  period: "Jul 2018 – Jul 2021",
+  period: "Jul 2018 – 2021",
   notes: [
     "Computer science fundamentals, algorithms, databases, software engineering.",
     "Second prize in a university Arduino prototype contest.",
-    "Left during the 2021 coup to pursue a full-time software development career.",
+    "Left in 2021 to pursue a full-time software development career.",
   ],
 };
 
