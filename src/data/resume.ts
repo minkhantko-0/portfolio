@@ -2,9 +2,9 @@ export const profile = {
   name: "Min Khant Ko",
   title: "Software Engineer",
   tagline:
-    "Software Engineer · 4+ years · full-stack across fintech / healthcare / SaaS",
+    "Software Engineer · 5 years · full-stack across fintech / healthcare / SaaS",
   summary:
-    "I build and ship web and mobile products end-to-end — React and React Native up front, Node.js and Python behind the scenes, AWS and multi-cloud underneath. Four-plus years across fintech, healthcare, SaaS, and e-commerce, working with multiple NGOs and non-profit healthcare organizations along the way — leading small teams, integrating AI services, and delivering production-ready products under tight deadlines. Currently based in Thailand, working remotely.",
+    "I build and ship web and mobile products end-to-end — React and React Native up front, Node.js and Python behind the scenes, AWS and multi-cloud underneath. Five years across fintech, healthcare, SaaS, and e-commerce, working with multiple NGOs and non-profit healthcare organizations along the way — leading small teams, integrating AI services, and delivering production-ready products under tight deadlines. Currently based in Thailand, working remotely.",
   email: "th.minkhantko@gmail.com",
   phone: "+66951045725",
   linkedin: "https://www.linkedin.com/in/min-khant-ko-b846b0247/",
