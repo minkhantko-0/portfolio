@@ -40,7 +40,6 @@ const jsonLd = {
     'REST APIs',
     'Cloud Architecture',
   ],
-  alumniOf: 'University of Technology (Yadanapon Cyber City)',
 };
 ---
 
@@ -71,6 +70,12 @@ const jsonLd = {
     <script is:inline>
       // mark JS availability before first paint so .reveal hiding only applies with JS
       document.documentElement.classList.add('js');
+      // ...and undo it if the animation bundle never arrives. Without this a
+      // failed/blocked module request leaves every [data-reveal] / [data-settle]
+      // section at opacity 0 forever. animations.ts clears the timer once it runs.
+      window.__revealFallback = setTimeout(function () {
+        document.documentElement.classList.remove('js');
+      }, 2500);
     </script>
   </head>
   <body class="antialiased">

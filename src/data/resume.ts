@@ -407,7 +407,9 @@ export const skills: { group: string; items: string[]; note?: string }[] = [
 ];
 
 export const education = {
-  degree: "BE in Information and Communication Technology",
+  /** attended, not completed — see the coup note below. Do not reword to a
+      completed degree without also restoring `alumniOf` in Base.astro. */
+  degree: "Studied Information and Communication Technology",
   school: "University of Technology (Yadanapon Cyber City)",
   period: "Jul 2018 – Jul 2021",
   notes: [

@@ -1,0 +1,45 @@
+---
+/**
+ * App-store links for a project. Lives in its own component because the
+ * flagship and grid project cards both render it — an earlier copy existed
+ * only in the grid branch, so marking a project `flagship` silently dropped
+ * its store links.
+ */
+interface Props {
+  name: string;
+  stores?: { ios?: string; android?: string };
+}
+const { name, stores } = Astro.props;
+
+/** app-store icons, same stroke style as the skills icons (24×24, stroke currentColor) */
+const storeIcons = {
+  android:
+    '<path d="M7 10h10v6a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v-6Z" stroke-linejoin="round"/><path d="M7 10a5 5 0 0 1 10 0" stroke-linejoin="round"/><path d="M9.3 6.8 8 4.8M14.7 6.8 16 4.8" stroke-linecap="round"/><path d="M10 8.6h.01M14 8.6h.01" stroke-linecap="round"/><path d="M9.5 18v2.2M14.5 18v2.2M4.8 11v3.4M19.2 11v3.4" stroke-linecap="round"/>',
+  ios: '<path d="M15.3 8.6c1.9 0 3.6 1.4 3.6 4.1 0 3.3-2.3 7.1-4.3 7.1-.9 0-1.4-.6-2.6-.6s-1.8.6-2.6.6c-2 0-4.3-3.8-4.3-7.1 0-2.7 1.7-4.1 3.6-4.1 1.1 0 2 .7 3.3.7s2.2-.7 3.3-.7Z" stroke-linejoin="round"/><path d="M12 8.2c-.1-1.9 1.2-3.6 3-4-.1 1.9-1.3 3.6-3 4Z" stroke-linejoin="round"/>',
+};
+
+const links = [
+  { href: stores?.ios, label: `${name} on the App Store`, text: 'App Store', icon: storeIcons.ios },
+  { href: stores?.android, label: `${name} on Google Play`, text: 'Google Play', icon: storeIcons.android },
+].filter((l) => l.href);
+---
+
+{
+  links.length > 0 && (
+    <span class="ml-1 inline-flex items-center gap-2">
+      <span class="hand text-sm text-ink-soft">get the app →</span>
+      {links.map((l) => (
+        <a
+          href={l.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={l.label}
+          class="chip inline-flex items-center gap-1.5 rounded-full border border-ink-soft/60 px-2.5 py-1 text-xs font-semibold text-ink"
+        >
+          <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" set:html={l.icon} />
+          {l.text}
+        </a>
+      ))}
+    </span>
+  )
+}

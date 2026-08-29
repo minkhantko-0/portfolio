@@ -62,7 +62,7 @@ import Doodle from './Doodle.astro';
         <a href={profile.linkedin} target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-accent">LinkedIn</a>
       </li>
       <li class="flex items-center gap-1.5">
-        {profile.phone}
+        <a href={`tel:${profile.phone}`} class="underline underline-offset-4 hover:text-accent">{profile.phone}</a>
         <HandArrow variant="curve-left" class="h-4 w-8 shrink-0 text-accent" />
         <a
           href={`https://wa.me/${profile.phone.replace(/[^0-9]/g, '')}`}

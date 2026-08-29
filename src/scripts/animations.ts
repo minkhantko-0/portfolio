@@ -116,6 +116,11 @@ if (!prefersReducedMotion) {
     gsap.set(el, { opacity: 0, ...(initialPose[el.dataset.reveal || 'up'] || initialPose.up)() });
   });
 
+  // GSAP now owns these elements' opacity, so the inline-script watchdog in
+  // Base.astro (which strips `.js` to un-hide them if this bundle never runs)
+  // has done its job and must not fire.
+  clearTimeout(window.__revealFallback);
+
   function revealIn(el: HTMLElement, delay: number) {
     const variant = el.dataset.reveal || 'up';
     // rough-notation measures text when it draws, so annotations inside this
