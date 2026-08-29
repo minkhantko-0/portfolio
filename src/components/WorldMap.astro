@@ -24,8 +24,11 @@ const allCountries = feature(world110m, world110m.objects.countries).features as
   geometry: object;
 }>;
 
-// trim path precision — halves the inline SVG payload
-const round = (d: string) => d.replace(/\d+\.\d+/g, (m) => (+m).toFixed(1));
+// Trim path precision. This is the single biggest chunk of the HTML payload,
+// and it ships to phones where the map is `display: none`. At 800 units across
+// a ~640px column one unit is under a device pixel, and the #scratch filter
+// displaces every stroke by 4 units regardless, so integers are lossless here.
+const round = (d: string) => d.replace(/\d+\.\d+/g, (m) => (+m).toFixed(0));
 
 /** project one crop window [west, north, east, south] to shapes + pins */
 function buildRegion(win: [number, number, number, number], width: number, markerNames: string[]) {
@@ -97,7 +100,7 @@ const usa = buildRegion([-128, 51, -64, 23], 220, ['USA']);
         </pattern>
       </defs>
 
-      <g filter="url(#scratch)">
+      <g class="map-ink" filter="url(#scratch)">
         {
           main.shapes.map((s) =>
             s.kind === 'base' ? (
@@ -159,7 +162,7 @@ const usa = buildRegion([-128, 51, -64, 23], 220, ['USA']);
       <div class={`tape absolute ${pos} ${rot} w-36 border border-line bg-white/85 p-1.5 pb-0.5 shadow-[2px_3px_10px_rgba(38,34,27,0.12)]`}>
         <div class="overflow-hidden">
           <svg viewBox={`0 0 ${region.width} ${region.height}`} fill="none" class="w-full" aria-hidden="true">
-            <g filter="url(#scratch)">
+            <g class="map-ink" filter="url(#scratch)">
               {region.shapes.map((s) =>
                 s.kind === 'base' ? (
                   <path d={s.d} fill="#ffffff66" stroke="var(--color-ink-soft)" stroke-opacity="0.55" stroke-width="1.2" />

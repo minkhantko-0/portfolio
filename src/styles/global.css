@@ -134,6 +134,50 @@ body {
   }
 }
 
+/* ---------- the two interactive overlays ----------
+   Deliberately CSS rather than GSAP: they are the only motion outside the
+   `prefers-reduced-motion` gate, and driving them from JS meant the whole
+   animation engine had to load for visitors who animate nothing. Tailwind v4
+   writes its own utilities to the `translate` / `rotate` properties, so the
+   `transform` shorthand here composes with them rather than fighting them. */
+#email-copied,
+#map-tip {
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
+}
+#email-copied {
+  transform: translateY(6px);
+}
+#map-tip {
+  transform: scale(0.6) rotate(-3deg);
+  transform-origin: left top;
+  /* `translate` is written per pointer sample by animations.ts */
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease,
+    translate 0.18s ease-out;
+}
+/* the ID beats Tailwind's `invisible` / `opacity-0` on the same element */
+#email-copied.is-on,
+#map-tip.is-on {
+  visibility: visible;
+  opacity: 1;
+}
+#email-copied.is-on {
+  transform: translateY(0);
+}
+#map-tip.is-on {
+  transform: scale(1) rotate(0deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #email-copied,
+  #map-tip {
+    transition: none;
+  }
+}
+
 /* countries with clients invite a hover */
 .map-country[data-client] {
   cursor: pointer;
