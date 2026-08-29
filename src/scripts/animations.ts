@@ -333,9 +333,17 @@ let copiedTimer: ReturnType<typeof setTimeout>;
 emailBtn?.addEventListener('click', () => {
   navigator.clipboard?.writeText(emailBtn.dataset.email || '').catch(() => {});
   if (!emailCopied) return;
+  // #email-copied is role="status": writing the text here is what announces it.
+  // Clearing it again on the way out means a second click re-announces.
+  emailCopied.textContent = 'copied!';
   emailCopied.classList.add('is-on');
   clearTimeout(copiedTimer);
-  copiedTimer = setTimeout(() => emailCopied.classList.remove('is-on'), 1600);
+  copiedTimer = setTimeout(() => {
+    emailCopied.classList.remove('is-on');
+    setTimeout(() => {
+      emailCopied.textContent = '';
+    }, 300);
+  }, 1600);
 });
 
 // ---------- map tooltip: hover a country/pin to see who I shipped for ----------
@@ -355,20 +363,36 @@ if (tip && tipWrap) {
   addEventListener('scroll', remeasure, { passive: true });
   addEventListener('resize', remeasure, { passive: true });
 
+  const showTip = (el: SVGElement) => {
+    countryEl.textContent = el.dataset.country || '';
+    clientEl.textContent = el.dataset.client || '';
+    // home base gets the "currently based" gold; clients keep the accent
+    countryEl.style.color = 'home' in el.dataset ? HOME : ACCENT;
+    remeasure();
+    tip.classList.add('is-on');
+  };
+  const hideTip = () => tip.classList.remove('is-on');
+  /** viewport coords in, wrapper-relative offset out */
+  const moveTip = (x: number, y: number) => {
+    tip.style.translate = `${x - wrapRect.left + 16}px ${y - wrapRect.top + 18}px`;
+  };
+
   document.querySelectorAll<SVGElement>('[data-client]').forEach((el) => {
-    el.addEventListener('mouseenter', () => {
-      countryEl.textContent = el.dataset.country || '';
-      clientEl.textContent = el.dataset.client || '';
-      // home base gets the "currently based" gold; clients keep the accent
-      countryEl.style.color = 'home' in el.dataset ? HOME : ACCENT;
-      remeasure();
-      tip.classList.add('is-on');
-    });
-    el.addEventListener('mouseleave', () => tip.classList.remove('is-on'));
+    el.addEventListener('mouseenter', () => showTip(el));
+    el.addEventListener('mouseleave', hideTip);
     el.addEventListener('mousemove', (e) => {
       const ev = e as MouseEvent;
-      tip.style.translate = `${ev.clientX - wrapRect.left + 16}px ${ev.clientY - wrapRect.top + 18}px`;
+      moveTip(ev.clientX, ev.clientY);
     });
+    // Keyboard parity: the pins carry tabindex, so mirror hover onto focus and
+    // park the tooltip under the marker instead of under an absent pointer.
+    // Without this the country -> client pairing was reachable by mouse only.
+    el.addEventListener('focus', () => {
+      showTip(el);
+      const r = el.getBoundingClientRect();
+      moveTip(r.left + r.width / 2, r.bottom);
+    });
+    el.addEventListener('blur', hideTip);
   });
 }
 

@@ -3,7 +3,7 @@
  * Client map, real geometry (world-atlas 110m + d3-geo), rendered to static
  * SVG at BUILD time. Only the regions with clients render: a main map of
  * South/East Asia (Myanmar, Thailand, Singapore, Japan) plus two postage-
- * stamp insets for France and Israel — no unused continents. Scratchy ink
+ * stamp insets for Europe and the USA — no unused continents. Scratchy ink
  * via displacement filter, hatch fills, hover tooltips via data-client.
  */
 import { geoNaturalEarth1, geoPath, geoCentroid } from 'd3-geo';
@@ -71,6 +71,12 @@ function buildRegion(win: [number, number, number, number], width: number, marke
   return { width, height, shapes, pins };
 }
 
+// derived, not hand-listed: the aria-label and the screen-reader list below
+// both went stale the last time a client country was added
+const mapLabel = `Map of client countries: ${mapMarkers.clients
+  .map((m) => m.name)
+  .join(', ')} — currently based in ${mapMarkers.home.name}`;
+
 const main = buildRegion([58, 52, 152, -12], 800, ['Myanmar', 'Japan', 'Singapore', 'Thailand']);
 const europe = buildRegion([-10, 55, 21, 40], 220, ['France', 'Czechia']);
 const usa = buildRegion([-128, 51, -64, 23], 220, ['USA']);
@@ -82,7 +88,7 @@ const usa = buildRegion([-128, 51, -64, 23], 220, ['USA']);
       viewBox={`0 0 ${main.width} ${main.height}`}
       fill="none"
       class="w-full"
-      aria-label="Map of client countries: Myanmar, Japan, Singapore, France, Czechia, USA — currently based in Thailand"
+      aria-label={mapLabel}
       role="img"
     >
       <defs>
@@ -125,7 +131,14 @@ const usa = buildRegion([-128, 51, -64, 23], 220, ['USA']);
         main.pins.map((c) => (
           <>
             {c.home && <circle class="pin-home-ring" cx={c.x} cy={c.y} r="12" stroke={HOME} stroke-width="2.5" />}
-            <g class="map-pin" data-country={c.name} data-client={c.client} {...(c.home ? { 'data-home': '' } : {})}>
+            <g
+              class="map-pin"
+              tabindex="0"
+              aria-label={`${c.name}: ${c.client}`}
+              data-country={c.name}
+              data-client={c.client}
+              {...(c.home ? { 'data-home': '' } : {})}
+            >
               <circle
                 class="pin-dot"
                 cx={c.x}
@@ -180,7 +193,7 @@ const usa = buildRegion([-128, 51, -64, 23], 220, ['USA']);
               )}
             </g>
             {region.pins.map((c) => (
-              <g class="map-pin" data-country={c.name} data-client={c.client}>
+              <g class="map-pin" tabindex="0" aria-label={`${c.name}: ${c.client}`} data-country={c.name} data-client={c.client}>
                 <circle class="pin-dot" cx={c.x} cy={c.y} r="9" fill="var(--color-accent)" stroke="var(--color-paper)" stroke-width="2.5" />
               </g>
             ))}
@@ -195,6 +208,12 @@ const usa = buildRegion([-128, 51, -64, 23], 220, ['USA']);
 <p class="map-label hand mt-3 text-center text-lg text-ink-soft">
   <span class="mx-1 inline-block size-3 rounded-full bg-accent align-baseline"></span> clients I’ve shipped for
   <span class="mx-1 ml-5 inline-block size-3 rounded-full border-2 border-ink bg-marker align-baseline"></span>
-  <span style={`color: ${HOME}`}>currently based</span>
+  <span class="text-ink">currently based</span>
   <span class="ml-3 text-base">(hover a country!)</span>
 </p>
+
+<ul class="sr-only">
+  {[...mapMarkers.clients, mapMarkers.home].map((m) => (
+    <li>{m.name} — {m.client}</li>
+  ))}
+</ul>

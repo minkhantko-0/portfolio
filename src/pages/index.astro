@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import { profile } from '../data/resume';
 import Hero from '../components/Hero.astro';
 import PlaneDivider from '../components/PlaneDivider.astro';
 import Highlights from '../components/Highlights.astro';
@@ -12,15 +13,28 @@ import ScrollBall from '../components/ScrollBall.astro';
 ---
 
 <Base>
+  <!-- the hero is a full viewport of decoration plus ten focusable things
+       (CV, GitHub, LinkedIn, seven map markers) before any prose -->
+  <a href="#content" class="skip-link">Skip to content</a>
+
+  <!-- outside <main>: GSAP puts a transform on <main>, which would turn it
+       into the containing block for this fixed layer -->
   <ScrollBall />
-  <Hero />
-  <PlaneDivider />
+
   <main>
+    <Hero />
+    <PlaneDivider />
     <Highlights />
     <Experience />
     <Projects />
     <Skills />
     <Education />
+    <Contact />
   </main>
-  <Contact />
+
+  <footer class="mx-auto max-w-4xl px-6 pb-16 pt-10">
+    <p class="hand text-center text-lg text-ink-soft">
+      hand-drawn with care · © {new Date().getFullYear()} {profile.name}
+    </p>
+  </footer>
 </Base>

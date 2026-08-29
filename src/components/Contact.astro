@@ -4,7 +4,7 @@ import HandArrow from './HandArrow.astro';
 import Doodle from './Doodle.astro';
 ---
 
-<footer class="mx-auto max-w-4xl px-6 pb-16 pt-24" aria-labelledby="contact">
+<section class="mx-auto max-w-4xl px-6 pt-24" aria-labelledby="contact">
   <div class="relative rounded-2xl border-2 border-ink bg-white/70 p-8 sm:p-12" data-reveal="pop">
     <div class="pointer-events-none absolute -top-14 left-6 hidden sm:block">
       <p class="hand -rotate-3 text-2xl text-accent">let’s build something</p>
@@ -28,13 +28,13 @@ import Doodle from './Doodle.astro';
 
     <div class="mt-8 flex flex-wrap items-center gap-4">
       <span class="relative inline-block">
+        <!-- text is written by animations.ts on click so the live region
+             actually announces; a permanently-present string would not -->
         <span
           id="email-copied"
+          role="status"
           class="hand pointer-events-none invisible absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap text-lg text-accent opacity-0"
-          aria-hidden="true"
-        >
-          copied!
-        </span>
+        />
         <a
           id="email-btn"
           href={`mailto:${profile.email}`}
@@ -76,7 +76,4 @@ import Doodle from './Doodle.astro';
     </ul>
   </div>
 
-  <p class="hand mt-10 text-center text-lg text-ink-soft">
-    hand-drawn with care · © {new Date().getFullYear()} {profile.name}
-  </p>
-</footer>
+</section>

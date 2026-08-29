@@ -13,8 +13,33 @@
   --color-line: #dce0d5;
 }
 
-html {
-  scroll-behavior: smooth;
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* keyboard escape hatch past the hero; off-screen until focused */
+.skip-link {
+  position: fixed;
+  left: 0.75rem;
+  top: 0.75rem;
+  z-index: 50;
+  transform: translateY(-250%);
+  border: 2px solid var(--color-ink);
+  border-radius: 0.5rem;
+  background: var(--color-paper);
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+}
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+/* skip-link landing targets are only focusable to move the caret, so the ring
+   around the whole section would be noise */
+[tabindex='-1']:focus {
+  outline: none;
 }
 
 /* slide-in reveal states start offscreen; never let them widen the page */
@@ -144,7 +169,8 @@ body {
 #map-tip {
   transition:
     opacity 0.25s ease,
-    transform 0.25s ease;
+    transform 0.25s ease,
+    visibility 0s linear 0.25s;
 }
 #email-copied {
   transform: translateY(6px);
@@ -163,6 +189,10 @@ body {
 #map-tip.is-on {
   visibility: visible;
   opacity: 1;
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease,
+    visibility 0s;
 }
 #email-copied.is-on {
   transform: translateY(0);
@@ -189,6 +219,10 @@ body {
 g.map-pin[data-client] {
   cursor: pointer;
 }
+g.map-pin:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 3px;
+}
 
 /* map pins grow on hover (GSAP owns the <g>, CSS owns the dot) */
 .pin-dot {
@@ -196,7 +230,8 @@ g.map-pin[data-client] {
   transform-origin: center;
   transition: transform 0.15s ease;
 }
-g.map-pin:hover .pin-dot {
+g.map-pin:hover .pin-dot,
+g.map-pin:focus-visible .pin-dot {
   transform: scale(1.45);
 }
 
