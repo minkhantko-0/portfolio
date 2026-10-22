@@ -104,6 +104,73 @@ export function initTown() {
     h?.addEventListener('blur', () => setHover(null));
   });
 
+  // ---------- the card keeps the town's height; a long one opens on request ----------
+  const frame = root.querySelector<HTMLElement>('[data-card-frame]');
+  const more = root.querySelector<HTMLElement>('[data-card-more]');
+  const toggle = root.querySelector<HTMLButtonElement>('[data-card-toggle]');
+  const toggleText = root.querySelector<HTMLElement>('[data-card-toggle-text]');
+  const nav = root.querySelector<HTMLElement>('.town-nav');
+  let open = false;
+  let settled = 0;
+  const tall = () => {
+    if (!frame || !nav) return 0;
+    const gap = parseFloat(getComputedStyle(panel).rowGap) || 0;
+    return Math.max(320, Math.round(stage.getBoundingClientRect().height - nav.getBoundingClientRect().height - gap));
+  };
+  const setOpen = (flag: boolean) => {
+    if (!frame || !more || !toggle) return;
+    open = flag;
+    frame.classList.toggle('is-open', open);
+    toggle.setAttribute('aria-expanded', String(open));
+    if (toggleText) toggleText.textContent = open ? 'Fold it back' : 'Read the rest';
+  };
+  const fitCard = () => {
+    if (!frame || !more) return;
+    if (narrow.matches) {
+      frame.style.height = '';
+      frame.classList.remove('has-more');
+      more.hidden = true;
+      return;
+    }
+    const h = tall();
+    frame.style.transition = 'none';
+    frame.style.height = open ? '' : `${h}px`;
+    const overflows = frame.scrollHeight > frame.clientHeight + 4 || open;
+    frame.classList.toggle('has-more', overflows);
+    more.hidden = !overflows;
+    void frame.offsetWidth;
+    frame.style.transition = '';
+  };
+  toggle?.addEventListener('click', () => {
+    if (!frame) return;
+    clearTimeout(settled);
+    const from = frame.getBoundingClientRect().height;
+    if (!open) {
+      setOpen(true);
+      frame.style.height = `${from}px`;
+      void frame.offsetWidth;
+      frame.style.height = `${frame.scrollHeight}px`;
+      settled = window.setTimeout(() => (frame.style.height = ''), reduced ? 0 : 480);
+    } else {
+      frame.style.height = `${from}px`;
+      void frame.offsetWidth;
+      setOpen(false);
+      frame.style.height = `${tall()}px`;
+      // bring the card's top back into view if it has scrolled away
+      const top = panel.getBoundingClientRect().top;
+      if (top < 0) scrollTo({ top: scrollY + top - 24, behavior: reduced ? 'auto' : 'smooth' });
+    }
+  });
+  if (frame) {
+    new ResizeObserver(fitCard).observe(stage);
+    narrow.addEventListener('change', fitCard);
+    addEventListener('town:card', () => {
+      setOpen(false);
+      fitCard();
+    });
+    fitCard();
+  }
+
   // ---------- idle life only while the town is on screen ----------
   if ('IntersectionObserver' in window) {
     new IntersectionObserver(([e]) => root.classList.toggle('is-on', e.isIntersecting), { threshold: 0.05 }).observe(stage);

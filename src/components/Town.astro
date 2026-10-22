@@ -94,7 +94,7 @@ const trees = [
         <p class="town-count hand"><span data-town-index>1</span> of {entries.length}</p>
         <button type="button" class="town-arrow" data-town-next aria-label="Next project">→</button>
       </div>
-      <div class="town-card-frame">
+      <div class="town-card-frame" data-card-frame>
         <ul class="town-cards">
           {
             entries.map(({ b, p }) => (
@@ -140,6 +140,12 @@ const trees = [
             ))
           }
         </ul>
+        <!-- on wide screens the card is as tall as the town; a long one opens here -->
+        <div class="town-more" data-card-more hidden>
+          <button type="button" class="town-more-btn" data-card-toggle aria-expanded="false">
+            <span data-card-toggle-text>Read the rest</span> <span class="town-more-arrow" aria-hidden="true">↓</span>
+          </button>
+        </div>
       </div>
     </div>
   </div>

@@ -1,4 +1,9 @@
 ---
+/**
+ * Skills, as a toolbox: a drawn tray with a handle, one compartment per
+ * group. A compartment leans toward the hand and its tags rise in turn
+ * (tilt.ts, the chips cascade in global.css).
+ */
 import { skills } from '../data/resume';
 import SectionHeading from './SectionHeading.astro';
 
@@ -25,30 +30,33 @@ const icons: Record<string, string> = {
 <section class="relative mx-auto max-w-6xl px-6 py-20 lg:py-28" aria-labelledby="skills">
   <SectionHeading id="skills" label="Skills" aside="the toolbox" />
 
-  <div class="grid gap-x-12 gap-y-10 sm:grid-cols-2">
-    {
-      skills.map((group) => (
-        <div data-enter>
-          <div class="flex items-center gap-3">
-            <svg
-              class="skill-icon size-6 shrink-0 text-accent"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.8"
-              aria-hidden="true"
-              set:html={icons[group.group] ?? icons.Practices}
-            />
-            <h3 class="hand text-xl font-semibold">{group.group}</h3>
-            {group.note && <p class="hand text-base text-accent">· {group.note}</p>}
-          </div>
-          <ul class="mt-3 flex flex-wrap gap-x-2 gap-y-2 pl-9">
-            {group.items.map((item) => (
-              <li><span class="chip inline-block rounded-full px-3 py-1 text-sm text-ink">{item}</span></li>
-            ))}
-          </ul>
-        </div>
-      ))
-    }
+  <div class="toolbox">
+    <svg class="toolbox-handle" viewBox="0 0 160 40" aria-hidden="true">
+      <path d="M8 40 V22 C8 10, 20 4, 34 4 H126 C140 4, 152 10, 152 22 V40" />
+      <path d="M22 40 V24 C22 18, 28 16, 36 16 H124 C132 16, 138 18, 138 24 V40" />
+    </svg>
+    <span class="toolbox-latch toolbox-latch-l" aria-hidden="true"></span>
+    <span class="toolbox-latch toolbox-latch-r" aria-hidden="true"></span>
+
+    <ul class="toolbox-trays" data-enter>
+      {
+        skills.map((group) => (
+          <li class="tray" data-tilt="3" data-lift="4">
+            <div class="tray-head">
+              <svg class="tray-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" set:html={icons[group.group] ?? icons.Practices} />
+              <h3 class="hand tray-title">{group.group}</h3>
+            </div>
+            {group.note && <p class="hand tray-note">{group.note}</p>}
+            <ul class="chips tray-chips">
+              {group.items.map((item, i) => (
+                <li style={`--i:${i}`}>
+                  <span class="chip inline-block rounded-full px-2.5 py-0.5 text-sm text-ink">{item}</span>
+                </li>
+              ))}
+            </ul>
+          </li>
+        ))
+      }
+    </ul>
   </div>
 </section>
