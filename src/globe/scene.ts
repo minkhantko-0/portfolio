@@ -9,7 +9,7 @@
  * from the clock), an inverted-hull ink outline and a once-perturbed paper
  * surface so it reads as drawn, the seven pins on the surface, and the
  * interaction: drag to spin with inertia, arrow keys, the pointer's tilt,
- * optional phone tilt, hover on a country. Rendering is on demand (only
+ * hover on a country. Rendering is on demand (only
  * while something moves, while the globe is on screen and the tab visible).
  *
  * Everything that reads as text stays in the DOM: the pin buttons in
@@ -481,37 +481,6 @@ export async function mountGlobe(root: HTMLElement): Promise<GlobeHandle> {
     if (id) pinEls.get(id)?.button.dispatchEvent(new Event('pointerenter'));
   };
   const hoverCountry = (x: number, y: number) => setCountry(dragging ? null : countryAt(x, y));
-
-  // ---------- phone tilt, behind a tap (iOS asks permission) ----------
-  const tiltButton = document.querySelector<HTMLButtonElement>('[data-tilt-toggle]');
-  let tilting = false;
-  const onOrientation = (e: DeviceOrientationEvent) => {
-    if (e.gamma == null || e.beta == null) return;
-    hoverTarget.set(MathUtils.clamp(e.gamma / 45, -1, 1) * d2r(6), MathUtils.clamp((e.beta - 45) / 45, -1, 1) * d2r(6));
-    invalidate();
-  };
-  if (tiltButton && coarse && 'DeviceOrientationEvent' in window) {
-    tiltButton.hidden = false;
-    tiltButton.addEventListener('click', async () => {
-      if (tilting) {
-        removeEventListener('deviceorientation', onOrientation);
-        tilting = false;
-        tiltButton.setAttribute('aria-pressed', 'false');
-        hoverTarget.set(0, 0);
-        invalidate();
-        return;
-      }
-      const DOE = DeviceOrientationEvent as unknown as { requestPermission?: () => Promise<string> };
-      try {
-        if (DOE.requestPermission && (await DOE.requestPermission()) !== 'granted') return;
-      } catch {
-        return;
-      }
-      addEventListener('deviceorientation', onOrientation);
-      tilting = true;
-      tiltButton.setAttribute('aria-pressed', 'true');
-    });
-  }
 
   // ---------- lifecycle: only draw while on screen and the tab is visible ----------
   const io = new IntersectionObserver(
