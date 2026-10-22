@@ -81,30 +81,44 @@ export const mapMarkers = {
   },
 };
 
-export const highlights = [
+/** each highlight is an object on the desk (Desk.astro): the drawing it
+ *  sits on, and, where one fits, the project it points to in the town */
+export interface Highlight {
+  text: string;
+  note: string;
+  desk: { kind: "note" | "clouds" | "stack" | "chart" | "calendar" | "postcard"; project?: string };
+}
+
+export const highlights: Highlight[] = [
   {
     text: "Architected an AWS-native AI platform at Myanmar’s largest private bank using Bedrock, Lambda, and EventBridge.",
     note: "the bank’s first AI product!",
+    desk: { kind: "note", project: "kbz" },
   },
   {
     text: "Led cloud & DevOps strategy across AWS, Azure, GCP, Cloudflare, and Hostinger for the Benchmarkps monitoring system.",
     note: "multi-cloud, for real",
+    desk: { kind: "clouds", project: "benchmark" },
   },
   {
     text: "Built and owned both back-end and front-end for 4+ production products across fintech, healthcare, and real estate.",
     note: "full ownership",
+    desk: { kind: "stack" },
   },
   {
     text: "Implemented an ELK stack (Elasticsearch + Kibana) for real-time performance monitoring and log aggregation.",
     note: "observability nerd",
+    desk: { kind: "chart", project: "benchmark" },
   },
   {
     text: "Delivered a digital banking MVP (React Native + Node.js) in 2 weeks — and its admin panel in under 2 days.",
     note: "yes, really → 2 weeks",
+    desk: { kind: "calendar", project: "meral" },
   },
   {
     text: "Worked with NGOs and non-profits in healthcare, such as Sun Community Health Myanmar.",
     note: "tech for good",
+    desk: { kind: "postcard", project: "sch" },
   },
 ];
 

@@ -80,7 +80,7 @@ const jsonLd = {
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
-    <meta property="og:image" content={new URL('/og-image.png', Astro.site)} />
+    <meta property="og:image" content={new URL('/og-image.jpg', Astro.site)} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
@@ -92,8 +92,8 @@ const jsonLd = {
       // mark JS availability before first paint so .reveal hiding only applies with JS
       document.documentElement.classList.add('js');
       // ...and undo it if the animation bundle never arrives. Without this a
-      // failed/blocked module request leaves every [data-reveal] / [data-settle]
-      // section at opacity 0 forever. animations.ts clears the timer once it runs.
+      // failed/blocked module request leaves every [data-enter] block at
+      // opacity 0 forever. animations.ts clears the timer once it runs.
       window.__revealFallback = setTimeout(function () {
         document.documentElement.classList.remove('js');
       }, 2500);

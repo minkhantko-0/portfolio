@@ -1,25 +1,47 @@
 ---
+/**
+ * Education as a certificate on the page, with its seal, and the languages
+ * as two speech bubbles saying hello in each. Both lean toward the hand.
+ */
 import { education, languages } from '../data/resume';
 import SectionHeading from './SectionHeading.astro';
-import Doodle from './Doodle.astro';
+
+const hello: Record<string, string> = { English: 'Hello!', Burmese: 'Mingalaba!' };
 ---
 
-<section class="relative mx-auto max-w-4xl px-6 py-24" aria-labelledby="education">
-  <div data-parallax="14" class="absolute right-10 top-10 hidden lg:block">
-    <Doodle variant="gradcap" class="w-20 rotate-6 text-ink-soft" float />
-  </div>
+<section class="relative mx-auto max-w-6xl px-6 pb-20 pt-4 lg:pb-24" aria-labelledby="education">
   <SectionHeading id="education" label="Education & Languages" aside="where it started" />
 
-  <div data-reveal="up">
-    <h3 class="text-lg font-bold">{education.degree}</h3>
-    <p class="mt-1 text-sm text-ink-soft">
-      {education.school} · {education.period}
-    </p>
-    <p class="mt-4 max-w-3xl leading-relaxed text-ink-soft">
-      {education.notes.join(' ')}
-    </p>
-    <p class="mt-4 text-ink-soft">
-      <span class="hand text-lg text-ink">Languages:</span> {languages.join(', ')}
-    </p>
+  <div class="edu">
+    <article class="diploma" data-tilt="2" data-lift="4" data-enter>
+      <svg class="diploma-seal" viewBox="0 0 120 150" aria-hidden="true">
+        <path class="ribbon" d="M44 92 L30 142 L46 134 L56 148 L66 100 Z" />
+        <path class="ribbon" d="M76 92 L90 142 L74 134 L64 148 L54 100 Z" />
+        <path
+          class="rosette"
+          d="M60 8 L68 18 L80 12 L83 25 L96 26 L93 39 L104 46 L96 56 L104 66 L93 73 L96 86 L83 87 L80 100 L68 94 L60 104 L52 94 L40 100 L37 87 L24 86 L27 73 L16 66 L24 56 L16 46 L27 39 L24 26 L37 25 L40 12 L52 18 Z"
+        />
+        <circle class="rosette-ring" cx="60" cy="56" r="26" />
+        <path class="rosette-mark" d="M46 58 L56 68 L76 46" />
+      </svg>
+      <h3 class="diploma-title">{education.degree}</h3>
+      <p class="diploma-school">{education.school} · {education.period}</p>
+      <p class="diploma-notes">{education.notes.join(' ')}</p>
+      <p class="diploma-sign hand">a certificate of showing up · left early, on purpose</p>
+    </article>
+
+    <div class="langs" data-enter>
+      <p class="hand langs-head">two languages, both spoken daily</p>
+      <ul class="bubbles">
+        {
+          languages.map((lang, i) => (
+            <li class={`bubble ${i % 2 ? 'bubble-r' : 'bubble-l'}`} data-tilt="5" data-lift="4">
+              <span class="bubble-word hand">{hello[lang] ?? 'Hello!'}</span>
+              <span class="bubble-lang">{lang}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
   </div>
 </section>

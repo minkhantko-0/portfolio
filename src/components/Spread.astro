@@ -1,0 +1,171 @@
+---
+/**
+ * The first screen and the flight, as one spread: the name across the top,
+ * the hero copy and then the seven chapters in the left column, the globe
+ * held in the right column (sticky for the whole spread) so the chapters
+ * pass beside it. On a phone the globe sits under the hero and sticks to
+ * the top of the screen while the chapters pass beneath it. Nothing here
+ * waits for JavaScript: the globe is drawn at build time (GlobeStatic) and
+ * the 3D version fades in over it later.
+ */
+import { profile } from '../data/resume';
+import { route, stopCount } from '../data/route';
+import GlobeStatic from './GlobeStatic.astro';
+import HandArrow from './HandArrow.astro';
+
+// The name is split into per-character spans at build time so its entrance
+// runs as a pure CSS animation from the first paint (it is the LCP element).
+// Tilt is derived from the index rather than Math.random() so builds stay
+// byte-identical between runs; hashed rather than plain sin(i) so consecutive
+// letters get uncorrelated tilts.
+const scatter = (i: number) => {
+  const x = Math.sin((i + 1) * 12.9898) * 43758.5453;
+  return +((x - Math.floor(x)) * 28 - 14).toFixed(1);
+};
+let charIndex = -1;
+const nameWords = profile.name.split(' ').map((word) => ({
+  chars: [...word].map((ch) => {
+    const i = ++charIndex;
+    return { ch, i, tilt: scatter(i) };
+  }),
+}));
+
+const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+---
+
+<section class="spread mx-auto max-w-6xl px-6" aria-labelledby="hero-title">
+  <!-- the name: full width, one line, the one dominant thing on the first screen -->
+  <header class="spread-head pt-10 lg:pt-12">
+    <h1 id="hero-title" class="hero-name hand font-bold leading-none" aria-label={profile.name}>
+      {
+        nameWords.map((word, w) => (
+          <>
+            {w > 0 && ' '}
+            <span class="hero-word" aria-hidden="true">
+              {word.chars.map((c) => (
+                <span class="hero-char" style={`--i:${c.i};--tilt:${c.tilt}deg`}>
+                  {c.ch}
+                </span>
+              ))}
+            </span>
+          </>
+        ))
+      }
+    </h1>
+    <!-- hand-drawn double underline, drawn after the letters land -->
+    <svg id="hero-underline" viewBox="0 0 420 26" class="mt-1 h-5 w-full max-w-2xl text-accent sm:h-7" fill="none" aria-hidden="true">
+      <path class="draw-path" stroke-width="3.5" d="M6 10 C80 4, 200 4, 300 8 C350 10, 390 12, 414 14" />
+      <path class="draw-path" stroke-width="3" d="M40 20 C130 15, 250 15, 380 20" />
+    </svg>
+  </header>
+
+  <div class="spread-grid">
+    <!-- hero copy -->
+    <div class="spread-hero">
+      <p class="hero-tagline max-w-xl text-lg leading-relaxed text-ink sm:text-xl">
+        Full-stack engineer in Thailand. Five years of web and mobile products for banks, clinics and
+        NGOs <span data-annotate="highlight">across seven countries</span>.
+      </p>
+
+      <div class="hero-cta mt-8 flex flex-wrap items-center gap-5">
+        <a href={profile.cvFile} download class="button-primary">
+          <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 3v12m0 0-4-4m4 4 4-4M5 21h14" />
+          </svg>
+          Download CV
+        </a>
+        <a href={profile.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub profile" title="GitHub" class="icon-link">
+          <svg class="size-8" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.55v-2.17c-3.2.7-3.87-1.36-3.87-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.19 1.76 1.19 1.03 1.75 2.69 1.25 3.34.95.11-.74.4-1.25.73-1.53-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.16-1.18 3.16-1.18.63 1.59.24 2.76.12 3.05.74.81 1.18 1.83 1.18 3.09 0 4.41-2.68 5.38-5.24 5.66.41.36.78 1.05.78 2.13v3.16c0 .3.2.67.8.55A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z" />
+          </svg>
+        </a>
+        <a href={profile.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn profile" title="LinkedIn" class="icon-link">
+          <svg class="size-8" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12ZM7.12 20.45H3.56V9h3.56v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.72v20.55C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.72C24 .77 23.2 0 22.22 0Z" />
+          </svg>
+        </a>
+      </div>
+
+      <div class="hero-note mt-4 flex items-end gap-1 text-ink-soft">
+        <HandArrow variant="curve-up" class="ml-8 h-14 w-11 text-accent" />
+        <p class="hand pb-1 text-xl">grab the PDF version</p>
+      </div>
+
+      <p class="hero-cue hand mt-16 text-xl text-ink-soft lg:mt-24">
+        scroll, and the plane takes off
+        <HandArrow variant="down" class="ml-6 inline-block h-12 w-6 align-top text-ink-soft" />
+      </p>
+    </div>
+
+    <!-- the globe, held beside the chapters -->
+    <div class="spread-globe">
+      <div class="globe-stage">
+        <GlobeStatic />
+        <p class="globe-count mt-3 text-center text-ink-soft" aria-live="polite">
+          <span data-count-current>home</span>
+        </p>
+        <p class="globe-legend hand mt-1 text-center text-lg text-ink-soft">
+          <span class="mx-1 inline-block size-3 rounded-full bg-accent align-baseline"></span> shipped for
+          <span class="mx-1 ml-4 inline-block size-3 rounded-full bg-marker ring-2 ring-ink align-baseline"></span>
+          <span class="text-ink">based</span>
+          <span class="ml-3 text-base" data-globe-hint>(drag to spin)</span>
+        </p>
+        <p class="mt-1 text-center">
+          <button type="button" data-tilt-toggle hidden aria-pressed="false" class="hand text-base text-accent underline-offset-4 hover:underline">
+            tilt with your phone
+          </button>
+        </p>
+      </div>
+    </div>
+
+    <!-- the flight: one chapter per country -->
+    <div class="spread-chapters" id="experience-section">
+      <div class="chapters-head" data-enter>
+        <h2 id="experience" class="hand text-3xl font-bold sm:text-4xl">
+          <span data-annotate="underline">Where the work went</span>
+        </h2>
+        <p class="hand text-lg text-ink-soft sm:text-xl">one stop at a time, ending at home</p>
+      </div>
+      <ol class="chapters">
+        {
+          route.map((s, i) => (
+            <li class="chapter" id={`stop-${slug(s.country)}`} data-stop={s.id} data-index={i}>
+              <div data-enter>
+                <p class="chapter-place hand text-2xl text-accent">
+                  {s.city}{s.city !== s.country ? `, ${s.country}` : ''}
+                </p>
+                <h3 class="chapter-role mt-1 text-xl font-bold sm:text-2xl">{s.role}</h3>
+                <p class="chapter-meta mt-1 text-base text-ink-soft">
+                  {s.client} · {s.period}
+                </p>
+                <ul class="mt-4 list-disc space-y-2 pl-5 text-ink marker:text-accent">
+                  {s.bullets.map((b) => (
+                    <li>{b}</li>
+                  ))}
+                </ul>
+                {s.links && (
+                  <p class="mt-3 flex flex-wrap gap-x-4 gap-y-1">
+                    {s.links.map((l) => (
+                      <a href={l.href} target="_blank" rel="noopener noreferrer" class="text-link">
+                        {l.label} ↗
+                      </a>
+                    ))}
+                  </p>
+                )}
+                {s.home && (
+                  <p class="hand mt-3 text-lg text-accent" data-clock data-clock-tail="">
+                    I’m on Thailand time (UTC+7).
+                  </p>
+                )}
+                <p class="chapter-count mt-4 text-base text-ink-soft">
+                  {s.note ? <span class="hand text-lg text-accent">— {s.note} · </span> : null}
+                  {i + 1} of {stopCount}
+                </p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </div>
+</section>

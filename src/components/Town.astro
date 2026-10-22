@@ -1,0 +1,152 @@
+---
+/**
+ * Projects, as a paper town. Every project is a building (Building.astro)
+ * standing on an isometric sheet of paper with a loop road; the four apps
+ * are the larger ones. The buildings fold up out of the sheet as the section
+ * arrives (animations.ts), a tuk-tuk drives the loop, and hovering a
+ * building lights its windows and plays its one piece of life. (The sheet
+ * does not lean toward the pointer: any extra rotation on it made Chrome
+ * mis-target pointer events on the far faces.) Pressing a building (its roof is a real
+ * button) shows that project on the card beside the town: the drawn phone
+ * or browser, the words, the links. All ten cards are in the markup; with
+ * JS one shows at a time (town.ts), without it the card is a plain list.
+ */
+import { projects } from '../data/resume';
+import { buildings, ground, roadLoop, roadSpurs } from '../data/town';
+import Building from './Building.astro';
+import AppScreen from './AppScreen.astro';
+import SiteScreen from './SiteScreen.astro';
+import StoreLinks from './StoreLinks.astro';
+import SectionHeading from './SectionHeading.astro';
+import HandArrow from './HandArrow.astro';
+
+const byName = new Map(projects.map((p) => [p.name, p]));
+const entries = buildings.map((b) => {
+  const p = byName.get(b.project);
+  if (!p) throw new Error(`town: no project named ${b.project}`);
+  return { b, p };
+});
+
+/** trees, as (x, y, r) on the ground */
+const trees = [
+  [150, 60, 9], [300, 50, 7], [470, 40, 10], [730, 70, 8], [790, 110, 7],
+  [120, 300, 8], [95, 330, 6], [250, 300, 8], [600, 250, 9], [620, 215, 6],
+  [700, 540, 9], [760, 500, 7], [60, 520, 8], [160, 560, 7], [520, 560, 9], [470, 230, 7],
+];
+---
+
+<section class="mx-auto max-w-6xl px-6 pt-20 lg:pt-28" aria-labelledby="projects">
+  <SectionHeading id="projects" label="Projects" aside="a small town of them" />
+
+  <div class="town" data-town>
+    <div class="town-stage">
+      <p class="town-hint hand">
+        <span class="town-hint-fine">hover a building · press one to visit</span>
+        <span class="town-hint-coarse">pan around · tap a building to visit</span>
+      </p>
+      <div class="town-scene">
+        <div class="town-ground">
+          <svg class="town-map" viewBox={`0 0 ${ground.w} ${ground.d}`} aria-hidden="true">
+            <defs>
+              <pattern id="town-hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                <path d="M0 0 V6" class="hatch-line" />
+              </pattern>
+              <pattern id="town-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                <path d="M40 0 H0 V40" class="grid-line" />
+              </pattern>
+            </defs>
+            <rect class="paper" x="0" y="0" width={ground.w} height={ground.d} />
+            <rect class="grid" x="0" y="0" width={ground.w} height={ground.d} />
+            <path class="road" d={roadLoop} />
+            {roadSpurs.map((d) => <path class="road" d={d} />)}
+            <path class="road-line" d={roadLoop} />
+            {roadSpurs.map((d) => <path class="road-line" d={d} />)}
+            <!-- parking by the clinic, a pond, trees -->
+            <path class="line thin" d="M140 262 h16 M140 270 h16 M140 278 h16 M140 286 h16" />
+            <path class="pond" d="M560 50 C600 36, 650 44, 660 70 C668 92, 640 104, 605 100 C575 97, 548 76, 560 50 Z" />
+            {trees.map(([x, y, r]) => (
+              <g class="tree">
+                <path class="trunk" d={`M${x} ${y + r} v${r * 0.9}`} />
+                <circle class="crown" cx={x} cy={y} r={r} />
+              </g>
+            ))}
+          </svg>
+
+          <!-- a tuk-tuk on the loop, flat on the paper -->
+          <div class="town-car" aria-hidden="true">
+            <svg viewBox="0 0 30 16">
+              <rect class="car-body" x="1" y="2" width="28" height="12" rx="3" />
+              <rect class="car-top" x="9" y="4" width="14" height="8" rx="2" />
+              <path class="line thin" d="M24 5 v6" />
+            </svg>
+          </div>
+
+          <ul class="town-blocks">
+            {entries.map(({ b, p }) => <Building b={b} name={`${p.name}: show this project`} />)}
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="town-panel">
+      <div class="town-nav">
+        <button type="button" class="town-arrow" data-town-prev aria-label="Previous project">←</button>
+        <p class="town-count hand"><span data-town-index>1</span> of {entries.length}</p>
+        <button type="button" class="town-arrow" data-town-next aria-label="Next project">→</button>
+      </div>
+      <div class="town-card-frame" data-card-frame>
+        <ul class="town-cards">
+          {
+            entries.map(({ b, p }) => (
+              <li class="town-card" data-card={b.key}>
+                <div class="town-screen">
+                  {b.app ? <AppScreen app={b.app} class="town-phone" tilt="7" /> : <SiteScreen name={p.name} link={p.link} about={p.about} />}
+                </div>
+                <div class="town-words">
+                  <h3 class="town-title">
+                    {p.link ? (
+                      <a href={p.link} target="_blank" rel="noopener noreferrer" class="text-link">
+                        {p.name.split(' ').slice(0, -1).join(' ')}{' '}
+                        <span class="whitespace-nowrap">
+                          {p.name.split(' ').at(-1)} <span class="arrow">↗</span>
+                        </span>
+                      </a>
+                    ) : (
+                      p.name
+                    )}
+                  </h3>
+                  <p class="town-meta">
+                    {b.app ? 'Mobile app' : p.link ? 'Website' : 'Product'}
+                    {p.stores && ' · on both stores'}
+                    {p.note && <span class="hand text-accent"> · {p.note}</span>}
+                  </p>
+                  {p.about && <p class="town-about">{p.about}</p>}
+                  <p class="town-desc">{p.description}</p>
+                  <ul class="chips town-chips">
+                    {p.tech.map((t, i) => (
+                      <li style={`--i:${i}`}>
+                        <span class="chip inline-block rounded-full px-2.5 py-0.5 text-sm font-medium text-ink">{t}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  {p.stores && (
+                    <div class="town-stores">
+                      <StoreLinks name={p.name} stores={p.stores} />
+                    </div>
+                  )}
+                  <p class="town-life hand">→ {b.life} when you hover its building</p>
+                </div>
+              </li>
+            ))
+          }
+        </ul>
+        <!-- on wide screens the card is as tall as the town; a long one opens here -->
+        <div class="town-more" data-card-more hidden>
+          <button type="button" class="town-more-btn" data-card-toggle aria-expanded="false">
+            <span data-card-toggle-text>Read the rest</span> <span class="town-more-arrow" aria-hidden="true">↓</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

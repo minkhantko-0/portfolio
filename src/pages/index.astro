@@ -1,38 +1,29 @@
 ---
 import Base from '../layouts/Base.astro';
 import { profile } from '../data/resume';
-import Hero from '../components/Hero.astro';
-import PlaneDivider from '../components/PlaneDivider.astro';
-import Highlights from '../components/Highlights.astro';
-import Experience from '../components/Experience.astro';
-import Projects from '../components/Projects.astro';
+import Spread from '../components/Spread.astro';
+import Desk from '../components/Desk.astro';
+import Town from '../components/Town.astro';
 import Skills from '../components/Skills.astro';
 import Education from '../components/Education.astro';
 import Contact from '../components/Contact.astro';
-import ScrollBall from '../components/ScrollBall.astro';
 ---
 
 <Base>
-  <!-- the hero is a full viewport of decoration plus ten focusable things
-       (CV, GitHub, LinkedIn, seven map markers) before any prose -->
+  <!-- the first spread is a full viewport of name, globe and seven focusable
+       pins before any prose -->
   <a href="#content" class="skip-link">Skip to content</a>
 
-  <!-- outside <main>: GSAP puts a transform on <main>, which would turn it
-       into the containing block for this fixed layer -->
-  <ScrollBall />
-
   <main>
-    <Hero />
-    <PlaneDivider />
-    <Highlights />
-    <Experience />
-    <Projects />
+    <Spread />
+    <Desk />
+    <Town />
     <Skills />
     <Education />
     <Contact />
   </main>
 
-  <footer class="mx-auto max-w-4xl px-6 pb-16 pt-10">
+  <footer class="mx-auto max-w-6xl px-6 pb-12 pt-12">
     <p class="hand text-center text-lg text-ink-soft">
       hand-drawn with care · © {new Date().getFullYear()} {profile.name}
     </p>
