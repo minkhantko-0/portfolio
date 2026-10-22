@@ -9,21 +9,58 @@ const ACCENT = themeVar('--color-accent', '#0f766e');
 const MARKER = themeVar('--color-marker', '#fcc419');
 const HOME = themeVar('--color-home', '#e0a80d');
 
-// reveal elements whose entrance animation has fully settled (annotations wait on this)
-const revealDone = new WeakSet<Element>();
+// This module is running, so the inline watchdog in Base.astro, which strips
+// `.js` to un-hide every [data-enter] block if the bundle never arrives, has
+// done its job. Cancel it before it can fire mid-fetch.
+clearTimeout(window.__revealFallback);
+
+// ---------- entrances: the parts of each [data-enter] block arrive in reading order ----------
+// CSS does the moving (global.css); this sets the stagger index on the children
+// and flips the class once, when the block's top is about 88% down the screen.
+const entered = new WeakSet<Element>();
+{
+  const blocks = document.querySelectorAll<HTMLElement>('[data-enter]');
+  const finish = (el: HTMLElement) => {
+    if (entered.has(el)) return;
+    entered.add(el);
+    el.dispatchEvent(new Event('enter:done'));
+  };
+  if (prefersReducedMotion || !('IntersectionObserver' in window)) {
+    blocks.forEach((b) => {
+      b.classList.add('is-in');
+      finish(b);
+    });
+  } else {
+    blocks.forEach((b) => {
+      Array.from(b.children).forEach((c, i) => (c as HTMLElement).style.setProperty('--i', String(i)));
+    });
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (!e.isIntersecting) continue;
+          io.unobserve(e.target);
+          const el = e.target as HTMLElement;
+          el.classList.add('is-in');
+          // the last child's transform transition is the last thing to settle;
+          // the timeout covers a child that has no transition to end
+          const last = el.lastElementChild;
+          last?.addEventListener('transitionend', () => finish(el), { once: true });
+          setTimeout(() => finish(el), 1800);
+        }
+      },
+      { rootMargin: '0px 0px -12% 0px', threshold: 0.1 }
+    );
+    blocks.forEach((b) => io.observe(b));
+  }
+}
 
 /**
  * Everything GSAP-driven, behind a dynamic import. GSAP is ~56 KB gzipped and
  * this whole function is skipped under `prefers-reduced-motion`, so it has no
- * business in the bundle those visitors download. The small interactive bits
- * that DO run for everyone (the copied-to-clipboard toast, the map tooltip)
- * are plain CSS transitions further down for the same reason.
+ * business in the bundle those visitors download.
  */
 async function initMotion() {
-  const [{ gsap }, { ScrollTrigger }] = await Promise.all([
-    import('gsap'),
-    import('gsap/ScrollTrigger'),
-  ]);
+  const [{ gsap }, { ScrollTrigger }] = await Promise.all([import('gsap'), import('gsap/ScrollTrigger')]);
   gsap.registerPlugin(ScrollTrigger);
 
   /** set a path up to be "drawn" (hidden stroke, revealed by dashoffset → 0) */
@@ -33,239 +70,24 @@ async function initMotion() {
     return len;
   };
 
-  // Initial hidden states are applied up front, before any rough-notation SVG
-  // attaches. Its absolutely-positioned SVGs anchor to the nearest transformed
-  // ancestor, so adding a transform later would re-anchor them and shift the
-  // drawn ink. Transforms must exist from t=0 and never be cleared. (The
-  // annotation pass below awaits `motionReady` so this ordering still holds
-  // now that GSAP arrives asynchronously.)
-  // NOTE: the hero text (greeting / name / tagline / cta / note) is animated
-  // in CSS now — see global.css. GSAP must not touch it, or its per-tick
-  // transform writes would fight the running CSS animation.
-  gsap.set('.map-pin', { scale: 0, transformOrigin: '50% 50%' });
-  gsap.set('.map-label, .pin-home-ring', { opacity: 0 });
-  gsap.set('.map-ink', { opacity: 0 });
-  // main gets a transform NOW so rough-notation SVGs anchor to it from the
-  // start (the velocity skew below would otherwise re-anchor them later)
-  gsap.set('main', { skewY: 0.001, transformOrigin: '50% 50%', force3D: true });
-
-  // ---------- hero decoration (drawn paths + map) ----------
-  // No longer gated on `document.fonts.ready`: nothing here measures text, and
-  // waiting on the fonts used to hold up the whole hero. The delay picks up
-  // roughly where the CSS text entrance leaves off, preserving the choreography.
+  // ---------- hero underline: drawn once the letters have landed ----------
   {
     const underlinePaths = document.querySelectorAll<SVGPathElement>('#hero-underline .draw-path');
-    const doodlePaths = document.querySelectorAll<SVGPathElement>('.hero-doodles .draw-path');
-
     underlinePaths.forEach(prepDraw);
-    doodlePaths.forEach(prepDraw);
-
-    const tl = gsap.timeline({ defaults: { ease: 'power3.out' }, delay: 0.85 });
-
-    tl.to(underlinePaths, { strokeDashoffset: 0, duration: 0.7, stagger: 0.15, ease: 'power1.inOut' })
-      .to('.hero-doodles', { opacity: 1, duration: 0.01 }, '-=0.4')
-      .to(doodlePaths, { strokeDashoffset: 0, duration: 1, stagger: 0.05, ease: 'power1.inOut' }, '<')
-      // The countries used to fade in one-by-one with a random stagger. Every
-      // one of those writes landed on a child of the <g filter="url(#scratch)">
-      // wrapper, so each frame re-ran the feTurbulence/feDisplacementMap over
-      // the whole map. The ink now fades as a single group — group opacity is
-      // composited after the filter, so the filter rasterizes once.
-      .to('.map-ink', { opacity: 1, duration: 0.5 }, '<')
-      .to('.map-pin', { scale: 1, duration: 0.45, stagger: 0.13, ease: 'back.out(2.5)' }, '-=0.6')
-      .to('.map-label', { opacity: 1, duration: 0.4, stagger: 0.08 }, '-=0.6')
-      .to('.pin-home-ring', { opacity: 1, duration: 0.3 }, '-=0.3');
-
-    // "you are here" pulse on the Thailand ring
-    gsap.to('.pin-home-ring', {
-      scale: 1.7,
-      opacity: 0,
-      transformOrigin: '50% 50%',
-      duration: 1.6,
-      ease: 'power1.out',
-      repeat: -1,
-      repeatDelay: 0.4,
-      delay: 4,
+    gsap.to(underlinePaths, {
+      strokeDashoffset: 0,
+      duration: 0.7,
+      stagger: 0.15,
+      ease: 'power1.inOut',
+      delay: 0.7,
     });
-
-    // continuous life after the entrance
-    gsap.to('[data-float]', {
-      y: () => gsap.utils.random(-12, 12),
-      rotation: () => gsap.utils.random(-4, 4),
-      duration: () => gsap.utils.random(2, 3.4),
-      ease: 'sine.inOut',
-      yoyo: true,
-      repeat: -1,
-      delay: 1.2,
-    });
-    gsap.to('.twinkle', {
-      scale: 0.55,
-      opacity: 0.35,
-      transformOrigin: '50% 50%',
-      duration: () => gsap.utils.random(0.7, 1.4),
-      ease: 'sine.inOut',
-      yoyo: true,
-      repeat: -1,
-      stagger: 0.35,
-    });
-    gsap.to('.scroll-cue', { y: 9, duration: 0.8, ease: 'sine.inOut', yoyo: true, repeat: -1 });
   }
 
   // the font swap changes layout heights, so trigger positions computed at
-  // module load are stale — recompute once the swap has actually happened.
-  // This still waits on the fonts, but nothing visible is blocked behind it.
+  // module load are stale; recompute once the swap has actually happened
   document.fonts.ready.then(() => ScrollTrigger.refresh());
 
-  // ---------- scroll reveals: per-variant choreography, not one straight slide ----------
-  const initialPose: Record<string, () => gsap.TweenVars> = {
-    up: () => ({ y: gsap.utils.random(55, 100), rotation: gsap.utils.random(-3, 3) }),
-    left: () => ({ x: -110, skewX: 7, rotation: -2 }),
-    right: () => ({ x: 110, skewX: -7, rotation: 2 }),
-    'arc-left': () => ({ x: -130, y: 80, rotation: -6 }),
-    'arc-right': () => ({ x: 130, y: 80, rotation: 6 }),
-    pop: () => ({ scale: 0.5, rotation: -8, y: 50 }),
-    flip: () => ({ rotationX: -60, transformPerspective: 700, transformOrigin: '50% 0%', y: 40 }),
-  };
-  gsap.utils.toArray<HTMLElement>('[data-reveal]').forEach((el) => {
-    gsap.set(el, { opacity: 0, ...(initialPose[el.dataset.reveal || 'up'] || initialPose.up)() });
-  });
-
-  function revealIn(el: HTMLElement, delay: number) {
-    const variant = el.dataset.reveal || 'up';
-    // rough-notation measures text when it draws, so annotations inside this
-    // element must wait until the transform (esp. scale/rotation) settles
-    const done = () => {
-      revealDone.add(el);
-      el.dispatchEvent(new Event('reveal:done'));
-    };
-    if (variant === 'arc-left' || variant === 'arc-right') {
-      // curved entry: overshoot past the resting point, then swing back
-      const dir = variant === 'arc-right' ? 1 : -1;
-      gsap
-        .timeline({ delay, onComplete: done })
-        .to(el, { opacity: 1, x: dir * -14, y: -14, rotation: dir * -2, duration: 0.65, ease: 'power2.out' })
-        .to(el, { x: 0, y: 0, rotation: 0, duration: 0.45, ease: 'power3.out' });
-    } else if (variant === 'flip') {
-      gsap.to(el, { opacity: 1, rotationX: 0, y: 0, duration: 1.1, delay, ease: 'power4.out', onComplete: done });
-    } else if (variant === 'pop') {
-      gsap.to(el, { opacity: 1, scale: 1, rotation: 0, y: 0, duration: 0.9, delay, ease: 'back.out(1.9)', onComplete: done });
-    } else {
-      gsap.to(el, { opacity: 1, x: 0, y: 0, rotation: 0, skewX: 0, duration: 1, delay, ease: 'power4.out', onComplete: done });
-    }
-    // child choreography: skill icons wind up and spin in, chips scatter-cascade
-    el.querySelectorAll<SVGElement>('.skill-icon').forEach((icon) => {
-      gsap.fromTo(
-        icon,
-        { rotation: -140, scale: 0, transformOrigin: '50% 50%' },
-        { rotation: 0, scale: 1, duration: 1.2, delay: delay + 0.15, ease: 'elastic.out(1, 0.45)' }
-      );
-    });
-    const chips = el.querySelectorAll('.chip-pop');
-    if (chips.length) {
-      gsap.fromTo(
-        chips,
-        { scale: 0, y: 14, rotation: () => gsap.utils.random(-10, 10) },
-        {
-          scale: 1,
-          y: 0,
-          rotation: 0,
-          duration: 0.5,
-          delay: delay + 0.2,
-          ease: 'back.out(2.4)',
-          stagger: { each: 0.035, from: 'random' },
-        }
-      );
-    }
-  }
-
-  ScrollTrigger.batch('[data-reveal]', {
-    start: 'top 88%',
-    once: true,
-    onEnter: (batch) => batch.forEach((el, i) => revealIn(el as HTMLElement, i * 0.1)),
-  });
-
-  // ---------- scrub-settled elements: fly in tied to scroll, reversible ----------
-  gsap.utils.toArray<HTMLElement>('[data-settle]').forEach((el, i) => {
-    gsap.fromTo(
-      el,
-      { y: 110, x: i % 2 ? 44 : -44, rotation: i % 2 ? 9 : -9, scale: 0.88, opacity: 0 },
-      {
-        y: 0,
-        x: 0,
-        rotation: 0,
-        scale: 1,
-        opacity: 1,
-        ease: 'none',
-        scrollTrigger: { trigger: el, start: 'top 98%', end: 'top 55%', scrub: 0.6 },
-      }
-    );
-  });
-
-  // Both of the scrubbed decorative layers below are `display: none` on phones,
-  // so building their ScrollTriggers there is pure cost for something nobody
-  // can see. matchMedia creates them only where they render, and reverts them
-  // when the query stops matching.
-  const mm = gsap.matchMedia();
-
-  // ---------- parallax drift for decorative layers ----------
-  // every [data-parallax] element is hidden below `sm` (the individual doodles
-  // then appear at sm / lg / xl depending on how much room they need)
-  mm.add('(min-width: 640px)', () => {
-    gsap.utils.toArray<HTMLElement>('[data-parallax]').forEach((el) => {
-      const strength = parseFloat(el.dataset.parallax || '12');
-      gsap.fromTo(
-        el,
-        { yPercent: strength },
-        {
-          yPercent: -strength,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: el.closest('section, header, footer') || el,
-            start: 'top bottom',
-            end: 'bottom top',
-            scrub: 0.6,
-          },
-        }
-      );
-    });
-  });
-
-  // ---------- scroll ball: weaves across the page background with scroll ----------
-  // #scroll-stage is `hidden lg:block`
-  mm.add('(min-width: 1024px)', () => {
-    const ball = document.getElementById('scroll-ball');
-    if (!ball) return;
-    gsap
-      .timeline({
-        defaults: { ease: 'sine.inOut', transformOrigin: '50% 50%' },
-        scrollTrigger: { start: 0, end: 'max', scrub: 0.6, invalidateOnRefresh: true },
-      })
-      .to(ball, { x: '80vw', y: '16vh', rotation: 420 })
-      .to(ball, { x: '10vw', y: '38vh', rotation: 840 })
-      .to(ball, { x: '72vw', y: '58vh', rotation: 1260 })
-      .to(ball, { x: '20vw', y: '82vh', rotation: 1680 });
-  });
-
-  // ---------- velocity skew: the page leans with fast scrolling ----------
-  const skewSetter = gsap.quickSetter('main', 'skewY', 'deg');
-  const skewClamp = gsap.utils.clamp(-1.6, 1.6);
-  const skewProxy = { skew: 0 };
-  ScrollTrigger.create({
-    onUpdate(self) {
-      const skew = skewClamp(self.getVelocity() / -400);
-      if (Math.abs(skew) > Math.abs(skewProxy.skew)) {
-        skewProxy.skew = skew;
-        gsap.to(skewProxy, {
-          skew: 0,
-          duration: 0.8,
-          ease: 'power3.out',
-          overwrite: true,
-          onUpdate: () => skewSetter(skewProxy.skew),
-        });
-      }
-    },
-  });
-
-  // ---------- hand-drawn arrows & doodles: draw strokes on entering viewport ----------
+  // ---------- hand-drawn arrows: draw their strokes on entering the viewport ----------
   document.querySelectorAll<SVGSVGElement>('svg[data-draw]').forEach((svg) => {
     const paths = svg.querySelectorAll<SVGPathElement>('.draw-path');
     paths.forEach(prepDraw);
@@ -277,52 +99,12 @@ async function initMotion() {
       scrollTrigger: { trigger: svg, start: 'top 90%', once: true },
     });
   });
-
-  // ---------- experience timeline squiggle: scrubbed by scroll ----------
-  document.querySelectorAll<SVGSVGElement>('svg[data-draw-scrub]').forEach((svg) => {
-    const path = svg.querySelector<SVGPathElement>('.draw-path');
-    if (!path) return;
-    prepDraw(path);
-    gsap.to(path, {
-      strokeDashoffset: 0,
-      ease: 'none',
-      scrollTrigger: { trigger: svg, start: 'top 75%', end: 'bottom 60%', scrub: 0.5 },
-    });
-  });
-
-  // ---------- paper plane rides its dashed route between hero and about ----------
-  // MotionPathPlugin is another ~10 KB gzipped and drives this one tween, so it
-  // only loads once we know the route is actually on the page.
-  const plane = document.querySelector('#plane');
-  if (plane) {
-    const { MotionPathPlugin } = await import('gsap/MotionPathPlugin');
-    gsap.registerPlugin(MotionPathPlugin);
-    gsap.to(plane, {
-      motionPath: {
-        path: '#plane-route',
-        align: '#plane-route',
-        alignOrigin: [0.5, 0.5],
-        autoRotate: true,
-      },
-      ease: 'none',
-      scrollTrigger: { trigger: '#plane-divider', start: 'top 95%', end: 'top 20%', scrub: 0.6 },
-    });
-  }
 }
-
-// This module is running, so the inline watchdog in Base.astro — which strips
-// `.js` to un-hide every [data-reveal]/[data-settle] section if the bundle
-// never arrives — has done its job. Cancel it before it can fire mid-fetch and
-// flash those sections in and back out on a slow connection. The remaining
-// failure mode, GSAP's own chunk not loading, is handled by the catch below.
-clearTimeout(window.__revealFallback);
 
 const motionReady = prefersReducedMotion
   ? Promise.resolve()
   : initMotion().catch(() => {
-      // nothing is going to animate the reveal targets in, so un-hide them and
-      // let the page stand still rather than stay blank
-      document.documentElement.classList.remove('js');
+      // GSAP's chunk did not arrive: the page simply stands still
     });
 
 // ---------- email button: mailto can silently no-op without a mail client,
@@ -334,7 +116,6 @@ emailBtn?.addEventListener('click', () => {
   navigator.clipboard?.writeText(emailBtn.dataset.email || '').catch(() => {});
   if (!emailCopied) return;
   // #email-copied is role="status": writing the text here is what announces it.
-  // Clearing it again on the way out means a second click re-announces.
   emailCopied.textContent = 'copied!';
   emailCopied.classList.add('is-on');
   clearTimeout(copiedTimer);
@@ -346,54 +127,38 @@ emailBtn?.addEventListener('click', () => {
   }, 1600);
 });
 
-// ---------- map tooltip: hover a country/pin to see who I shipped for ----------
-const tip = document.getElementById('map-tip');
-const tipWrap = document.querySelector<HTMLElement>('.hero-doodles');
-if (tip && tipWrap) {
-  const countryEl = tip.querySelector<HTMLElement>('[data-tip-country]')!;
-  const clientEl = tip.querySelector<HTMLElement>('[data-tip-client]')!;
-
-  // The wrapper's box only moves on scroll (it parallaxes) and on resize, so
-  // measure it then. This used to be a getBoundingClientRect() inside an
-  // unthrottled mousemove, forcing layout on every pointer sample.
-  let wrapRect = tipWrap.getBoundingClientRect();
-  const remeasure = () => {
-    wrapRect = tipWrap.getBoundingClientRect();
-  };
-  addEventListener('scroll', remeasure, { passive: true });
-  addEventListener('resize', remeasure, { passive: true });
-
-  const showTip = (el: SVGElement) => {
-    countryEl.textContent = el.dataset.country || '';
-    clientEl.textContent = el.dataset.client || '';
-    // home base gets the "currently based" gold; clients keep the accent
-    countryEl.style.color = 'home' in el.dataset ? HOME : ACCENT;
-    remeasure();
-    tip.classList.add('is-on');
-  };
-  const hideTip = () => tip.classList.remove('is-on');
-  /** viewport coords in, wrapper-relative offset out */
-  const moveTip = (x: number, y: number) => {
-    tip.style.translate = `${x - wrapRect.left + 16}px ${y - wrapRect.top + 18}px`;
-  };
-
-  document.querySelectorAll<SVGElement>('[data-client]').forEach((el) => {
-    el.addEventListener('mouseenter', () => showTip(el));
-    el.addEventListener('mouseleave', hideTip);
-    el.addEventListener('mousemove', (e) => {
-      const ev = e as MouseEvent;
-      moveTip(ev.clientX, ev.clientY);
+// ---------- globe pins: hover or focus names the client; press jumps to the chapter ----------
+{
+  const globe = document.getElementById('globe');
+  const tip = document.getElementById('map-tip');
+  if (globe && tip) {
+    const countryEl = tip.querySelector<HTMLElement>('[data-tip-country]')!;
+    const clientEl = tip.querySelector<HTMLElement>('[data-tip-client]')!;
+    const show = (pin: HTMLElement) => {
+      countryEl.textContent = pin.dataset.country || '';
+      clientEl.textContent = pin.dataset.client || '';
+      countryEl.style.color = 'home' in pin.dataset ? HOME : ACCENT;
+      // park the tip beside the pin, on whichever side has room
+      const g = globe.getBoundingClientRect();
+      const r = pin.getBoundingClientRect();
+      const onLeft = r.left - g.left > g.width * 0.6;
+      const x = onLeft ? r.left - g.left - 12 - tip.offsetWidth : r.right - g.left + 12;
+      const y = r.top - g.top + r.height / 2 - tip.offsetHeight / 2;
+      tip.style.translate = `${Math.round(x)}px ${Math.round(y)}px`;
+      tip.classList.add('is-on');
+    };
+    const hide = () => tip.classList.remove('is-on');
+    globe.querySelectorAll<HTMLButtonElement>('button.pin').forEach((pin) => {
+      pin.addEventListener('pointerenter', () => show(pin));
+      pin.addEventListener('pointerleave', hide);
+      pin.addEventListener('focus', () => show(pin));
+      pin.addEventListener('blur', hide);
+      pin.addEventListener('click', () => {
+        const target = document.querySelector<HTMLElement>(`.chapter[data-stop="${pin.dataset.stop}"]`);
+        target?.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth', block: 'center' });
+      });
     });
-    // Keyboard parity: the pins carry tabindex, so mirror hover onto focus and
-    // park the tooltip under the marker instead of under an absent pointer.
-    // Without this the country -> client pairing was reachable by mouse only.
-    el.addEventListener('focus', () => {
-      showTip(el);
-      const r = el.getBoundingClientRect();
-      moveTip(r.left + r.width / 2, r.bottom);
-    });
-    el.addEventListener('blur', hideTip);
-  });
+  }
 }
 
 // ---------- rough-notation: hand-drawn underlines/highlights on key phrases ----------
@@ -424,12 +189,12 @@ const observer = new IntersectionObserver(
         animationDuration: prefersReducedMotion ? 0 : 900,
       });
       // rough-notation measures the text at show() time, so drawing while an
-      // ancestor is still mid-scale/rotation lands the ink in the wrong place
-      // (was viewport-width dependent). Wait for the reveal to actually finish.
-      const show = () => setTimeout(() => annotation.show(), prefersReducedMotion ? 0 : 350);
-      const host = prefersReducedMotion ? null : el.closest('[data-reveal]');
-      if (host && !revealDone.has(host)) {
-        host.addEventListener('reveal:done', show, { once: true });
+      // ancestor is still mid-transform lands the ink in the wrong place.
+      // Wait for the block's entrance to finish.
+      const show = () => setTimeout(() => annotation.show(), prefersReducedMotion ? 0 : 250);
+      const host = prefersReducedMotion ? null : el.closest('[data-enter]');
+      if (host && !entered.has(host)) {
+        host.addEventListener('enter:done', show, { once: true });
       } else {
         show();
       }
@@ -439,12 +204,8 @@ const observer = new IntersectionObserver(
   { threshold: 0.6 }
 );
 
-// Observe only once the webfonts have loaded AND the motion layer has set its
-// permanent transforms: rough-notation measures text (fallback-font metrics
-// misplace the ink) and anchors its absolute SVGs to the nearest transformed
-// ancestor (so `main` must already carry its transform). The library itself is
-// imported lazily — no ink is drawn until both of those settle anyway, so it
-// has no business in the bundle that gates first render.
+// Observe only once the webfonts have loaded and the motion layer is in place:
+// rough-notation measures text (fallback-font metrics misplace the ink).
 Promise.all([document.fonts.ready, motionReady]).then(async () => {
   const targets = document.querySelectorAll('[data-annotate]');
   if (!targets.length) return;

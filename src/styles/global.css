@@ -13,22 +13,40 @@
   --color-line: #dce0d5;
 }
 
+:root {
+  /* ---------- motion tokens ----------
+     strong ease-outs for arrivals, in-out for things that travel; no overshoot */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.76, 0, 0.24, 1);
+  --ease-soft: cubic-bezier(0.33, 1, 0.68, 1);
+  --t-press: 140ms;
+  --t-hover: 180ms;
+  --t-ui: 240ms;
+  --t-reveal: 800ms;
+  --stagger-item: 80ms;
+
+  /* surfaces are one tone step from the page, never a line */
+  --surface: color-mix(in srgb, var(--color-ink) 6%, var(--color-paper));
+  --surface-accent: color-mix(in srgb, var(--color-accent) 14%, var(--color-paper));
+}
+
 @media (prefers-reduced-motion: no-preference) {
   html {
     scroll-behavior: smooth;
   }
 }
 
-/* keyboard escape hatch past the hero; off-screen until focused */
+/* keyboard escape hatch past the first spread; off-screen until focused */
 .skip-link {
   position: fixed;
   left: 0.75rem;
   top: 0.75rem;
   z-index: 50;
   transform: translateY(-250%);
-  border: 2px solid var(--color-ink);
   border-radius: 0.5rem;
-  background: var(--color-paper);
+  background: var(--color-ink);
+  color: var(--color-paper);
   padding: 0.5rem 1rem;
   font-weight: 600;
 }
@@ -36,13 +54,17 @@
   transform: translateY(0);
 }
 
-/* skip-link landing targets are only focusable to move the caret, so the ring
-   around the whole section would be noise */
+/* skip-link landing targets are only focusable to move the caret */
 [tabindex='-1']:focus {
   outline: none;
 }
 
-/* slide-in reveal states start offscreen; never let them widen the page */
+:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 3px;
+}
+
+/* entrance states start off-screen; never let them widen the page */
 html,
 body {
   overflow-x: clip;
@@ -52,7 +74,7 @@ body {
   background-color: var(--color-paper);
   color: var(--color-ink);
   font-family: var(--font-sans);
-  /* subtle paper grain, pure SVG — no image request */
+  /* subtle paper grain, pure SVG, no image request */
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
 }
 
@@ -60,68 +82,349 @@ body {
   font-family: var(--font-hand);
 }
 
-/* animated elements start hidden only when JS runs and motion is allowed,
-   so no-JS / reduced-motion visitors always see the full page.
-   NOTE: the hero *text* is deliberately not in this list. Hiding it here meant
-   it could not paint until the JS bundle had loaded and animated it back in,
-   which pushed LCP out to several seconds. It now animates from CSS below,
-   starting at first paint. Only `.hero-in` — the decorative map column, which
-   genuinely needs JS to draw its paths — still starts hidden. */
+/* ---------- controls: flat fills, press feedback, no shadows ---------- */
+.button-primary,
+.button-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  border-radius: 0.5rem;
+  padding: 0.7rem 1.25rem;
+  font-weight: 600;
+  transition:
+    transform var(--t-press) var(--ease-out),
+    background-color var(--t-hover) ease,
+    color var(--t-hover) ease;
+}
+.button-primary {
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+.button-secondary {
+  background: var(--surface);
+  color: var(--color-ink);
+}
+.button-primary:active,
+.button-secondary:active {
+  transform: scale(0.97);
+}
+@media (hover: hover) and (pointer: fine) {
+  .button-primary:hover {
+    background: var(--color-accent);
+  }
+  .button-secondary:hover {
+    background: var(--color-ink);
+    color: var(--color-paper);
+  }
+}
+
+.icon-link {
+  display: inline-block;
+  color: var(--color-ink);
+  transition:
+    transform var(--t-ui) var(--ease-out),
+    color var(--t-hover) ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .icon-link:hover {
+    color: var(--color-accent);
+    transform: translateY(-3px);
+  }
+}
+
+.text-link {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--color-accent) 55%, transparent);
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.2em;
+  transition:
+    text-decoration-color var(--t-hover) ease,
+    color var(--t-hover) ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .text-link:hover {
+    color: var(--color-accent);
+    text-decoration-color: currentColor;
+  }
+}
+
+/* skill / tech chips: a tone step, and they answer the pointer */
+.chip {
+  background: var(--surface);
+  transition:
+    transform var(--t-ui) var(--ease-out),
+    background-color var(--t-hover) ease,
+    color var(--t-hover) ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .chip:hover {
+    transform: translateY(-2px);
+    background: var(--surface-accent);
+    color: var(--color-accent);
+  }
+}
+
+/* ---------- the first spread: name, hero copy, chapters, held globe ---------- */
+.hero-name {
+  font-size: clamp(2.6rem, 7.8vw, 7.5rem);
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+}
+
+.spread-grid {
+  display: grid;
+  gap: 2.5rem;
+  margin-top: 1.5rem;
+}
+.globe-stage {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.globe {
+  width: min(100%, 40svh);
+  margin-inline: auto;
+}
+.chapter {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-block: 1.5rem;
+}
+.chapters-head {
+  padding-top: 2rem;
+}
+
+@media (max-width: 1023.98px) {
+  /* phones and tablets see the finished composition: the globe once, under
+     the hero, then the chapters as a plain column (the held stage is a
+     desktop device; a globe pinned over a phone screen covers the text) */
+  .globe {
+    width: min(100%, 72vw, 46svh);
+  }
+  .chapter {
+    min-height: 0;
+    padding-block: 1.75rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .spread-grid {
+    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+    grid-template-rows: auto auto;
+    column-gap: 3.5rem;
+    margin-top: 2rem;
+  }
+  .spread-hero {
+    grid-column: 1;
+    grid-row: 1;
+    min-height: calc(100svh - 15rem);
+    padding-top: 1rem;
+  }
+  .spread-chapters {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .spread-globe {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+  }
+  /* held for the whole spread; the globe sits high enough to be whole on the
+     first screen (under the name) and near the middle once it sticks */
+  .globe-stage {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    justify-content: flex-start;
+    padding-top: 11svh;
+  }
+  .globe {
+    width: min(100%, 58svh);
+  }
+  .chapter {
+    min-height: 62svh;
+    padding-block: 2rem;
+  }
+}
+
+/* ---------- pins over the globe: real buttons, 44px targets ----------
+   the list covers the globe box but only the buttons may take the pointer */
+.globe-pins {
+  pointer-events: none;
+}
+.globe-pins li {
+  width: 0;
+  height: 0;
+}
+.pin {
+  pointer-events: auto;
+  position: absolute;
+  left: 0;
+  top: 0;
+  translate: -50% -50%;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  color: var(--color-ink-soft);
+}
+.pin:focus-visible {
+  outline-offset: -6px;
+}
+.pin-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  border: 2px solid var(--color-paper);
+  transition: transform var(--t-ui) var(--ease-out);
+}
+.pin[data-home] .pin-dot {
+  width: 17px;
+  height: 17px;
+  background: var(--color-marker);
+  border-color: var(--color-ink);
+}
+.pin[data-home] {
+  color: var(--color-ink);
+}
+.pin-label {
+  position: absolute;
+  white-space: nowrap;
+  font-size: 1.1rem;
+  line-height: 1;
+  pointer-events: none;
+}
+.pin[data-home] .pin-label {
+  font-weight: 600;
+}
+.pin[data-side='right'] .pin-label {
+  left: 100%;
+  top: 50%;
+  translate: -6px -50%;
+}
+.pin[data-side='left'] .pin-label {
+  right: 100%;
+  top: 50%;
+  translate: 6px -50%;
+}
+.pin[data-side='below'] .pin-label {
+  top: 100%;
+  left: 50%;
+  translate: -50% -8px;
+}
+.pin[data-side='above'] .pin-label {
+  bottom: 100%;
+  left: 50%;
+  translate: -50% 8px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .pin:hover .pin-dot {
+    transform: scale(1.4);
+  }
+}
+.pin:focus-visible .pin-dot {
+  transform: scale(1.4);
+}
+
+/* a section on its own field: full-bleed colour step behind a normal column */
+.band {
+  background: var(--surface);
+}
+
+/* ---------- luggage tags ---------- */
+.tag {
+  position: relative;
+  min-height: 7.5rem;
+  padding: 1.25rem 1.25rem 1.1rem 2.75rem;
+  rotate: var(--tilt, 0deg);
+}
+.tag-shape {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.tag-outline {
+  fill: #ffffff;
+  stroke: var(--color-ink);
+  stroke-width: 2;
+}
+.tag-hole {
+  fill: var(--color-paper);
+  stroke: var(--color-ink);
+  stroke-width: 2;
+}
+.tag-string {
+  position: absolute;
+  left: calc(10% - 2.2rem);
+  top: calc(50% - 2.3rem);
+  width: 2.4rem;
+  height: 2.4rem;
+  color: var(--color-ink-soft);
+}
+.tag-text {
+  position: relative;
+  line-height: 1.5;
+}
+.tag-note {
+  position: relative;
+  margin-top: 0.5rem;
+  font-size: 1.125rem;
+  color: var(--color-accent);
+}
+
+/* ---------- entrances: the parts of a block arrive in reading order ----------
+   CSS moves them; animations.ts sets --i on the children and adds .is-in once.
+   Only when JS runs and motion is allowed, so no-JS and reduced-motion visitors
+   always see the finished page. */
 @media (prefers-reduced-motion: no-preference) {
-  .js [data-reveal],
-  .js [data-settle],
-  .js .hero-in {
+  .js [data-enter] > * {
+    transition:
+      opacity 700ms var(--ease-expo),
+      transform 900ms var(--ease-expo);
+    transition-delay: calc(var(--i, 0) * var(--stagger-item));
+  }
+  .js [data-enter]:not(.is-in) > * {
     opacity: 0;
+    transform: translateY(24px);
   }
 }
 
 /* ---------- hero entrance: CSS-driven, so it never waits on JS or webfonts ----------
-   These run for every visitor (no `.js` gate) — with JS off the animation still
-   plays and still ends visible, and reduced-motion skips it entirely. */
+   The name paints immediately at full opacity; only the glyphs move, so it is
+   a valid LCP candidate from the very first frame. Characters are split only
+   because the name is three words. Reduced motion skips it entirely. */
 @media (prefers-reduced-motion: no-preference) {
-  .hero-greeting {
-    animation: hero-drop 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
-  }
-
-  /* the name paints immediately at full opacity; only the glyphs move, so it
-     is a valid LCP candidate from the very first frame */
-  /* deliberately NOT `overflow: hidden` — glyphs stay visible while they swing
-     up (matching the previous SplitText behaviour), and a clipped-away LCP
-     element risks not counting as painted at all */
   .hero-word {
     display: inline-block;
   }
   .hero-char {
     display: inline-block;
-    animation: hero-char 0.9s cubic-bezier(0.34, 1.36, 0.64, 1) both;
-    animation-delay: calc(0.25s + var(--i) * 0.045s);
+    animation: hero-char 0.9s var(--ease-expo) both;
+    animation-delay: calc(0.15s + var(--i) * 0.035s);
   }
-
-  /* opacity only, no transform: rough-notation anchors its absolutely
-     positioned ink to the nearest transformed ancestor, and the highlight in
-     this paragraph must keep anchoring to `main` (which holds a permanent
-     transform) rather than briefly re-anchoring to the paragraph itself */
+  /* opacity only, no transform: rough-notation anchors its ink to the nearest
+     transformed ancestor, and the highlight in this paragraph must not
+     re-anchor mid-entrance */
   .hero-tagline {
-    animation: hero-fade 0.5s ease-out 0.75s both;
+    animation: hero-fade 0.5s ease-out 0.65s both;
   }
   .hero-cta {
-    animation: hero-rise 0.5s cubic-bezier(0.34, 1.5, 0.64, 1) 0.95s both;
+    animation: hero-rise 0.6s var(--ease-expo) 0.8s both;
   }
   .hero-note {
-    animation: hero-slide 0.45s cubic-bezier(0.22, 1, 0.36, 1) 1.25s both;
+    animation: hero-slide 0.5s var(--ease-out) 1.05s both;
+  }
+  .hero-cue {
+    animation: hero-fade 0.6s ease-out 1.4s both;
   }
 }
 
-@keyframes hero-drop {
-  from {
-    opacity: 0;
-    transform: translateY(-18px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
 @keyframes hero-char {
   from {
     transform: translateY(115%) rotate(var(--tilt));
@@ -141,11 +444,11 @@ body {
 @keyframes hero-rise {
   from {
     opacity: 0;
-    transform: translateY(34px) scale(0.95);
+    transform: translateY(24px);
   }
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateY(0);
   }
 }
 @keyframes hero-slide {
@@ -159,29 +462,23 @@ body {
   }
 }
 
-/* ---------- the two interactive overlays ----------
-   Deliberately CSS rather than GSAP: they are the only motion outside the
-   `prefers-reduced-motion` gate, and driving them from JS meant the whole
-   animation engine had to load for visitors who animate nothing. Tailwind v4
-   writes its own utilities to the `translate` / `rotate` properties, so the
-   `transform` shorthand here composes with them rather than fighting them. */
+/* ---------- the two small overlays: CSS transitions, run for everyone ---------- */
 #email-copied,
 #map-tip {
   transition:
-    opacity 0.25s ease,
-    transform 0.25s ease,
-    visibility 0s linear 0.25s;
+    opacity var(--t-ui) ease,
+    transform var(--t-ui) var(--ease-out),
+    visibility 0s linear var(--t-ui);
 }
 #email-copied {
   transform: translateY(6px);
 }
 #map-tip {
-  transform: scale(0.6) rotate(-3deg);
+  transform: scale(0.96);
   transform-origin: left top;
-  /* `translate` is written per pointer sample by animations.ts */
   transition:
-    opacity 0.25s ease,
-    transform 0.25s ease,
+    opacity var(--t-ui) ease,
+    transform var(--t-ui) var(--ease-out),
     translate 0.18s ease-out;
 }
 /* the ID beats Tailwind's `invisible` / `opacity-0` on the same element */
@@ -190,64 +487,21 @@ body {
   visibility: visible;
   opacity: 1;
   transition:
-    opacity 0.25s ease,
-    transform 0.25s ease,
+    opacity var(--t-ui) ease,
+    transform var(--t-ui) var(--ease-out),
     visibility 0s;
 }
 #email-copied.is-on {
   transform: translateY(0);
 }
 #map-tip.is-on {
-  transform: scale(1) rotate(0deg);
+  transform: scale(1);
 }
-
 @media (prefers-reduced-motion: reduce) {
   #email-copied,
   #map-tip {
     transition: none;
   }
-}
-
-/* countries with clients invite a hover */
-.map-country[data-client] {
-  cursor: pointer;
-  transition: stroke-width 0.15s ease;
-}
-.map-country[data-client]:hover {
-  stroke-width: 2.6;
-}
-g.map-pin[data-client] {
-  cursor: pointer;
-}
-g.map-pin:focus-visible {
-  outline: 2px solid var(--color-ink);
-  outline-offset: 3px;
-}
-
-/* map pins grow on hover (GSAP owns the <g>, CSS owns the dot) */
-.pin-dot {
-  transform-box: fill-box;
-  transform-origin: center;
-  transition: transform 0.15s ease;
-}
-g.map-pin:hover .pin-dot,
-g.map-pin:focus-visible .pin-dot {
-  transform: scale(1.45);
-}
-
-/* skill / tech chips perk up on hover */
-.chip {
-  transition:
-    transform 0.15s ease,
-    border-color 0.15s ease,
-    color 0.15s ease,
-    box-shadow 0.15s ease;
-}
-.chip:hover {
-  transform: translateY(-3px) rotate(-1deg);
-  border-color: var(--color-accent);
-  color: var(--color-accent);
-  box-shadow: 2px 3px 0 0 color-mix(in srgb, var(--color-accent) 25%, transparent);
 }
 
 /* hand-drawn SVG strokes get "drawn" by GSAP; visible without JS */
@@ -258,18 +512,13 @@ g.map-pin:focus-visible .pin-dot {
   stroke-linejoin: round;
 }
 
-/* sticky-note tape strip */
-.tape::before {
-  content: '';
-  position: absolute;
-  top: -0.7rem;
-  left: 50%;
-  width: 5.5rem;
-  height: 1.4rem;
-  transform: translateX(-50%) rotate(-2deg);
-  background: rgba(233, 200, 120, 0.45);
-  border-left: 1px dashed rgba(0, 0, 0, 0.08);
-  border-right: 1px dashed rgba(0, 0, 0, 0.08);
+/* rough-notation sizes its overlay SVG to a 100px square at the containing
+   block's corner and draws past it (overflow visible). The square itself has
+   no job and lands on top of whatever heading sits in that corner; shrink it
+   so the ink is the only thing the overlay occupies. */
+.rough-annotation {
+  width: 1px !important;
+  height: 1px !important;
 }
 
 ::selection {

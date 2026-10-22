@@ -1,0 +1,43 @@
+---
+/**
+ * About, told as luggage tags: the summary paragraph, then the six
+ * highlights hung as tags off a drawn rail. Tags are drawn (an SVG outline
+ * with a hole and a string), not boxed, and nothing casts a shadow.
+ */
+import { profile, highlights } from '../data/resume';
+import SectionHeading from './SectionHeading.astro';
+
+const tilts = ['-1.5deg', '1deg', '-0.8deg', '1.4deg', '-1.2deg', '0.6deg'];
+---
+
+<section id="content" tabindex="-1" class="relative mx-auto max-w-6xl px-6 py-20 lg:py-28" aria-labelledby="about">
+  <SectionHeading id="about" label="About" aside="the short version" />
+
+  <div data-enter>
+    <p class="max-w-3xl text-lg leading-relaxed text-ink sm:text-xl">{profile.summary}</p>
+  </div>
+
+  <div class="mt-14">
+    <ul class="tags m-0 grid list-none gap-x-8 gap-y-7 p-0 sm:grid-cols-2 lg:grid-cols-3" data-enter>
+      {
+        highlights.map((h, i) => (
+          <li class="tag" style={`--tilt:${tilts[i % tilts.length]}`}>
+            <svg class="tag-shape" viewBox="0 0 200 110" preserveAspectRatio="none" aria-hidden="true">
+              <path
+                class="tag-outline"
+                d="M18 7 C70 5, 130 5, 182 7 C193 8, 195 18, 195 24 L196 86 C196 96, 192 103, 182 103 C130 106, 70 105, 18 103 C8 103, 4 96, 4 86 L4 24 C4 14, 8 8, 18 7 Z"
+                vector-effect="non-scaling-stroke"
+              />
+              <circle class="tag-hole" cx="20" cy="55" r="6" vector-effect="non-scaling-stroke" />
+            </svg>
+            <svg class="tag-string" viewBox="0 0 60 60" aria-hidden="true">
+              <path d="M52 52 C40 34, 26 20, 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+            <p class="tag-text">{h.text}</p>
+            <p class="tag-note hand">— {h.note}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>

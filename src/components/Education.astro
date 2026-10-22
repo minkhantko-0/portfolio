@@ -1,25 +1,23 @@
 ---
 import { education, languages } from '../data/resume';
 import SectionHeading from './SectionHeading.astro';
-import Doodle from './Doodle.astro';
 ---
 
-<section class="relative mx-auto max-w-4xl px-6 py-24" aria-labelledby="education">
-  <div data-parallax="14" class="absolute right-10 top-10 hidden lg:block">
-    <Doodle variant="gradcap" class="w-20 rotate-6 text-ink-soft" float />
-  </div>
+<section class="band" aria-labelledby="education">
+  <div class="mx-auto max-w-6xl px-6 py-20 lg:py-24">
   <SectionHeading id="education" label="Education & Languages" aside="where it started" />
 
-  <div data-reveal="up">
-    <h3 class="text-lg font-bold">{education.degree}</h3>
-    <p class="mt-1 text-sm text-ink-soft">
+  <div class="max-w-3xl" data-enter>
+    <h3 class="text-xl font-bold sm:text-2xl">{education.degree}</h3>
+    <p class="mt-1 text-base text-ink-soft">
       {education.school} · {education.period}
     </p>
-    <p class="mt-4 max-w-3xl leading-relaxed text-ink-soft">
+    <p class="mt-4 text-lg leading-relaxed text-ink">
       {education.notes.join(' ')}
     </p>
-    <p class="mt-4 text-ink-soft">
-      <span class="hand text-lg text-ink">Languages:</span> {languages.join(', ')}
+    <p class="mt-5 text-lg text-ink">
+      <span class="hand text-xl text-accent">Languages:</span> {languages.join(', ')}
     </p>
+  </div>
   </div>
 </section>

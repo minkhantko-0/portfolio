@@ -4,25 +4,23 @@ import HandArrow from './HandArrow.astro';
 import Doodle from './Doodle.astro';
 ---
 
-<section class="mx-auto max-w-4xl px-6 pt-24" aria-labelledby="contact">
-  <div class="relative rounded-2xl border-2 border-ink bg-white/70 p-8 sm:p-12" data-reveal="pop">
+<section class="mx-auto max-w-6xl px-6 pt-20 lg:pt-24" aria-labelledby="contact">
+  <div class="contact-card relative rounded-2xl bg-white p-8 sm:p-12" data-enter>
     <div class="pointer-events-none absolute -top-14 left-6 hidden sm:block">
       <p class="hand -rotate-3 text-2xl text-accent">let’s build something</p>
       <HandArrow variant="down" class="ml-24 h-10 w-6 text-accent" />
     </div>
 
-    <div data-parallax="10" class="pointer-events-none absolute right-8 top-8 hidden sm:block">
-      <Doodle variant="envelope" class="w-28 text-ink-soft" float />
-    </div>
-    <div data-parallax="20" class="pointer-events-none absolute bottom-8 right-10 hidden sm:block">
-      <Doodle variant="plane" class="w-16 text-accent" float />
+    <!-- the envelope the paper plane lands as (Phase 5 morphs the plane into it) -->
+    <div id="contact-envelope" class="pointer-events-none absolute right-8 top-8 hidden sm:block">
+      <Doodle variant="envelope" class="w-28 text-ink-soft" />
     </div>
 
     <h2 id="contact" class="hand text-3xl font-bold sm:text-4xl">
-      <span data-annotate="highlight">Get in touch</span>
+      <span data-annotate="underline">Get in touch</span>
     </h2>
-    <p class="mt-4 max-w-xl text-lg text-ink-soft">
-      Available for consulting work, and open to the right full-time role. Either way — email is the
+    <p class="mt-4 max-w-xl text-lg text-ink">
+      Available for consulting work, and open to the right full-time role. Either way, email is the
       fastest way to reach me, and I actually reply.
     </p>
 
@@ -39,30 +37,24 @@ import Doodle from './Doodle.astro';
           id="email-btn"
           href={`mailto:${profile.email}`}
           data-email={profile.email}
-          title="Opens your mail app — and copies the address"
-          class="inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-ink px-5 py-3 font-semibold text-paper shadow-[4px_4px_0_0_var(--color-accent)] transition-transform duration-150 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_0_var(--color-accent)]"
+          title="Opens your mail app, and copies the address"
+          class="button-primary"
         >
           {profile.email}
         </a>
       </span>
-      <a
-        href={profile.cvFile}
-        download
-        class="rounded-lg border-2 border-ink px-5 py-3 font-semibold transition-colors hover:bg-ink hover:text-paper"
-      >
-        Download CV
-      </a>
+      <a href={profile.cvFile} download class="button-secondary">Download CV</a>
     </div>
 
-    <ul class="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-ink-soft">
+    <ul class="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-ink">
       <li>
-        <a href={profile.github} target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-accent">GitHub</a>
+        <a href={profile.github} target="_blank" rel="noopener noreferrer" class="text-link">GitHub</a>
       </li>
       <li>
-        <a href={profile.linkedin} target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-accent">LinkedIn</a>
+        <a href={profile.linkedin} target="_blank" rel="noopener noreferrer" class="text-link">LinkedIn</a>
       </li>
       <li class="flex items-center gap-1.5">
-        <a href={`tel:${profile.phone}`} class="underline underline-offset-4 hover:text-accent">{profile.phone}</a>
+        <a href={`tel:${profile.phone}`} class="text-link">{profile.phone}</a>
         <HandArrow variant="curve-left" class="h-4 w-8 shrink-0 text-accent" />
         <a
           href={`https://wa.me/${profile.phone.replace(/[^0-9]/g, '')}`}
@@ -75,5 +67,4 @@ import Doodle from './Doodle.astro';
       </li>
     </ul>
   </div>
-
 </section>

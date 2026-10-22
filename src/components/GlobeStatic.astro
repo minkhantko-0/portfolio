@@ -1,0 +1,112 @@
+---
+/**
+ * The globe as it looks before any JavaScript runs: an orthographic view
+ * drawn at build time from the same world-atlas data as the texture, in the
+ * same ink. It is the first frame on every visit and the whole globe for
+ * no-JS, no-WebGL and reduced-motion visitors. The 3D scene (src/globe)
+ * mounts into #globe-mount with an orthographic camera matched to this
+ * view, so it can fade in over the drawing without a jump.
+ *
+ * The pins are real buttons, positioned over the drawing in percent of the
+ * box; the 3D scene moves them as the globe turns. Far-side pins start
+ * hidden.
+ */
+import { orthographicView } from '../lib/worldmap';
+import { route } from '../data/route';
+
+/** lon/lat the drawn globe faces: Asia, with home near the middle */
+const CENTER: [number, number] = [100, 15];
+const SIZE = 600;
+const RADIUS = 290;
+
+const view = orthographicView(CENTER, SIZE, RADIUS);
+const pinById = new Map(view.pins.map((p) => [p.id, p]));
+const label = `Globe of the countries the work shipped to: ${route
+  .filter((s) => !s.home)
+  .map((s) => s.country)
+  .join(', ')}; currently based in Thailand`;
+---
+
+<div
+  id="globe"
+  class="globe relative aspect-square w-full select-none"
+  data-lon={CENTER[0]}
+  data-lat={CENTER[1]}
+  data-size={SIZE}
+  data-radius={RADIUS}
+>
+  <svg id="globe-svg" viewBox={`0 0 ${SIZE} ${SIZE}`} class="block h-full w-full" fill="none" role="img" aria-label={label}>
+    <defs>
+      <filter id="globe-scratch" x="-5%" y="-5%" width="110%" height="110%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="3" seed="7" result="noise" />
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="4" />
+      </filter>
+      <pattern id="globe-hatch-client" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(-42)">
+        <path d="M0 0v7" stroke="var(--color-accent)" stroke-width="1.8" opacity="0.75" />
+      </pattern>
+      <pattern id="globe-hatch-home" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(38)">
+        <path d="M0 0v6" stroke="var(--color-home)" stroke-width="2.2" opacity="0.9" />
+      </pattern>
+    </defs>
+    <path d={view.sphere} fill="#fbfaf5" />
+    <path d={view.graticule} stroke="var(--color-ink-soft)" stroke-opacity="0.18" stroke-width="1" />
+    <g filter="url(#globe-scratch)">
+      {
+        view.shapes.map((s) =>
+          s.kind === 'base' ? (
+            <path d={s.d} fill="#ffffff" stroke="var(--color-ink-soft)" stroke-opacity="0.55" stroke-width="0.8" />
+          ) : (
+            <path
+              d={s.d}
+              fill={s.kind === 'home' ? 'url(#globe-hatch-home)' : 'url(#globe-hatch-client)'}
+              stroke={s.kind === 'home' ? 'var(--color-ink)' : 'var(--color-accent)'}
+              stroke-width="1.6"
+            />
+          )
+        )
+      }
+    </g>
+    <path d={view.sphere} stroke="var(--color-ink)" stroke-width="2.2" />
+  </svg>
+
+  <!-- the 3D globe is mounted here, over the drawing -->
+  <div id="globe-mount" class="pointer-events-none absolute inset-0" aria-hidden="true"></div>
+
+  <ul class="globe-pins absolute inset-0 m-0 list-none p-0">
+    {
+      route.map((s) => {
+        const p = pinById.get(s.id)!;
+        return (
+          <li
+            class="absolute"
+            style={`left:${((p.x / SIZE) * 100).toFixed(2)}%;top:${((p.y / SIZE) * 100).toFixed(2)}%`}
+            data-pin={s.id}
+            hidden={!p.visible}
+          >
+            <button
+              type="button"
+              class="pin"
+              data-stop={s.id}
+              data-country={s.country}
+              data-client={s.client}
+              data-side={s.label ?? 'right'}
+              {...(s.home ? { 'data-home': '' } : {})}
+              aria-label={`${s.country}: ${s.client}. Jump to this stop`}
+            >
+              <span class="pin-dot" aria-hidden="true" />
+              <span class="pin-label hand" aria-hidden="true">
+                {s.home ? 'Thailand, I’m here' : s.country}
+              </span>
+            </button>
+          </li>
+        );
+      })
+    }
+  </ul>
+
+  <!-- hover / focus tooltip for the pins; positioned by animations.ts -->
+  <div id="map-tip" class="pointer-events-none invisible absolute left-0 top-0 z-20 rounded-lg border-2 border-ink bg-white px-3 py-2 opacity-0">
+    <p class="hand text-base font-semibold text-accent" data-tip-country></p>
+    <p class="hand text-lg text-ink" data-tip-client></p>
+  </div>
+</div>
