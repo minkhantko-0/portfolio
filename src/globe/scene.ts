@@ -50,6 +50,8 @@ export interface GlobeHandle {
   readonly radius: number;
   /** ask for frames: anything that changed the scene calls this */
   invalidate(): void;
+  /** the flight owns the orientation while flying; idle drift only when it says so */
+  allowIdle(flag: boolean): void;
   /** lon/lat → position on the sphere's own frame, at `lift` × radius */
   point(lon: number, lat: number, lift?: number): Vector3;
   dispose(): void;
@@ -237,6 +239,26 @@ export async function mountGlobe(root: HTMLElement): Promise<GlobeHandle> {
     }
   };
 
+  // ---------- idle: after twenty seconds without a hand on it, a slow turn ----------
+  // (stops at the first touch, off screen, in a hidden tab, and while the flight flies)
+  let idleAllowed = true;
+  let idleSpin = false;
+  let idleTimer: ReturnType<typeof setTimeout> | undefined;
+  const armIdle = () => {
+    clearTimeout(idleTimer);
+    idleSpin = false;
+    if (!idleAllowed) return;
+    idleTimer = setTimeout(() => {
+      if (!idleAllowed || !onScreen || !visible) return;
+      idleSpin = true;
+      invalidate();
+    }, 20000);
+  };
+  const allowIdle = (flag: boolean) => {
+    idleAllowed = flag;
+    armIdle();
+  };
+
   // ---------- render on demand ----------
   let frames = 0;
   let raf = 0;
@@ -270,6 +292,9 @@ export async function mountGlobe(root: HTMLElement): Promise<GlobeHandle> {
       yawTarget = tween.from[0] + (tween.to[0] - tween.from[0]) * e;
       pitchTarget = tween.from[1] + (tween.to[1] - tween.from[1]) * e;
       if (k >= 1) tween = null;
+      moving = true;
+    } else if (idleSpin && !dragging) {
+      yawTarget -= 0.025 * dt;
       moving = true;
     } else if (!dragging) {
       // inertia after a drag
@@ -320,6 +345,7 @@ export async function mountGlobe(root: HTMLElement): Promise<GlobeHandle> {
   const DRAG = (Math.PI / size) * 1.15; // radians per pixel: a full drag across the globe is about half a turn
 
   const onDown = (e: PointerEvent) => {
+    armIdle();
     if (e.button !== 0 || (e.target as HTMLElement).closest('button')) return;
     dragging = true;
     pointerId = e.pointerId;
@@ -333,6 +359,7 @@ export async function mountGlobe(root: HTMLElement): Promise<GlobeHandle> {
     root.classList.add('is-dragging');
   };
   const onMove = (e: PointerEvent) => {
+    if (idleSpin) armIdle();
     if (dragging && e.pointerId === pointerId) {
       const dx = e.clientX - lastX;
       const dy = e.clientY - lastY;
@@ -386,6 +413,7 @@ export async function mountGlobe(root: HTMLElement): Promise<GlobeHandle> {
 
   // keyboard: arrow keys turn the globe, from the globe itself or from a focused pin
   const onKey = (e: KeyboardEvent) => {
+    armIdle();
     const step = d2r(15);
     switch (e.key) {
       case 'ArrowLeft':
@@ -489,7 +517,12 @@ export async function mountGlobe(root: HTMLElement): Promise<GlobeHandle> {
   const io = new IntersectionObserver(
     (entries) => {
       onScreen = entries[0].isIntersecting;
-      if (onScreen) invalidate();
+      if (onScreen) {
+        invalidate();
+        armIdle();
+      } else {
+        idleSpin = false;
+      }
     },
     { threshold: 0 }
   );
@@ -506,16 +539,19 @@ export async function mountGlobe(root: HTMLElement): Promise<GlobeHandle> {
   canvas.style.opacity = '1';
   root.classList.add('is-live');
   invalidate();
+  armIdle();
 
   return {
     lookAt,
     surface,
     radius,
     invalidate,
+    allowIdle,
     point: (lon, lat, lift = 1) => toPoint(lon, lat, radius * lift),
     dispose() {
       cancelAnimationFrame(raf);
       clearInterval(sunTimer);
+      clearTimeout(idleTimer);
       ro.disconnect();
       io.disconnect();
       document.removeEventListener('visibilitychange', onVisibility);

@@ -119,6 +119,9 @@ export function startFlight(globe: GlobeHandle, gsap: typeof Gsap, ScrollTrigger
 
   const forward = new Vector3();
   const up = new Vector3();
+  // the plane banks with the speed of the scroll and settles as it stops
+  let roll = 0;
+  let rollTarget = 0;
   const placePlane = (leg: number, t: number, follow: boolean) => {
     const pts = paths[leg];
     const i = Math.min(SEGMENTS - 1, Math.floor(t * SEGMENTS));
@@ -128,6 +131,8 @@ export function startFlight(globe: GlobeHandle, gsap: typeof Gsap, ScrollTrigger
     up.copy(plane.position).normalize();
     plane.up.copy(up);
     plane.lookAt(forward);
+    roll += (rollTarget - roll) * 0.18;
+    plane.rotateZ(roll);
     if (!follow) return;
     const at = lonLatOf(plane.position);
     globe.lookAt(at.lon, at.lat, 0);
@@ -164,6 +169,7 @@ export function startFlight(globe: GlobeHandle, gsap: typeof Gsap, ScrollTrigger
     // before the first chapter the globe stays as drawn (or as the visitor left it)
     placePlane(leg, t, p > 0);
     setActive(p <= 0 ? -1 : leg);
+    globe.allowIdle(p <= 0);
     globe.invalidate();
   };
 
@@ -183,6 +189,9 @@ export function startFlight(globe: GlobeHandle, gsap: typeof Gsap, ScrollTrigger
         end: 'bottom 62%',
         scrub: 0.6,
         invalidateOnRefresh: true,
+        onUpdate: (self) => {
+          rollTarget = Math.max(-1, Math.min(1, self.getVelocity() / 2500)) * -0.45;
+        },
       },
     });
     return () => {
@@ -195,6 +204,7 @@ export function startFlight(globe: GlobeHandle, gsap: typeof Gsap, ScrollTrigger
   mm.add('(max-width: 1023.98px)', () => {
     // the finished composition: every leg drawn, the plane home
     rest();
+    globe.allowIdle(true);
     if (count) count.textContent = 'home';
     return () => undefined;
   });

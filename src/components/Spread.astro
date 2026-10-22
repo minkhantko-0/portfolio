@@ -109,7 +109,9 @@ const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-');
           <span class="mx-1 ml-4 inline-block size-3 rounded-full bg-marker ring-2 ring-ink align-baseline"></span>
           <span class="text-ink">based</span>
           <span class="ml-3 text-base" data-globe-hint>(drag to spin)</span>
-          <button type="button" data-tilt-toggle hidden aria-pressed="false" class="hand ml-3 text-base text-accent underline-offset-4 hover:underline">
+        </p>
+        <p class="mt-1 text-center">
+          <button type="button" data-tilt-toggle hidden aria-pressed="false" class="hand text-base text-accent underline-offset-4 hover:underline">
             tilt with your phone
           </button>
         </p>
@@ -148,6 +150,11 @@ const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-');
                         {l.label} ↗
                       </a>
                     ))}
+                  </p>
+                )}
+                {s.home && (
+                  <p class="hand mt-3 text-lg text-accent" data-clock data-clock-tail="">
+                    I’m on Thailand time (UTC+7).
                   </p>
                 )}
                 <p class="chapter-count mt-4 text-base text-ink-soft">

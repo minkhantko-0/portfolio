@@ -208,6 +208,10 @@ body {
     min-height: 0;
     padding-block: 1.75rem;
   }
+  /* the pins' own labels say it; a legend here would read as a label above the chapters */
+  .globe-legend {
+    display: none;
+  }
 }
 
 @media (min-width: 1024px) {
@@ -244,7 +248,7 @@ body {
     width: min(100%, 58svh);
   }
   .chapter {
-    min-height: 62svh;
+    min-height: 56svh;
     padding-block: 2rem;
     transition: opacity var(--t-ui) ease;
   }
@@ -544,7 +548,7 @@ body {
    so the ink is the only thing the overlay occupies. */
 .rough-annotation {
   width: 1px !important;
-  height: 1px !important;
+  height: 1px !important; /* taste-skill-ignore: an overlay box, not a rule */
 }
 
 ::selection {
@@ -592,7 +596,7 @@ body {
   justify-content: space-between;
   gap: 0.4rem;
   padding-bottom: 0.4rem;
-  border-bottom: 2px solid var(--surface);
+  border-bottom: 2px solid var(--surface); /* taste-skill-ignore: inside a data-ui fragment */
 }
 .ui-title {
   font-size: 1.05rem;
@@ -754,7 +758,7 @@ body {
 
 /* ---------- the projects row: a native drag row, held and scrolled sideways on wide screens ---------- */
 .gallery {
-  --item: min(76vw, 21rem);
+  --item: min(76vw, 20rem);
   --page-margin: max(1.5rem, calc((100vw - 72rem) / 2 + 1.5rem));
 }
 .gallery-track {
@@ -800,6 +804,8 @@ body {
   flex-direction: column;
   justify-content: center;
   overflow: clip;
+  /* the row runs under the page's own margins, not to the screen's edge */
+  clip-path: inset(0 calc(var(--page-margin) - 1.5rem));
 }
 .gallery.is-pinned .gallery-track {
   overflow: visible;
@@ -808,15 +814,3 @@ body {
   will-change: transform;
 }
 
-/* ---------- the curtain footer: the page lifts to uncover the contact ---------- */
-main {
-  position: relative;
-  z-index: 1;
-  background-color: var(--color-paper);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
-}
-.curtain {
-  position: sticky;
-  bottom: 0;
-  z-index: 0;
-}

@@ -161,6 +161,29 @@ const motionReady = prefersReducedMotion
 // ---------- the projects row ----------
 initGallery();
 
+// ---------- the clocks: his time against the visitor's, from the visitor's own settings ----------
+{
+  const clocks = document.querySelectorAll<HTMLElement>('[data-clock]');
+  if (clocks.length) {
+    const fmt = (zone?: string) =>
+      new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit', timeZone: zone }).format(new Date());
+    const tick = () => {
+      const zone = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+      const here = fmt('Asia/Bangkok');
+      const there = fmt();
+      const same = zone === 'Asia/Bangkok' || here === there;
+      const where = zone.split('/').pop()?.replace(/_/g, ' ') || 'where you are';
+      clocks.forEach((el) => {
+        el.textContent = same
+          ? `It’s ${here} here in Thailand. ${el.dataset.clockTail || ''}`.trim()
+          : `It’s ${here} here in Thailand and ${there} in ${where}. ${el.dataset.clockTail || ''}`.trim();
+      });
+    };
+    tick();
+    setInterval(tick, 30000);
+  }
+}
+
 // ---------- email button: mailto can silently no-op without a mail client,
 // so clicking also copies the address and confirms it ----------
 const emailBtn = document.getElementById('email-btn');

@@ -4,7 +4,7 @@ import HandArrow from './HandArrow.astro';
 ---
 
 <section class="mx-auto max-w-6xl px-6 pt-20 lg:pt-24" aria-labelledby="contact">
-  <div class="contact-card relative rounded-2xl bg-white p-8 sm:p-12" data-enter>
+  <div class="contact-card relative rounded-2xl bg-white p-8 sm:p-12">
     <div class="pointer-events-none absolute -top-14 left-6 hidden sm:block">
       <p class="hand -rotate-3 text-2xl text-accent">let’s build something</p>
       <HandArrow variant="down" class="ml-24 h-10 w-6 text-accent" />
@@ -34,6 +34,10 @@ import HandArrow from './HandArrow.astro';
     <p class="mt-4 max-w-xl text-lg text-ink">
       Available for consulting work, and open to the right full-time role. Either way, email is the
       fastest way to reach me, and I actually reply.
+    </p>
+    <!-- filled by animations.ts from the visitor's own clock; the static line stands without JS -->
+    <p class="hand mt-3 text-lg text-accent" data-clock data-clock-tail="I usually reply the same day.">
+      I’m in Thailand (UTC+7) and usually reply the same day.
     </p>
 
     <div class="mt-8 flex flex-wrap items-center gap-4">
