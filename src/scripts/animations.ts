@@ -107,6 +107,28 @@ const motionReady = prefersReducedMotion
       // GSAP's chunk did not arrive: the page simply stands still
     });
 
+// ---------- the 3D globe: after the hero has painted, when the browser is idle ----------
+// Reduced motion, Save-Data and no-WebGL visitors keep the drawn globe, which is
+// the finished composition anyway. The module (Three.js inside) is its own chunk.
+{
+  const root = document.getElementById('globe');
+  const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData;
+  if (root && !prefersReducedMotion && !saveData) {
+    const start = () =>
+      import('../globe/scene')
+        .then(({ mountGlobe }) => mountGlobe(root))
+        .then((globe) => {
+          window.__globe = globe;
+          root.dispatchEvent(new CustomEvent('globe:live'));
+        })
+        .catch(() => {
+          // no WebGL, or the texture failed: the drawing stays
+        });
+    if ('requestIdleCallback' in window) requestIdleCallback(() => start(), { timeout: 2500 });
+    else setTimeout(start, 900);
+  }
+}
+
 // ---------- email button: mailto can silently no-op without a mail client,
 // so clicking also copies the address and confirms it ----------
 const emailBtn = document.getElementById('email-btn');

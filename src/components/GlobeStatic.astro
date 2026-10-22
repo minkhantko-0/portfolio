@@ -30,6 +30,9 @@ const label = `Globe of the countries the work shipped to: ${route
 <div
   id="globe"
   class="globe relative aspect-square w-full select-none"
+  role="group"
+  tabindex="0"
+  aria-label="Globe of the client countries. Drag, or use the arrow keys, to turn it."
   data-lon={CENTER[0]}
   data-lat={CENTER[1]}
   data-size={SIZE}

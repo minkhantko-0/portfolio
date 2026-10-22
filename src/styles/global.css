@@ -249,6 +249,27 @@ body {
   }
 }
 
+/* the globe answers the hand once the 3D scene is live; until then it is a drawing */
+.globe {
+  border-radius: 50%;
+}
+.globe.is-live {
+  cursor: grab;
+}
+.globe.is-live.is-dragging {
+  cursor: grabbing;
+}
+.globe.is-live #globe-svg {
+  opacity: 0;
+  transition: opacity 600ms ease;
+}
+.globe.is-live .pin-dot {
+  opacity: 0;
+}
+.globe:focus-visible {
+  outline-offset: 8px;
+}
+
 /* ---------- pins over the globe: real buttons, 44px targets ----------
    the list covers the globe box but only the buttons may take the pointer */
 .globe-pins {

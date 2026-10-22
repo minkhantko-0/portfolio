@@ -65,7 +65,7 @@ export const route: Stop[] = [
       'Responsive UI and shared component-library contributions, shipped in an agile cycle with product, design and back-end.',
     ],
     links: [{ label: 'Partipost', href: 'https://www.partipost.com/' }],
-    label: 'right',
+    label: 'below',
   },
   {
     id: '392',
