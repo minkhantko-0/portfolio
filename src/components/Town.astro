@@ -106,7 +106,10 @@ const trees = [
                   <h3 class="town-title">
                     {p.link ? (
                       <a href={p.link} target="_blank" rel="noopener noreferrer" class="text-link">
-                        {p.name}{'\u00a0'}<span class="arrow">↗</span>
+                        {p.name.split(' ').slice(0, -1).join(' ')}{' '}
+                        <span class="whitespace-nowrap">
+                          {p.name.split(' ').at(-1)} <span class="arrow">↗</span>
+                        </span>
                       </a>
                     ) : (
                       p.name
