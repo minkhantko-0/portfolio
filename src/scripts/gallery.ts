@@ -13,12 +13,35 @@ export function initGallery() {
   const wide = matchMedia('(min-width: 1024px) and (prefers-reduced-motion: no-preference)');
   let dx = 0;
   let queued = false;
+  // the row leans a little with the speed it is pulled at, and settles
+  let lastX = 0;
+  let lean = 0;
+  let settling = 0;
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const place = () => {
     queued = false;
     if (!root.classList.contains('is-pinned')) return;
     const p = Math.min(1, Math.max(0, -root.getBoundingClientRect().top / dx));
-    track.style.transform = `translate3d(${(-p * dx).toFixed(1)}px, 0, 0)`;
+    const x = -p * dx;
+    if (!reduced) {
+      const v = x - lastX;
+      lastX = x;
+      lean = Math.max(-4, Math.min(4, lean * 0.8 + v * 0.08));
+      if (Math.abs(lean) > 0.05 && !settling) settle();
+    }
+    track.style.transform = `translate3d(${x.toFixed(1)}px, 0, 0) skewX(${lean.toFixed(2)}deg)`;
+  };
+  // after the scroll stops, ease the lean back to nothing
+  const settle = () => {
+    settling = requestAnimationFrame(() => {
+      settling = 0;
+      lean *= 0.82;
+      if (Math.abs(lean) < 0.05) lean = 0;
+      const m = /translate3d\(([-\d.]+)px/.exec(track.style.transform);
+      track.style.transform = `translate3d(${m ? m[1] : 0}px, 0, 0) skewX(${lean.toFixed(2)}deg)`;
+      if (lean !== 0) settle();
+    });
   };
   const measure = () => {
     // held only where the whole row fits under the heading; short windows keep the drag row

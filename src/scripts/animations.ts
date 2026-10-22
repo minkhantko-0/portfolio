@@ -1,5 +1,6 @@
 import type { RoughAnnotationType } from 'rough-notation/lib/model';
 import { initGallery } from './gallery';
+import { initTilt } from './tilt';
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -94,6 +95,83 @@ async function initMotion() {
   // module load are stale; recompute once the swap has actually happened
   document.fonts.ready.then(() => ScrollTrigger.refresh());
 
+  // ---------- the About deck deals out of a pile ----------
+  {
+    const deck = document.querySelector<HTMLElement>('[data-deck]');
+    const cards = deck ? deck.querySelectorAll<HTMLElement>('.card') : [];
+    if (deck && cards.length) {
+      const centre = () => {
+        const d = deck.getBoundingClientRect();
+        return { x: d.left + d.width / 2, y: d.top + d.height / 2 };
+      };
+      gsap.from(cards, {
+        x: (_i, el) => {
+          const r = (el as HTMLElement).getBoundingClientRect();
+          return centre().x - (r.left + r.width / 2);
+        },
+        y: (_i, el) => {
+          const r = (el as HTMLElement).getBoundingClientRect();
+          return centre().y - (r.top + r.height / 2) - 30;
+        },
+        rotation: (i) => (i % 2 ? 1 : -1) * (12 + i * 4),
+        scale: 0.72,
+        autoAlpha: 0,
+        duration: 0.9,
+        ease: 'power3.out',
+        stagger: 0.085,
+        clearProps: 'transform,opacity,visibility',
+        scrollTrigger: { trigger: deck, start: 'top 82%', once: true },
+      });
+    }
+  }
+
+  // ---------- the projects row slides in ----------
+  {
+    const items = document.querySelectorAll<HTMLElement>('.gallery-item');
+    if (items.length) {
+      gsap.from(items, {
+        x: 90,
+        autoAlpha: 0,
+        duration: 0.8,
+        ease: 'power3.out',
+        stagger: 0.07,
+        clearProps: 'transform,opacity,visibility',
+        scrollTrigger: { trigger: '.gallery', start: 'top 78%', once: true },
+      });
+    }
+  }
+
+  // ---------- the KBZ Wiki chat types itself when the flagship arrives ----------
+  {
+    const thread = document.querySelector<HTMLElement>('[data-chat]');
+    if (thread) {
+      const msgs = Array.from(thread.querySelectorAll<HTMLElement>('.ui-msg:not(.ui-typing)'));
+      const typing = thread.querySelector<HTMLElement>('.ui-typing');
+      gsap.set(msgs, { autoAlpha: 0, y: 10 });
+      const tl = gsap.timeline({ scrollTrigger: { trigger: thread, start: 'top 85%', once: true }, delay: 0.3 });
+      msgs.forEach((m) => {
+        const fromBot = !m.classList.contains('ui-msg-me');
+        if (fromBot && typing) {
+          tl.set(typing, { display: 'flex' }).to({}, { duration: 0.9 }).set(typing, { display: 'none' });
+        } else {
+          tl.to({}, { duration: 0.35 });
+        }
+        tl.to(m, { autoAlpha: 1, y: 0, duration: 0.45, ease: 'power3.out' });
+      });
+    }
+  }
+
+  // ---------- the booking calendar stamps its day ----------
+  gsap.utils.toArray<HTMLElement>('.ui-today').forEach((day) => {
+    gsap.from(day, {
+      scale: 1.7,
+      autoAlpha: 0,
+      duration: 0.5,
+      ease: 'power3.out',
+      scrollTrigger: { trigger: day, start: 'top 85%', once: true },
+    });
+  });
+
   // ---------- the paper plane lands as the envelope ----------
   const morphSvg = document.getElementById('contact-plane');
   if (morphSvg) {
@@ -171,8 +249,65 @@ const motionReady = prefersReducedMotion
   }
 }
 
+// ---------- the held globe: flag the stage once it has stuck to the top ----------
+// (CSS moves the globe from under the name to the middle of the screen)
+{
+  const column = document.querySelector<HTMLElement>('.spread-globe');
+  const stage = column?.querySelector<HTMLElement>('.globe-stage');
+  if (column && stage && 'IntersectionObserver' in window) {
+    const sentinel = document.createElement('div');
+    sentinel.style.cssText = 'position:absolute;top:0;left:0;width:1px;height:1px;pointer-events:none'; // taste-skill-ignore: a probe, not a rule
+    column.style.position = 'relative';
+    column.prepend(sentinel);
+    new IntersectionObserver(
+      ([e]) => stage.classList.toggle('is-stuck', !e.isIntersecting && e.boundingClientRect.top < 0),
+      { threshold: 0 }
+    ).observe(sentinel);
+  }
+}
+
 // ---------- the projects row ----------
 initGallery();
+
+// ---------- things that lean toward the hand ----------
+initTilt();
+
+// ---------- the About statement inks in as it is read ----------
+// Each word watches its own position (CSS scroll timelines); readable before it
+// fills. Browsers without scroll timelines, and reduced motion, get full ink.
+if (CSS.supports('animation-timeline: view()') && !prefersReducedMotion) {
+  document.querySelectorAll<HTMLElement>('[data-fill]').forEach((el) => {
+    const words = (el.textContent || '').trim().split(/\s+/);
+    el.textContent = '';
+    words.forEach((word, i) => {
+      const span = document.createElement('span');
+      span.textContent = word;
+      el.append(span, i < words.length - 1 ? ' ' : '');
+    });
+    el.classList.add('is-filling');
+  });
+}
+
+// ---------- the call timer on the drawn MyanCare screen ticks while it is on screen ----------
+{
+  const timer = document.querySelector<HTMLElement>('[data-timer]');
+  if (timer && 'IntersectionObserver' in window && !prefersReducedMotion) {
+    let seconds = parseInt(timer.dataset.timer || '0', 10);
+    let handle: ReturnType<typeof setInterval> | undefined;
+    const paint = () => {
+      timer.textContent = `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
+    };
+    new IntersectionObserver(([e]) => {
+      clearInterval(handle);
+      if (e.isIntersecting) {
+        handle = setInterval(() => {
+          seconds += 1;
+          paint();
+        }, 1000);
+      }
+    }).observe(timer);
+  }
+}
 
 // ---------- the clocks: his time against the visitor's, from the visitor's own settings ----------
 {

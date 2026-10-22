@@ -8,12 +8,16 @@ import AppScreen from './AppScreen.astro';
 const flagship = projects.find((p) => p.flagship);
 const rest = projects.filter((p) => !p.flagship);
 
-/** the apps on the stores get a drawn phone; the rest a card */
+/** the apps on the stores get a drawn phone; the rest a drawn card */
 const phoneFor: Record<string, 'myancare' | 'magical' | 'z8'> = {
   'MyanCare TeleHealth App': 'myancare',
   'Magical Face Luxury Aesthetic Complex': 'magical',
   'Z8 Real Estate': 'z8',
 };
+
+/** a hand-drawn rounded rectangle, stretched to whatever it sits behind */
+const outline =
+  'M12 6 C60 3, 140 3, 188 6 C195 7, 197 12, 197 20 L196 100 C196 110, 192 115, 184 115 C140 118, 60 117, 14 115 C6 115, 3 110, 3 100 L4 20 C4 12, 6 7, 12 6 Z';
 ---
 
 <section class="relative mx-auto max-w-6xl px-6 pt-20 lg:pt-28" aria-labelledby="projects">
@@ -21,17 +25,20 @@ const phoneFor: Record<string, 'myancare' | 'magical' | 'z8'> = {
 
   {
     flagship && (
-      <article class="flagship relative rounded-xl bg-white p-6 sm:p-8 lg:p-10" data-enter>
+      <article class="flagship drawn relative" data-tilt="2" data-lift="4" data-enter>
+        <svg class="drawn-outline" viewBox="0 0 200 120" preserveAspectRatio="none" aria-hidden="true">
+          <path d={outline} vector-effect="non-scaling-stroke" />
+        </svg>
         <div class="pointer-events-none absolute -top-12 right-4 hidden sm:block">
           <p class="hand rotate-3 text-xl text-accent">{flagship.note}</p>
           <HandArrow variant="down" class="ml-16 h-10 w-6 text-accent" />
         </div>
-        <div class="grid gap-8 lg:grid-cols-[1.25fr_0.75fr] lg:gap-12">
+        <div class="relative grid gap-8 p-6 sm:p-8 lg:grid-cols-[1.25fr_0.75fr] lg:items-center lg:gap-12 lg:p-10">
           <div>
             <h3 class="text-xl font-bold sm:text-2xl">
               {flagship.link ? (
                 <a href={flagship.link} target="_blank" rel="noopener noreferrer" class="text-link">
-                  {flagship.name} ↗
+                  {flagship.name} <span class="arrow">↗</span>
                 </a>
               ) : (
                 flagship.name
@@ -40,15 +47,15 @@ const phoneFor: Record<string, 'myancare' | 'magical' | 'z8'> = {
             {flagship.about && <p class="hand mt-2 max-w-3xl text-lg leading-snug text-accent">{flagship.about}</p>}
             <p class="mt-3 max-w-3xl leading-relaxed text-ink">{flagship.description}</p>
             <div class="mt-4 flex flex-wrap items-center gap-2">
-              <ul class="flex flex-wrap gap-2">
-                {flagship.tech.map((t) => (
-                  <li><span class="chip inline-block rounded-full px-3 py-1 text-sm font-medium text-ink">{t}</span></li>
+              <ul class="chips flex flex-wrap gap-2">
+                {flagship.tech.map((t, i) => (
+                  <li style={`--i:${i}`}><span class="chip inline-block rounded-full px-3 py-1 text-sm font-medium text-ink">{t}</span></li>
                 ))}
               </ul>
               <StoreLinks name={flagship.name} stores={flagship.stores} />
             </div>
           </div>
-          <AppScreen app="kbz" class="mx-auto w-full max-w-[14rem] lg:max-w-[15rem]" />
+          <AppScreen app="kbz" class="mx-auto w-full max-w-[14rem] lg:max-w-[15rem]" tilt="10" />
         </div>
       </article>
     )
@@ -67,15 +74,20 @@ const phoneFor: Record<string, 'myancare' | 'magical' | 'z8'> = {
     <ul class="gallery-track">
       {
         rest.map((p) => (
-          <li class="gallery-item">
-            <article class={`project ${phoneFor[p.name] ? 'project-app' : 'project-card'}`}>
-              {phoneFor[p.name] && <AppScreen app={phoneFor[p.name]} class="project-phone" />}
-              <div class="project-body">
+          <li class:list={['gallery-item', { 'is-wide': !!phoneFor[p.name] }]}>
+            <article class={`project ${phoneFor[p.name] ? 'project-app' : 'project-card drawn'}`} data-tilt={phoneFor[p.name] ? undefined : '5'} data-lift="6">
+              {!phoneFor[p.name] && (
+                <svg class="drawn-outline" viewBox="0 0 200 120" preserveAspectRatio="none" aria-hidden="true">
+                  <path d={outline} vector-effect="non-scaling-stroke" />
+                </svg>
+              )}
+              {phoneFor[p.name] && <AppScreen app={phoneFor[p.name]} class="project-phone" tilt="8" />}
+              <div class="project-body relative">
                 <div class="flex flex-wrap items-baseline gap-x-3">
                   <h4 class="text-lg font-bold">
                     {p.link ? (
                       <a href={p.link} target="_blank" rel="noopener noreferrer" class="text-link">
-                        {p.name} ↗
+                        {p.name} <span class="arrow">↗</span>
                       </a>
                     ) : (
                       <span>{p.name}</span>
@@ -86,9 +98,9 @@ const phoneFor: Record<string, 'myancare' | 'magical' | 'z8'> = {
                 {p.about && <p class="hand mt-1.5 text-base leading-snug text-accent">{p.about}</p>}
                 <p class="mt-2 text-base leading-relaxed text-ink">{p.description}</p>
                 <div class="mt-3 flex flex-wrap items-center gap-2">
-                  <ul class="flex flex-wrap gap-1.5">
-                    {p.tech.map((t) => (
-                      <li><span class="chip inline-block rounded-full px-2.5 py-0.5 text-sm font-medium text-ink">{t}</span></li>
+                  <ul class="chips flex flex-wrap gap-1.5">
+                    {p.tech.map((t, i) => (
+                      <li style={`--i:${i}`}><span class="chip inline-block rounded-full px-2.5 py-0.5 text-sm font-medium text-ink">{t}</span></li>
                     ))}
                   </ul>
                   <StoreLinks name={p.name} stores={p.stores} />

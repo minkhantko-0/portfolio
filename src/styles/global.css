@@ -235,17 +235,24 @@ body {
     grid-column: 2;
     grid-row: 1 / span 2;
   }
-  /* held for the whole spread; the globe sits high enough to be whole on the
-     first screen (under the name) and near the middle once it sticks */
+  /* held for the whole spread. The globe is sized by the height the screen
+     actually has under the name, sits just under it on the first screen, and
+     moves to the middle of the screen once the stage sticks (animations.ts
+     flags that with .is-stuck; the padding eases there) */
   .globe-stage {
+    --globe-size: min(42rem, calc(100svh - 24rem));
     position: sticky;
     top: 0;
     height: 100svh;
     justify-content: flex-start;
-    padding-top: 11svh;
+    padding-top: 1.5rem;
+    transition: padding-top 600ms var(--ease-out);
+  }
+  .globe-stage.is-stuck {
+    padding-top: calc((100svh - var(--globe-size) - 5.5rem) / 2);
   }
   .globe {
-    width: min(100%, 58svh);
+    width: min(100%, var(--globe-size));
   }
   .chapter {
     min-height: 56svh;
@@ -374,46 +381,207 @@ body {
   background: var(--surface);
 }
 
-/* ---------- luggage tags ---------- */
-.tag {
-  position: relative;
-  min-height: 7.5rem;
-  padding: 1.25rem 1.25rem 1.1rem 2.75rem;
-  rotate: var(--tilt, 0deg);
+/* ---------- things that lean toward the hand ([data-tilt], tilt.ts) ---------- */
+[data-tilt] {
+  --rx: 0deg;
+  --ry: 0deg;
+  --ty: 0px;
+  transform: perspective(900px) rotateX(var(--rx)) rotateY(var(--ry)) translateY(var(--ty));
+  transform-style: preserve-3d;
+  transition: transform 320ms var(--ease-out);
 }
-.tag-shape {
+[data-tilt].is-hover {
+  --ty: calc(var(--lift, 6px) * -1);
+  transition-duration: 160ms;
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-tilt] {
+    transform: none !important;
+    transition: none;
+  }
+}
+
+/* ---------- a hand-drawn surface: an outline stretched behind the content ---------- */
+.drawn {
+  position: relative;
+}
+.drawn-outline {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-}
-.tag-outline {
   fill: #ffffff;
   stroke: var(--color-ink);
   stroke-width: 2;
+  stroke-linejoin: round;
+  transition: stroke var(--t-hover) ease;
 }
-.tag-hole {
-  fill: var(--color-paper);
+[data-tilt].is-hover > .drawn-outline {
+  stroke: var(--color-accent);
+}
+
+/* ---------- the About deck: index cards ---------- */
+.card {
+  list-style: none;
+}
+.card-face {
+  position: relative;
+  min-height: 9.5rem;
+  padding: 1.6rem 1.25rem 1.1rem;
+  rotate: var(--tilt, 0deg);
+  cursor: default;
+}
+.card-outline {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  fill: #ffffff;
   stroke: var(--color-ink);
   stroke-width: 2;
+  stroke-linejoin: round;
+  transition: stroke var(--t-hover) ease;
 }
-.tag-string {
+.card-face.is-hover .card-outline {
+  stroke: var(--color-accent);
+}
+.card-tack {
   position: absolute;
-  left: calc(10% - 2.2rem);
-  top: calc(50% - 2.3rem);
-  width: 2.4rem;
-  height: 2.4rem;
-  color: var(--color-ink-soft);
+  top: -0.55rem;
+  left: 50%;
+  width: 1.35rem;
+  height: 1.7rem;
+  margin-left: -0.675rem;
+  fill: var(--color-marker);
+  stroke: var(--color-ink);
+  stroke-width: 2;
+  stroke-linecap: round;
+  transform-origin: 50% 30%;
 }
-.tag-text {
+.card-face.is-hover .card-tack {
+  animation: tack-wobble 520ms var(--ease-out);
+}
+@keyframes tack-wobble {
+  0% {
+    transform: rotate(0deg);
+  }
+  30% {
+    transform: rotate(-11deg);
+  }
+  65% {
+    transform: rotate(8deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+.card-text {
   position: relative;
   line-height: 1.5;
 }
-.tag-note {
+.card-note {
   position: relative;
-  margin-top: 0.5rem;
+  display: inline-block;
+  margin-top: 0.55rem;
   font-size: 1.125rem;
   color: var(--color-accent);
+}
+.card-underline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -0.2rem;
+  height: 0.6rem;
+  width: 100%;
+  overflow: visible;
+}
+.card-underline path {
+  fill: none;
+  stroke: var(--color-accent);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 420ms var(--ease-out);
+}
+.card-face.is-hover .card-underline path {
+  stroke-dashoffset: 0;
+}
+
+/* ---------- the About statement inks in as it is read (ink-fill, scroll-driven) ---------- */
+[data-fill] {
+  --fill: var(--color-ink);
+  color: var(--fill);
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .is-filling > span {
+      display: inline-block;
+      color: color-mix(in oklab, var(--fill) 45%, transparent);
+      animation: ink-fill linear both;
+      animation-timeline: view();
+      animation-range: cover 18% cover 42%;
+    }
+  }
+}
+@keyframes ink-fill {
+  to {
+    color: var(--fill);
+  }
+}
+
+/* ---------- chips cascade and arrows nudge while a card is hovered ---------- */
+.chips > li {
+  transition: transform var(--t-ui) var(--ease-out);
+  transition-delay: calc(var(--i, 0) * 28ms);
+}
+[data-tilt].is-hover .chips > li {
+  transform: translateY(-3px);
+}
+.arrow {
+  display: inline-block;
+  transition: transform var(--t-ui) var(--ease-out);
+}
+[data-tilt].is-hover .arrow,
+.text-link:hover .arrow {
+  transform: translate(3px, -3px);
+}
+
+/* ---------- a chat that types itself ---------- */
+.ui-thread {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.ui-typing {
+  display: none;
+  gap: 0.25rem;
+  align-items: center;
+  width: max-content;
+  padding: 0.5rem 0.65rem;
+}
+.ui-typing span {
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: var(--color-ink-soft);
+  animation: ui-typing 900ms ease-in-out infinite;
+}
+.ui-typing span:nth-child(2) {
+  animation-delay: 150ms;
+}
+.ui-typing span:nth-child(3) {
+  animation-delay: 300ms;
+}
+@keyframes ui-typing {
+  0%,
+  60%,
+  100% {
+    opacity: 0.35;
+  }
+  30% {
+    opacity: 1;
+  }
 }
 
 /* ---------- entrances: the parts of a block arrive in reading order ----------
@@ -766,7 +934,7 @@ body {
 
 /* ---------- the projects row: a native drag row, held and scrolled sideways on wide screens ---------- */
 .gallery {
-  --item: min(76vw, 20rem);
+  --item: min(76vw, 18.5rem);
   --page-margin: max(1.5rem, calc((100vw - 72rem) / 2 + 1.5rem));
 }
 .gallery-track {
@@ -786,19 +954,41 @@ body {
   scroll-snap-align: start;
   display: flex;
 }
+/* an app item is two cards wide: the drawn phone beside its words, so the row
+   stays shallow enough to hold on one screen */
+@media (min-width: 640px) {
+  .gallery-item.is-wide {
+    flex-basis: calc(var(--item) * 1.85 + 1.5rem);
+  }
+  .project.project-app {
+    flex-direction: row;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  .project.project-app .project-phone {
+    flex: 0 0 11.5rem;
+    width: 11.5rem;
+    margin: 0;
+  }
+  .project.project-app .project-body {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+}
 .project {
   display: flex;
   flex-direction: column;
   width: 100%;
 }
+.project-app {
+  cursor: default;
+}
 .project-card .project-body {
   height: 100%;
-  padding: 1.25rem;
-  border-radius: 0.75rem;
-  background: #ffffff;
+  padding: 1.5rem 1.35rem 1.35rem;
 }
 .project-app .project-phone {
-  width: min(100%, 13rem);
+  width: min(100%, 12rem);
   margin: 0 auto 0.75rem;
 }
 .project-app .project-body {

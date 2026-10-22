@@ -226,8 +226,8 @@ export async function mountGlobe(root: HTMLElement): Promise<GlobeHandle> {
       mesh.getWorldPosition(world);
       normal.copy(world).normalize();
       const facing = normal.z;
-      // hide pins near the rim (about 70° from the centre), as the drawing does
-      const visible = facing > 0.3;
+      // hide pins near the rim (about 66° from the centre), as the drawing does
+      const visible = facing > 0.4;
       el.li.hidden = !visible;
       if (!visible) continue;
       const x = (world.x / size + 0.5) * box;
@@ -235,7 +235,7 @@ export async function mountGlobe(root: HTMLElement): Promise<GlobeHandle> {
       el.li.style.left = `${x.toFixed(1)}px`;
       el.li.style.top = `${y.toFixed(1)}px`;
       // labels fade out toward the rim rather than popping
-      el.button.style.opacity = String(MathUtils.smoothstep(facing, 0.3, 0.5));
+      el.button.style.opacity = String(MathUtils.smoothstep(facing, 0.4, 0.58));
     }
   };
 

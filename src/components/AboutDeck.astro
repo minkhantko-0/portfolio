@@ -1,0 +1,57 @@
+---
+/**
+ * About, in two parts: the summary as a statement that inks in as it is
+ * read (ink-fill, scroll-driven), and the six highlights as a deck of
+ * hand-drawn index cards. The cards deal out of a pile when the section
+ * arrives (animations.ts), lean toward the pointer, lift, and underline
+ * their handwritten note on hover (tilt.ts); a tap does the same on touch.
+ */
+import { profile, highlights } from '../data/resume';
+import SectionHeading from './SectionHeading.astro';
+import HandArrow from './HandArrow.astro';
+
+const tilts = ['-2deg', '1.5deg', '-1deg', '2deg', '-1.5deg', '1deg'];
+---
+
+<section id="content" tabindex="-1" class="relative mx-auto max-w-6xl px-6 py-20 lg:py-28" aria-labelledby="about">
+  <SectionHeading id="about" label="About" aside="the short version" />
+
+  <div class="grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
+    <div data-enter>
+      <p class="about-statement max-w-2xl text-xl leading-relaxed text-ink sm:text-2xl" data-fill>{profile.summary}</p>
+      <p class="hand mt-8 flex items-end gap-2 text-xl text-accent">
+        six things I’d tell you first
+        <HandArrow variant="curve-left" class="hidden h-8 w-14 rotate-180 text-accent lg:block" />
+        <HandArrow variant="down" class="ml-1 h-10 w-5 text-accent lg:hidden" />
+      </p>
+    </div>
+
+    <ul class="deck m-0 grid list-none gap-5 p-0 sm:grid-cols-2" data-deck>
+      {
+        highlights.map((h, i) => (
+          <li class="card" style={`--i:${i}`}>
+            <div class="card-face" data-tilt="7" data-lift="8" style={`--tilt:${tilts[i % tilts.length]}`}>
+              <svg class="card-outline" viewBox="0 0 200 120" preserveAspectRatio="none" aria-hidden="true">
+                <path
+                  d="M12 6 C60 3, 140 3, 188 6 C195 7, 197 12, 197 20 L196 100 C196 110, 192 115, 184 115 C140 118, 60 117, 14 115 C6 115, 3 110, 3 100 L4 20 C4 12, 6 7, 12 6 Z"
+                  vector-effect="non-scaling-stroke"
+                />
+              </svg>
+              <svg class="card-tack" viewBox="0 0 24 30" aria-hidden="true">
+                <circle cx="12" cy="9" r="6" />
+                <path d="M12 15v12" />
+              </svg>
+              <p class="card-text">{h.text}</p>
+              <p class="card-note hand">
+                <span class="card-note-text">— {h.note}</span>
+                <svg class="card-underline" viewBox="0 0 200 12" preserveAspectRatio="none" aria-hidden="true">
+                  <path pathLength="1" d="M3 7 C50 3, 120 10, 197 5" />
+                </svg>
+              </p>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>

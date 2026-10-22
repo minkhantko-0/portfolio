@@ -26,15 +26,15 @@ const links = [
 
 {
   links.length > 0 && (
-    <span class="ml-1 inline-flex items-center gap-2">
-      <span class="hand text-base text-ink-soft">get the app →</span>
+    <span class="ml-1 inline-flex flex-wrap items-center gap-2">
+      <span class="hand whitespace-nowrap text-base text-ink-soft">get the app →</span>
       {links.map((l) => (
         <a
           href={l.href}
           target="_blank"
           rel="noopener noreferrer"
           aria-label={l.label}
-          class="chip inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-sm font-semibold text-ink"
+          class="chip inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 text-sm font-semibold text-ink"
         >
           <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" set:html={l.icon} />
           {l.text}
