@@ -1,0 +1,165 @@
+---
+/**
+ * About, as a desk seen from above. An open notebook holds the route so far
+ * and the summary (which inks in as it is read); a flip clock keeps
+ * Bangkok's time to the second; a lamp lights the desk where the pointer is
+ * (desk.ts turns its head and lays every object's shade away from it);
+ * the six highlights are papers on the desk, each on its own drawing that
+ * does one small thing when the paper is picked up (hover, or a tap), and
+ * each with a readable sentence at rest. Everything reads without JS; the
+ * clock hides until the script runs it.
+ */
+import { profile, highlights, projects } from '../data/resume';
+import { route } from '../data/route';
+import { buildings } from '../data/town';
+import SectionHeading from './SectionHeading.astro';
+
+const labelFor = (key?: string) => buildings.find((b) => b.key === key)?.label;
+const rotations = ['-1.4deg', '1deg', '-0.8deg', '1.3deg', '-1.1deg', '0.9deg'];
+
+/** one split flap (markup mirrored in scripts/flap.ts) */
+const flap = (ch: string) =>
+  `<span class="flap" data-char="${ch}"><span class="flap-top">${ch}</span><span class="flap-bottom">${ch}</span><span class="flap-flip"><span class="flap-flip-front">${ch}</span><span class="flap-flip-back">${ch}</span></span></span>`;
+const pair = flap('-') + flap('-');
+
+/** the drawing each paper sits on, 300×100 */
+const art: Record<string, string> = {
+  note: `<svg viewBox="0 0 300 100">
+    <g class="robot"><rect class="paper" x="28" y="30" width="58" height="48" rx="9"/><path class="line" d="M57 30 V18"/><circle class="mark" cx="57" cy="14" r="4"/><circle class="ink" cx="47" cy="52" r="4.5"/><circle class="ink" cx="67" cy="52" r="4.5"/><path class="line" d="M46 66 h22"/><path class="line" d="M28 50 h-10 M86 50 h10"/></g>
+    <path class="paper" d="M112 24 C150 20, 232 20, 270 24 C276 25, 278 29, 278 34 L277 60 C277 66, 273 69, 267 69 L142 70 L120 84 L124 70 C114 70, 110 66, 110 60 L110 34 C110 28, 108 24, 112 24 Z"/>
+    <circle class="dot d1" cx="166" cy="47" r="5"/><circle class="dot d2" cx="194" cy="47" r="5"/><circle class="dot d3" cx="222" cy="47" r="5"/>
+  </svg>`,
+  clouds: `<svg viewBox="0 0 300 100">
+    <path class="link" d="M92 58 H118 M182 46 H208"/>
+    <path class="cloud c1" d="M30 62 C14 62, 12 44, 28 42 C30 26, 56 24, 62 40 C78 36, 86 52, 76 62 Z"/>
+    <path class="cloud c2" d="M126 52 C108 52, 106 32, 124 30 C127 12, 156 10, 162 28 C180 24, 188 44, 176 52 Z"/>
+    <path class="cloud c3" d="M216 66 C200 66, 198 48, 214 46 C216 30, 242 28, 248 44 C264 40, 272 56, 262 66 Z"/>
+    <path class="line thin" d="M20 86 H280"/>
+  </svg>`,
+  stack: `<svg viewBox="0 0 300 100">
+    <g class="layer l1"><rect class="paper" x="18" y="22" width="80" height="56" rx="5"/><path class="line" d="M18 36 H98"/><circle class="ink" cx="27" cy="29" r="2"/><circle class="ink" cx="35" cy="29" r="2"/><path class="line thin" d="M30 48 H80 M30 58 H70 M30 68 H60"/></g>
+    <path class="flow f1" d="M104 50 H130"/>
+    <g class="layer l2"><rect class="paper" x="136" y="30" width="56" height="40" rx="4"/><path class="line thin" d="M144 42 H184 M144 50 H184 M144 58 H184"/><circle class="mark" cx="150" cy="38" r="1.6"/></g>
+    <path class="flow f2" d="M198 50 H224"/>
+    <g class="layer l3"><path class="paper" d="M232 32 C232 24, 282 24, 282 32 V70 C282 78, 232 78, 232 70 Z"/><path class="line" d="M232 32 C232 40, 282 40, 282 32 M232 50 C232 58, 282 58, 282 50"/></g>
+  </svg>`,
+  chart: `<svg viewBox="0 0 300 100">
+    <path class="line" d="M28 16 V80 H212"/>
+    <polyline class="trace" points="36,66 60,58 84,62 108,40 132,46 156,30 180,36 204,22"/>
+    <g class="glass"><circle class="lens" cx="186" cy="38" r="18"/><path class="line" d="M199 51 L222 74"/></g>
+    <g class="bell"><path class="paper" d="M252 24 C252 14, 276 14, 276 24 V36 L282 42 H246 L252 36 Z"/><path class="line" d="M260 46 C262 50, 266 50, 268 46"/></g>
+  </svg>`,
+  calendar: `<svg viewBox="0 0 300 100">
+    <rect class="paper" x="18" y="12" width="196" height="76" rx="5"/><path class="line" d="M18 30 H214"/>
+    ${Array.from({ length: 14 }, (_, i) => {
+      const x = 28 + (i % 7) * 26;
+      const y = 38 + Math.floor(i / 7) * 24;
+      return `<rect class="day" x="${x}" y="${y}" width="18" height="16" rx="2"/>` + (i < 13 ? `<path class="x" style="--k:${i}" d="M${x + 4} ${y + 4} l10 8 M${x + 14} ${y + 4} l-10 8"/>` : `<path class="star" d="M${x + 9} ${y + 3} l2 5 5 .5 -4 3.5 1.2 5 -4.2 -2.8 -4.2 2.8 1.2 -5 -4 -3.5 5 -.5 Z"/>`);
+    }).join('')}
+    <g class="stamp"><circle class="ring" cx="256" cy="50" r="24"/><path class="tick" d="M243 51 L252 60 L270 40"/></g>
+  </svg>`,
+  postcard: `<svg viewBox="0 0 300 100">
+    <path class="line thin" d="M150 14 V86"/>
+    <g class="sun"><circle class="mark" cx="56" cy="46" r="16"/><path class="rays" d="M56 18 V26 M56 66 V74 M28 46 H36 M76 46 H84 M36 26 L42 32 M70 60 L76 66 M76 26 L70 32 M42 60 L36 66"/></g>
+    <path class="line" d="M100 76 C104 60, 118 56, 128 62"/>
+    <g class="stamp2"><rect class="paper" x="236" y="16" width="44" height="52" rx="2"/><path class="line thin" d="M244 24 H272 M244 32 H272 M244 40 H272 M244 48 H272 M244 56 H272"/><path class="plus" d="M258 36 v14 M251 43 h14"/></g>
+    <path class="line thin" d="M166 48 H224 M166 60 H216 M166 72 H224"/>
+  </svg>`,
+};
+---
+
+<section id="content" tabindex="-1" class="relative mx-auto max-w-6xl px-6 pb-12 pt-20 lg:pb-16 lg:pt-28" aria-labelledby="about">
+  <SectionHeading id="about" label="About" aside="from my desk" />
+
+  <div class="desk" data-desk>
+    <div class="desk-glow" aria-hidden="true"></div>
+
+    <!-- the lamp: its head turns toward the light, which follows the pointer -->
+    <div class="desk-lamp" data-lamp aria-hidden="true">
+      <svg viewBox="0 0 160 240">
+        <ellipse class="lamp-base" cx="52" cy="226" rx="40" ry="9" />
+        <path class="lamp-arm" d="M52 224 C58 180, 70 120, 80 70" />
+        <g class="lamp-head" data-lamp-head>
+          <path class="lamp-cone" d="M50 118 L-60 300 H190 L110 118 Z" />
+          <path class="lamp-arm" d="M80 67 V80" />
+          <path class="lamp-shade" d="M60 80 H100 L114 118 H46 Z" />
+          <path class="lamp-glow" d="M48 118 a32 10 0 0 0 64 0 Z" />
+        </g>
+        <circle class="lamp-joint" cx="80" cy="67" r="5" />
+      </svg>
+    </div>
+
+    <!-- the notebook -->
+    <div class="desk-notebook" data-cast data-tilt="1.5" data-lift="3">
+      <div class="nb-page nb-left">
+        <p class="nb-head hand">the route so far</p>
+        <ol class="nb-route hand">
+          {route.map((s) => <li>{s.city}{s.home ? ' (home)' : ''}</li>)}
+        </ol>
+        <svg class="nb-plane" viewBox="0 0 60 48" aria-hidden="true" data-draw>
+          <path class="draw-path" d="M4 25 C20 19, 38 12, 54 6 C47 18, 41 30, 34 42 C31 37, 29 33, 26 28 C19 27, 11 26, 4 25 Z" stroke-width="2.5" />
+          <path class="draw-path" d="M26 28 C35 21, 45 13, 54 6" stroke-width="2.5" />
+        </svg>
+        <p class="nb-foot hand">5 years · {route.length} stops · {projects.length} products</p>
+      </div>
+      <div class="nb-page nb-right">
+        <p class="nb-head hand">hello, I’m {profile.name.split(' ')[0]}</p>
+        <p class="nb-text" data-fill>{profile.summary}</p>
+      </div>
+      <svg class="nb-spiral" viewBox="0 0 24 400" preserveAspectRatio="none" aria-hidden="true">
+        {Array.from({ length: 11 }, (_, i) => <ellipse cx="12" cy={18 + i * 36} rx="9" ry="5" />)}
+      </svg>
+      <svg class="desk-pen" viewBox="0 0 260 36" aria-hidden="true">
+        <path class="pen-body" d="M8 18 L40 6 H230 C240 6, 244 12, 244 18 C244 24, 240 30, 230 30 H40 Z" />
+        <path class="pen-tip" d="M8 18 L40 10 V26 Z" />
+        <path class="line" d="M40 6 V30 M212 6 V30" />
+        <circle class="ink" cx="10" cy="18" r="2" />
+      </svg>
+    </div>
+
+    <!-- the clock: Bangkok, to the second (desk.ts) -->
+    <div class="desk-clock" data-desk-clock data-cast>
+      <div class="clock-body" aria-hidden="true">
+        <span class="clock-group" set:html={pair} />
+        <span class="clock-colon">:</span>
+        <span class="clock-group" set:html={pair} />
+        <span class="clock-colon">:</span>
+        <span class="clock-group" set:html={pair} />
+      </div>
+      <p class="clock-label"><span class="sr-only" data-clock-sr></span>Bangkok · local time</p>
+      <p class="clock-vs hand" data-clock-vs></p>
+    </div>
+
+    <!-- a mug, a plant, a clip: just a desk -->
+    <div class="desk-props" aria-hidden="true">
+      <svg class="prop-ring" viewBox="0 0 80 80"><circle cx="40" cy="40" r="30" /></svg>
+      <svg class="prop-mug" viewBox="0 0 120 110">
+        <path class="steam s1" d="M46 28 C40 20, 52 16, 46 8" /><path class="steam s2" d="M62 30 C56 22, 68 18, 62 10" /><path class="steam s3" d="M78 28 C72 20, 84 16, 78 8" />
+        <path class="paper" d="M30 40 H94 L90 96 H34 Z" /><path class="line" d="M94 50 C112 50, 112 80, 92 84" /><path class="line thin" d="M34 54 H90" />
+      </svg>
+      <svg class="prop-plant" viewBox="0 0 120 130">
+        <path class="leaf" d="M60 100 C40 80, 30 50, 44 26 C60 44, 66 70, 60 100 Z" /><path class="leaf" d="M62 100 C82 84, 96 58, 86 30 C68 46, 60 72, 62 100 Z" /><path class="leaf" d="M58 102 C46 90, 20 86, 12 66 C30 66, 50 78, 58 102 Z" /><path class="leaf" d="M64 102 C76 90, 102 86, 110 66 C92 66, 72 78, 64 102 Z" />
+        <path class="paper" d="M34 100 H88 L82 126 H40 Z" /><path class="line" d="M30 100 H92" />
+      </svg>
+      <svg class="prop-clip" viewBox="0 0 40 90"><path class="line" d="M12 70 V18 C12 8, 28 8, 28 18 V74 C28 86, 6 86, 6 74 V26" /></svg>
+    </div>
+
+    <!-- six papers on the desk -->
+    <ul class="desk-items">
+      {
+        highlights.map((h, i) => (
+          <li class={`desk-item desk-item-${h.desk.kind}`} style={`--rot:${rotations[i % rotations.length]}`} data-cast data-tilt="4" data-lift="6">
+            <div class="item-art" aria-hidden="true" set:html={art[h.desk.kind]} />
+            <p class="item-text">{h.text}</p>
+            <p class="item-note hand">{h.note}</p>
+            {h.desk.project && (
+              <a class="item-gate text-link" href="#projects" data-town-gate={h.desk.project}>
+                see {labelFor(h.desk.project)} in the town <span class="arrow">→</span>
+              </a>
+            )}
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>

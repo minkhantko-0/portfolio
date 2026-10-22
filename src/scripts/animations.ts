@@ -1,7 +1,7 @@
 import type { RoughAnnotationType } from 'rough-notation/lib/model';
 import { initTilt } from './tilt';
 import { initTown } from './town';
-import { initBoard } from './board';
+import { initDesk } from './desk';
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -97,6 +97,25 @@ async function initMotion() {
   // The town's cards are hidden until chosen, so the same again on a swap.
   document.fonts.ready.then(() => ScrollTrigger.refresh());
   addEventListener('town:card', () => ScrollTrigger.refresh());
+
+  // ---------- the papers land on the desk ----------
+  {
+    const desk = document.querySelector<HTMLElement>('[data-desk]');
+    const papers = desk ? gsap.utils.toArray<HTMLElement>('.desk-item, .desk-clock') : [];
+    if (desk && papers.length) {
+      gsap.from(papers, {
+        y: -28,
+        scale: 1.06,
+        rotation: (i) => (i % 2 ? 5 : -5),
+        autoAlpha: 0,
+        duration: 0.7,
+        ease: 'power3.out',
+        stagger: 0.08,
+        clearProps: 'transform,opacity,visibility',
+        scrollTrigger: { trigger: desk, start: 'top 72%', once: true },
+      });
+    }
+  }
 
   // ---------- the town folds up out of the paper as it arrives (scroll-driven) ----------
   {
@@ -240,8 +259,8 @@ const motionReady = prefersReducedMotion
   }
 }
 
-// ---------- the departures board ----------
-initBoard();
+// ---------- the desk ----------
+initDesk();
 
 // ---------- the paper town ----------
 initTown();
