@@ -1,0 +1,127 @@
+---
+/**
+ * A drawn phone with one of the shipped apps on its screen. The screen is
+ * real HTML (marked data-ui: an interface fragment keeps its own surfaces),
+ * drawn flat in the page's ink, so it reads as the product and stays text
+ * for screen readers and search. The frame is a hand-drawn SVG outline.
+ */
+interface Props {
+  app: 'kbz' | 'myancare' | 'magical' | 'z8';
+  class?: string;
+}
+const { app, class: className = '' } = Astro.props;
+
+const labels: Record<Props['app'], string> = {
+  kbz: 'KBZ Wiki, drawn: an example exchange with the bank agent',
+  myancare: 'MyanCare, drawn: a video consultation in progress',
+  magical: 'Magical Face, drawn: booking a visit',
+  z8: 'Z8 Real Estate, drawn: a listing',
+};
+---
+
+<figure class={`phone ${className}`} data-ui aria-label={labels[app]}>
+  <svg class="phone-frame" viewBox="0 0 200 400" preserveAspectRatio="none" aria-hidden="true">
+    <path
+      class="phone-outline"
+      d="M28 6 C80 4, 120 4, 172 6 C188 7, 194 14, 194 30 L195 370 C195 386, 188 394, 172 394 C120 397, 80 396, 28 394 C12 394, 5 386, 5 370 L4 30 C4 14, 12 7, 28 6 Z"
+      vector-effect="non-scaling-stroke"
+    />
+    <path class="phone-outline" d="M82 20 C92 19, 108 19, 118 20" vector-effect="non-scaling-stroke" />
+  </svg>
+
+  <div class="phone-screen">
+    {
+      app === 'kbz' && (
+        <>
+          <div class="ui-bar">
+            <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10 12 4l9 6M5 10v9M19 10v9M9 19v-6h6v6M3 19h18" /></svg>
+            <span class="hand ui-title">KBZ Wiki</span>
+          </div>
+          <p class="ui-msg ui-msg-me">What do I need for a home loan?</p>
+          <p class="ui-msg">Your NRC, six months of income proof and the sale agreement. Want the checklist?</p>
+          <p class="ui-msg ui-msg-me">Yes please</p>
+          <p class="ui-msg">Sent. Updated with this month’s loan changes.</p>
+          <div class="ui-input">
+            <span>Ask anything about KBZ</span>
+            <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h14M13 6l6 6-6 6" /></svg>
+          </div>
+        </>
+      )
+    }
+    {
+      app === 'myancare' && (
+        <>
+          <div class="ui-bar">
+            <span class="hand ui-title">MyanCare</span>
+            <span class="ui-dim">12:04</span>
+          </div>
+          <div class="ui-avatar" aria-hidden="true">
+            <svg viewBox="0 0 80 80">
+              <circle cx="40" cy="30" r="14" />
+              <path d="M14 70 C16 52, 28 46, 40 46 C52 46, 64 52, 66 70" />
+              <path d="M30 46 C30 56, 34 62, 40 62 C46 62, 50 56, 50 46" />
+              <circle cx="40" cy="66" r="4" />
+            </svg>
+          </div>
+          <p class="ui-center hand">Video consultation</p>
+          <p class="ui-center ui-dim">General practice · now</p>
+          <div class="ui-controls" aria-hidden="true">
+            <span class="ui-round"><svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 0 0 3-3V7a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3ZM7 12a5 5 0 0 0 10 0M12 17v3" /></svg></span>
+            <span class="ui-round ui-round-end"><svg viewBox="0 0 24 24"><path d="M5 17c4-4 10-4 14 0M9 13v4M15 13v4" /></svg></span>
+            <span class="ui-round"><svg viewBox="0 0 24 24"><path d="M4 8h10v8H4zM14 11l6-3v8l-6-3" /></svg></span>
+          </div>
+          <p class="ui-note">Prescription sent to the pharmacy</p>
+        </>
+      )
+    }
+    {
+      app === 'magical' && (
+        <>
+          <div class="ui-bar">
+            <span class="hand ui-title">Magical Face</span>
+          </div>
+          <p class="ui-dim">Book a visit · November</p>
+          <ol class="ui-cal" aria-hidden="true">
+            {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d) => (
+              <li class="ui-dim">{d}</li>
+            ))}
+            {Array.from({ length: 28 }, (_, i) => (
+              <li class:list={[{ 'ui-today': i === 12, 'ui-past': i < 9 }]}>{i + 1}</li>
+            ))}
+          </ol>
+          <div class="ui-slots">
+            <span>10:00</span>
+            <span class="ui-on">11:30</span>
+            <span>14:00</span>
+          </div>
+          <div class="ui-btn">Book Thursday 13, 11:30</div>
+        </>
+      )
+    }
+    {
+      app === 'z8' && (
+        <>
+          <div class="ui-bar">
+            <span class="hand ui-title">Z8</span>
+            <span class="ui-dim">Yangon · for rent</span>
+          </div>
+          <div class="ui-house" aria-hidden="true">
+            <svg viewBox="0 0 160 90">
+              <path d="M14 48 80 12l66 36" />
+              <path d="M26 44v38h108V44" />
+              <path d="M68 82V58h24v24" />
+              <path d="M40 54h16v14H40zM104 54h16v14h-16z" />
+            </svg>
+          </div>
+          <p class="hand ui-strong">Condo in Bahan</p>
+          <p class="ui-dim">3 bed · 2 bath · 118 m²</p>
+          <div class="ui-row">
+            <span class="ui-chip">Agent verified</span>
+            <span class="ui-chip">Furnished</span>
+          </div>
+          <div class="ui-btn">Ask the agent</div>
+        </>
+      )
+    }
+  </div>
+</figure>

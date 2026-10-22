@@ -1,4 +1,5 @@
 import type { RoughAnnotationType } from 'rough-notation/lib/model';
+import { initGallery } from './gallery';
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -93,6 +94,25 @@ async function initMotion() {
   // module load are stale; recompute once the swap has actually happened
   document.fonts.ready.then(() => ScrollTrigger.refresh());
 
+  // ---------- the paper plane lands as the envelope ----------
+  const morphSvg = document.getElementById('contact-plane');
+  if (morphSvg) {
+    const { MorphSVGPlugin } = await import('gsap/MorphSVGPlugin');
+    gsap.registerPlugin(MorphSVGPlugin);
+    const body = morphSvg.querySelector('#morph-body')!;
+    const fold = morphSvg.querySelector('#morph-fold')!;
+    const envelope = { body: body.getAttribute('d')!, fold: fold.getAttribute('d')! };
+    // start as the plane, off to the left; fly in, land, then unfold into the letter
+    gsap.set(body, { morphSVG: morphSvg.dataset.plane });
+    gsap.set(fold, { morphSVG: morphSvg.dataset.planeFold });
+    gsap.set(morphSvg, { x: -180, y: 70, rotation: -14, opacity: 0 });
+    gsap
+      .timeline({ scrollTrigger: { trigger: '#contact', start: 'top 85%', once: true } })
+      .to(morphSvg, { x: 0, y: 0, rotation: 0, opacity: 1, duration: 1.2, ease: 'power2.out' })
+      .to(body, { morphSVG: envelope.body, duration: 1, ease: 'power2.inOut' }, '+=0.25')
+      .to(fold, { morphSVG: envelope.fold, duration: 1, ease: 'power2.inOut' }, '<');
+  }
+
   // ---------- hand-drawn arrows: draw their strokes on entering the viewport ----------
   document.querySelectorAll<SVGSVGElement>('svg[data-draw]').forEach((svg) => {
     const paths = svg.querySelectorAll<SVGPathElement>('.draw-path');
@@ -137,6 +157,9 @@ const motionReady = prefersReducedMotion
     else setTimeout(start, 900);
   }
 }
+
+// ---------- the projects row ----------
+initGallery();
 
 // ---------- email button: mailto can silently no-op without a mail client,
 // so clicking also copies the address and confirms it ----------

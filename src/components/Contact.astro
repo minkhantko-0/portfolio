@@ -1,7 +1,6 @@
 ---
 import { profile } from '../data/resume';
 import HandArrow from './HandArrow.astro';
-import Doodle from './Doodle.astro';
 ---
 
 <section class="mx-auto max-w-6xl px-6 pt-20 lg:pt-24" aria-labelledby="contact">
@@ -11,9 +10,22 @@ import Doodle from './Doodle.astro';
       <HandArrow variant="down" class="ml-24 h-10 w-6 text-accent" />
     </div>
 
-    <!-- the envelope the paper plane lands as (Phase 5 morphs the plane into it) -->
+    <!-- the paper plane lands here and unfolds into the envelope (MorphSVG, in
+         animations.ts). The resting shapes in the markup are the envelope, so
+         no-JS and reduced-motion visitors see the letter, not a plane. -->
     <div id="contact-envelope" class="pointer-events-none absolute right-8 top-8 hidden sm:block">
-      <Doodle variant="envelope" class="w-28 text-ink-soft" />
+      <svg
+        id="contact-plane"
+        class="w-32 text-ink-soft"
+        viewBox="0 0 140 100"
+        fill="none"
+        aria-hidden="true"
+        data-plane="M8 50 C40 38, 76 24, 108 12 C94 36, 82 60, 68 84 C62 74, 58 66, 52 56 C38 54, 22 52, 8 50 Z"
+        data-plane-fold="M52 56 C70 42, 90 26, 108 12"
+      >
+        <path id="morph-body" class="draw-path" stroke-width="3" d="M13 20 C55 15, 90 15, 127 20 C130 45, 130 65, 127 84 C85 89, 50 89, 15 84 C11 62, 11 41, 13 20 Z" />
+        <path id="morph-fold" class="draw-path" stroke-width="3" d="M15 22 C35 42, 55 56, 70 56 C85 56, 107 40, 125 22" />
+      </svg>
     </div>
 
     <h2 id="contact" class="hand text-3xl font-bold sm:text-4xl">

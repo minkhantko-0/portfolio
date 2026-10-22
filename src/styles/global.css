@@ -551,3 +551,272 @@ body {
   background: var(--color-marker);
   color: var(--color-ink);
 }
+
+/* ---------- drawn phones: interface fragments (data-ui keeps its own surfaces) ---------- */
+.phone {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 2;
+  margin: 0;
+}
+.phone-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.phone-outline {
+  fill: #ffffff;
+  stroke: var(--color-ink);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+.phone-outline + .phone-outline {
+  fill: none;
+}
+.phone-screen {
+  position: absolute;
+  inset: 7.5% 5.5% 4% 5.5%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem 0.5rem 0.6rem;
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  color: var(--color-ink);
+  overflow: hidden;
+}
+.ui-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 2px solid var(--surface);
+}
+.ui-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+.ui-icon {
+  flex: none;
+  width: 1.1rem;
+  height: 1.1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.ui-msg {
+  max-width: 88%;
+  padding: 0.4rem 0.55rem;
+  border-radius: 0.7rem;
+  background: var(--surface);
+}
+.ui-msg-me {
+  align-self: flex-end;
+  background: var(--color-accent);
+  color: var(--color-paper);
+}
+.ui-input {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+  padding: 0.45rem 0.65rem;
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--color-ink-soft);
+}
+.ui-dim {
+  color: var(--color-ink-soft);
+}
+.ui-center {
+  text-align: center;
+}
+.ui-strong {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+.ui-avatar {
+  width: 46%;
+  aspect-ratio: 1;
+  margin: 0.5rem auto 0;
+  border-radius: 50%;
+  background: var(--surface);
+  display: grid;
+  place-items: center;
+}
+.ui-avatar svg,
+.ui-house svg,
+.ui-round svg {
+  fill: none;
+  stroke: var(--color-ink);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.ui-avatar svg {
+  width: 80%;
+}
+.ui-controls {
+  margin-top: auto;
+  display: flex;
+  justify-content: center;
+  gap: 0.6rem;
+}
+.ui-round {
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 50%;
+  background: var(--surface);
+  display: grid;
+  place-items: center;
+}
+.ui-round svg {
+  width: 1.2rem;
+  stroke-width: 1.8;
+}
+.ui-round-end {
+  background: var(--color-ink);
+}
+.ui-round-end svg {
+  stroke: var(--color-paper);
+}
+.ui-note {
+  text-align: center;
+  color: var(--color-ink-soft);
+}
+.ui-cal {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.15rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  text-align: center;
+}
+.ui-cal li {
+  padding: 0.12rem 0;
+  border-radius: 50%;
+}
+.ui-today {
+  background: var(--color-marker);
+  font-weight: 700;
+}
+.ui-past {
+  opacity: 0.45;
+}
+.ui-slots {
+  display: flex;
+  gap: 0.4rem;
+}
+.ui-slots span {
+  flex: 1;
+  padding: 0.3rem 0;
+  border-radius: 0.5rem;
+  background: var(--surface);
+  text-align: center;
+}
+.ui-on {
+  background: var(--color-accent) !important;
+  color: var(--color-paper);
+}
+.ui-btn {
+  margin-top: auto;
+  padding: 0.5rem;
+  border-radius: 0.6rem;
+  background: var(--color-ink);
+  color: var(--color-paper);
+  font-weight: 600;
+  text-align: center;
+}
+.ui-house {
+  padding: 0.5rem 0.6rem;
+  border-radius: 0.6rem;
+  background: var(--surface);
+}
+.ui-house svg {
+  width: 100%;
+}
+.ui-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+.ui-chip {
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: var(--surface);
+}
+
+/* ---------- the projects row: a native drag row, held and scrolled sideways on wide screens ---------- */
+.gallery {
+  --item: min(76vw, 21rem);
+  --page-margin: max(1.5rem, calc((100vw - 72rem) / 2 + 1.5rem));
+}
+.gallery-track {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+  list-style: none;
+  margin: 1.5rem 0 0;
+  padding: 0.5rem var(--page-margin) 1.5rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--page-margin);
+  overscroll-behavior-x: contain;
+}
+.gallery-item {
+  flex: 0 0 var(--item);
+  scroll-snap-align: start;
+  display: flex;
+}
+.project {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+.project-card .project-body {
+  height: 100%;
+  padding: 1.25rem;
+  border-radius: 0.75rem;
+  background: #ffffff;
+}
+.project-app .project-phone {
+  width: min(100%, 13rem);
+  margin: 0 auto 0.75rem;
+}
+.project-app .project-body {
+  padding: 0 0.25rem;
+}
+.gallery.is-pinned .gallery-stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: clip;
+}
+.gallery.is-pinned .gallery-track {
+  overflow: visible;
+  scroll-snap-type: none;
+  padding-bottom: 0;
+  will-change: transform;
+}
+
+/* ---------- the curtain footer: the page lifts to uncover the contact ---------- */
+main {
+  position: relative;
+  z-index: 1;
+  background-color: var(--color-paper);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+}
+.curtain {
+  position: sticky;
+  bottom: 0;
+  z-index: 0;
+}

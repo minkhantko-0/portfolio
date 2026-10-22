@@ -3,72 +3,101 @@ import { projects } from '../data/resume';
 import SectionHeading from './SectionHeading.astro';
 import HandArrow from './HandArrow.astro';
 import StoreLinks from './StoreLinks.astro';
+import AppScreen from './AppScreen.astro';
 
 const flagship = projects.find((p) => p.flagship);
 const rest = projects.filter((p) => !p.flagship);
+
+/** the apps on the stores get a drawn phone; the rest a card */
+const phoneFor: Record<string, 'myancare' | 'magical' | 'z8'> = {
+  'MyanCare TeleHealth App': 'myancare',
+  'Magical Face Luxury Aesthetic Complex': 'magical',
+  'Z8 Real Estate': 'z8',
+};
 ---
 
-<section class="relative mx-auto max-w-6xl px-6 py-20 lg:py-28" aria-labelledby="projects">
+<section class="relative mx-auto max-w-6xl px-6 pt-20 lg:pt-28" aria-labelledby="projects">
   <SectionHeading id="projects" label="Projects" aside="shipped, not just started" />
 
   {
     flagship && (
-      <article class="flagship relative mb-16 rounded-xl bg-white p-6 sm:p-8" data-enter>
+      <article class="flagship relative rounded-xl bg-white p-6 sm:p-8 lg:p-10" data-enter>
         <div class="pointer-events-none absolute -top-12 right-4 hidden sm:block">
           <p class="hand rotate-3 text-xl text-accent">{flagship.note}</p>
           <HandArrow variant="down" class="ml-16 h-10 w-6 text-accent" />
         </div>
-        <h3 class="text-xl font-bold sm:text-2xl">
-          {flagship.link ? (
-            <a href={flagship.link} target="_blank" rel="noopener noreferrer" class="text-link">
-              {flagship.name} ↗
-            </a>
-          ) : (
-            flagship.name
-          )}
-        </h3>
-        {flagship.about && <p class="hand mt-2 max-w-3xl text-lg leading-snug text-accent">{flagship.about}</p>}
-        <p class="mt-3 max-w-3xl leading-relaxed text-ink">{flagship.description}</p>
-        <div class="mt-4 flex flex-wrap items-center gap-2">
-          <ul class="flex flex-wrap gap-2">
-            {flagship.tech.map((t) => (
-              <li><span class="chip inline-block rounded-full px-3 py-1 text-sm font-medium text-ink">{t}</span></li>
-            ))}
-          </ul>
-          <StoreLinks name={flagship.name} stores={flagship.stores} />
+        <div class="grid gap-8 lg:grid-cols-[1.25fr_0.75fr] lg:gap-12">
+          <div>
+            <h3 class="text-xl font-bold sm:text-2xl">
+              {flagship.link ? (
+                <a href={flagship.link} target="_blank" rel="noopener noreferrer" class="text-link">
+                  {flagship.name} ↗
+                </a>
+              ) : (
+                flagship.name
+              )}
+            </h3>
+            {flagship.about && <p class="hand mt-2 max-w-3xl text-lg leading-snug text-accent">{flagship.about}</p>}
+            <p class="mt-3 max-w-3xl leading-relaxed text-ink">{flagship.description}</p>
+            <div class="mt-4 flex flex-wrap items-center gap-2">
+              <ul class="flex flex-wrap gap-2">
+                {flagship.tech.map((t) => (
+                  <li><span class="chip inline-block rounded-full px-3 py-1 text-sm font-medium text-ink">{t}</span></li>
+                ))}
+              </ul>
+              <StoreLinks name={flagship.name} stores={flagship.stores} />
+            </div>
+          </div>
+          <AppScreen app="kbz" class="mx-auto w-full max-w-[14rem] lg:max-w-[15rem]" />
         </div>
       </article>
     )
   }
+</section>
 
-  <div class="grid gap-x-12 gap-y-12 sm:grid-cols-2">
-    {
-      rest.map((p) => (
-        <article class="project" data-enter>
-          <div class="flex flex-wrap items-baseline gap-x-3">
-            <h3 class="text-lg font-bold sm:text-xl">
-              {p.link ? (
-                <a href={p.link} target="_blank" rel="noopener noreferrer" class="text-link">
-                  {p.name} ↗
-                </a>
-              ) : (
-                <span>{p.name}</span>
-              )}
-            </h3>
-            {p.note && <p class="hand text-base text-accent">{p.note}!</p>}
-          </div>
-          {p.about && <p class="hand mt-1.5 text-base leading-snug text-accent">{p.about}</p>}
-          <p class="mt-2 leading-relaxed text-ink">{p.description}</p>
-          <div class="mt-3 flex flex-wrap items-center gap-2">
-            <ul class="flex flex-wrap gap-2">
-              {p.tech.map((t) => (
-                <li><span class="chip inline-block rounded-full px-3 py-1 text-sm font-medium text-ink">{t}</span></li>
-              ))}
-            </ul>
-            <StoreLinks name={p.name} stores={p.stores} />
-          </div>
-        </article>
-      ))
-    }
+<!-- the rest, as a row you pull sideways (held and scrolled sideways on wide screens) -->
+<section class="gallery mt-14 lg:mt-20" aria-labelledby="more-projects">
+  <div class="gallery-stage">
+    <div class="gallery-head mx-auto max-w-6xl px-6" data-enter>
+      <h3 id="more-projects" class="hand text-2xl font-semibold sm:text-3xl">and nine more</h3>
+      <p class="hand text-lg text-ink-soft">four of them on both app stores · pull the row sideways
+        <HandArrow variant="curve-left" class="ml-2 inline-block h-5 w-10 rotate-180 align-middle text-accent" />
+      </p>
+    </div>
+    <ul class="gallery-track">
+      {
+        rest.map((p) => (
+          <li class="gallery-item">
+            <article class={`project ${phoneFor[p.name] ? 'project-app' : 'project-card'}`}>
+              {phoneFor[p.name] && <AppScreen app={phoneFor[p.name]} class="project-phone" />}
+              <div class="project-body">
+                <div class="flex flex-wrap items-baseline gap-x-3">
+                  <h4 class="text-lg font-bold">
+                    {p.link ? (
+                      <a href={p.link} target="_blank" rel="noopener noreferrer" class="text-link">
+                        {p.name} ↗
+                      </a>
+                    ) : (
+                      <span>{p.name}</span>
+                    )}
+                  </h4>
+                  {p.note && <p class="hand text-base text-accent">{p.note}!</p>}
+                </div>
+                {p.about && <p class="hand mt-1.5 text-base leading-snug text-accent">{p.about}</p>}
+                <p class="mt-2 text-base leading-relaxed text-ink">{p.description}</p>
+                <div class="mt-3 flex flex-wrap items-center gap-2">
+                  <ul class="flex flex-wrap gap-1.5">
+                    {p.tech.map((t) => (
+                      <li><span class="chip inline-block rounded-full px-2.5 py-0.5 text-sm font-medium text-ink">{t}</span></li>
+                    ))}
+                  </ul>
+                  <StoreLinks name={p.name} stores={p.stores} />
+                </div>
+              </div>
+            </article>
+          </li>
+        ))
+      }
+    </ul>
   </div>
 </section>
