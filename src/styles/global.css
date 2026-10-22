@@ -530,9 +530,9 @@ body {
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background-image: /* taste-skill-ignore: the lamp's light, not a gradient fill */
-    radial-gradient(circle at var(--lx) var(--ly), rgb(255 255 255 / 0.4) 0, rgb(255 255 255 / 0.16) 11rem, transparent 24rem),
-    radial-gradient(circle at var(--lx) var(--ly), transparent 18rem, rgb(34 48 46 / 0.04) 30rem, rgb(34 48 46 / 0.1) 46rem, rgb(34 48 46 / 0.13) 64rem);
+  background-image:
+    radial-gradient(circle at var(--lx) var(--ly), rgb(255 255 255 / 0.4) 0, rgb(255 255 255 / 0.16) 11rem, transparent 24rem), /* taste-skill-ignore: the lamp's pool of light */
+    radial-gradient(circle at var(--lx) var(--ly), transparent 18rem, rgb(34 48 46 / 0.04) 30rem, rgb(34 48 46 / 0.1) 46rem, rgb(34 48 46 / 0.13) 64rem); /* taste-skill-ignore: the room beyond the lamp */
 }
 .desk > [data-cast] {
   position: relative;
