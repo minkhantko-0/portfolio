@@ -1,6 +1,7 @@
 import type { RoughAnnotationType } from 'rough-notation/lib/model';
-import { initGallery } from './gallery';
 import { initTilt } from './tilt';
+import { initTown } from './town';
+import { initBoard } from './board';
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -92,51 +93,24 @@ async function initMotion() {
   }
 
   // the font swap changes layout heights, so trigger positions computed at
-  // module load are stale; recompute once the swap has actually happened
+  // module load are stale; recompute once the swap has actually happened.
+  // The town's cards are hidden until chosen, so the same again on a swap.
   document.fonts.ready.then(() => ScrollTrigger.refresh());
+  addEventListener('town:card', () => ScrollTrigger.refresh());
 
-  // ---------- the About deck deals out of a pile ----------
+  // ---------- the town folds up out of the paper as it arrives (scroll-driven) ----------
   {
-    const deck = document.querySelector<HTMLElement>('[data-deck]');
-    const cards = deck ? deck.querySelectorAll<HTMLElement>('.card') : [];
-    if (deck && cards.length) {
-      const centre = () => {
-        const d = deck.getBoundingClientRect();
-        return { x: d.left + d.width / 2, y: d.top + d.height / 2 };
-      };
-      gsap.from(cards, {
-        x: (_i, el) => {
-          const r = (el as HTMLElement).getBoundingClientRect();
-          return centre().x - (r.left + r.width / 2);
-        },
-        y: (_i, el) => {
-          const r = (el as HTMLElement).getBoundingClientRect();
-          return centre().y - (r.top + r.height / 2) - 30;
-        },
-        rotation: (i) => (i % 2 ? 1 : -1) * (12 + i * 4),
-        scale: 0.72,
-        autoAlpha: 0,
-        duration: 0.9,
-        ease: 'power3.out',
-        stagger: 0.085,
-        clearProps: 'transform,opacity,visibility',
-        scrollTrigger: { trigger: deck, start: 'top 82%', once: true },
-      });
-    }
-  }
-
-  // ---------- the projects row slides in ----------
-  {
-    const items = document.querySelectorAll<HTMLElement>('.gallery-item');
-    if (items.length) {
-      gsap.from(items, {
-        x: 90,
-        autoAlpha: 0,
-        duration: 0.8,
-        ease: 'power3.out',
-        stagger: 0.07,
-        clearProps: 'transform,opacity,visibility',
-        scrollTrigger: { trigger: '.gallery', start: 'top 78%', once: true },
+    const town = document.querySelector<HTMLElement>('[data-town]');
+    const blds = town ? gsap.utils.toArray<HTMLElement>('.bld') : [];
+    // already in view (a reload at #projects): it stands, no theatre
+    if (town && blds.length && town.getBoundingClientRect().top > innerHeight * 0.9) {
+      gsap.set(blds, { '--p': 0 });
+      gsap.to(blds, {
+        '--p': 1,
+        duration: 1,
+        ease: 'back.out(1.3)',
+        stagger: { each: 0.1, from: 'center' },
+        scrollTrigger: { trigger: town, start: 'top 85%', end: 'top 20%', scrub: 0.5 },
       });
     }
   }
@@ -266,8 +240,11 @@ const motionReady = prefersReducedMotion
   }
 }
 
-// ---------- the projects row ----------
-initGallery();
+// ---------- the departures board ----------
+initBoard();
+
+// ---------- the paper town ----------
+initTown();
 
 // ---------- things that lean toward the hand ----------
 initTilt();

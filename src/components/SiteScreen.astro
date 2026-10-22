@@ -1,0 +1,37 @@
+---
+/**
+ * A drawn browser window for the projects that are websites: the same
+ * hand-drawn frame language as the phones, with the project's own name as
+ * the page and a few drawn lines of copy that "load" when the card arrives.
+ */
+interface Props {
+  name: string;
+  link?: string;
+  about?: string;
+}
+const { name, link, about } = Astro.props;
+const host = link ? new URL(link).host.replace(/^www\./, '') : 'internal · not public';
+const short = name.split(/ — | – /)[0];
+---
+
+<figure class="site" data-ui aria-label={`${name}, drawn: the website`} data-tilt="5" data-lift="4">
+  <svg class="site-frame" viewBox="0 0 300 190" preserveAspectRatio="none" aria-hidden="true">
+    <path
+      class="site-outline"
+      d="M14 6 C100 3, 200 3, 286 6 C293 7, 296 11, 296 18 L295 172 C295 180, 291 184, 284 184 C200 187, 100 186, 16 184 C9 184, 5 180, 5 172 L4 18 C4 11, 8 7, 14 6 Z"
+      vector-effect="non-scaling-stroke"
+    />
+  </svg>
+  <div class="site-chrome" aria-hidden="true">
+    <span class="site-dot"></span><span class="site-dot"></span><span class="site-dot"></span>
+    <span class="site-url">{host}</span>
+  </div>
+  <div class="site-page">
+    <p class="site-h hand">{short}</p>
+    <p class="site-sub">{about ? about.split('. ')[0].replace(/\.$/, '') : ''}</p>
+    <div class="site-lines" aria-hidden="true">
+      <span style="--w:92%"></span><span style="--w:74%"></span><span style="--w:58%"></span>
+    </div>
+    <div class="site-blocks" aria-hidden="true"><span></span><span></span><span></span></div>
+  </div>
+</figure>
