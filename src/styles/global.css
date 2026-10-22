@@ -246,6 +246,11 @@ body {
   .chapter {
     min-height: 62svh;
     padding-block: 2rem;
+    transition: opacity var(--t-ui) ease;
+  }
+  /* while the flight is live, the stop the plane is at is the lit one */
+  .flight-live .chapter:not(.is-active) {
+    opacity: 0.45;
   }
 }
 

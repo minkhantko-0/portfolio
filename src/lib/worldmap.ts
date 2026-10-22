@@ -66,8 +66,17 @@ export interface OrthoView {
   center: [number, number];
   sphere: string;
   graticule: string;
+  /** the plane's whole route, great circles, clipped to the visible hemisphere */
+  routePath: string;
   shapes: Shape[];
   pins: { id: string; x: number; y: number; visible: boolean }[];
+}
+
+/** home → every stop → home, the order the plane flies */
+export function routeCoordinates(): [number, number][] {
+  const home = route.find((s) => s.home) ?? route[route.length - 1];
+  const stops = route.filter((s) => s !== home);
+  return [home, ...stops, home].map((s) => [s.lon, s.lat]);
 }
 
 /**
@@ -84,6 +93,7 @@ export function orthographicView(center: [number, number], size = 600, radius = 
   const path = geoPath(projection);
   const sphere = round(path({ type: 'Sphere' } as never) || '');
   const graticule = round(path(geoGraticule().step([30, 30])() as never) || '');
+  const routePath = round(path({ type: 'LineString', coordinates: routeCoordinates() } as never) || '');
   const shapes = shapesFor(projection);
   const pins = route.map((s) => {
     const [x, y] = projection([s.lon, s.lat]) ?? [0, 0];
@@ -92,7 +102,7 @@ export function orthographicView(center: [number, number], size = 600, radius = 
     const visible = geoDistance([s.lon, s.lat], center) < 1.2;
     return { id: s.id, x: +x.toFixed(1), y: +y.toFixed(1), visible };
   });
-  return { size, radius, center, sphere, graticule, shapes, pins };
+  return { size, radius, center, sphere, graticule, routePath, shapes, pins };
 }
 
 export interface EquirectMap {

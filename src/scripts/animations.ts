@@ -59,9 +59,15 @@ const entered = new WeakSet<Element>();
  * this whole function is skipped under `prefers-reduced-motion`, so it has no
  * business in the bundle those visitors download.
  */
+type Motion = { gsap: typeof import('gsap').gsap; ScrollTrigger: typeof import('gsap/ScrollTrigger').ScrollTrigger };
+let resolveMotion: (m: Motion) => void = () => {};
+/** resolves once GSAP and ScrollTrigger are loaded and registered (never, under reduced motion) */
+const motionLoaded = new Promise<Motion>((r) => (resolveMotion = r));
+
 async function initMotion() {
   const [{ gsap }, { ScrollTrigger }] = await Promise.all([import('gsap'), import('gsap/ScrollTrigger')]);
   gsap.registerPlugin(ScrollTrigger);
+  resolveMotion({ gsap, ScrollTrigger });
 
   /** set a path up to be "drawn" (hidden stroke, revealed by dashoffset → 0) */
   const prepDraw = (path: SVGPathElement) => {
@@ -117,9 +123,12 @@ const motionReady = prefersReducedMotion
     const start = () =>
       import('../globe/scene')
         .then(({ mountGlobe }) => mountGlobe(root))
-        .then((globe) => {
+        .then(async (globe) => {
           window.__globe = globe;
           root.dispatchEvent(new CustomEvent('globe:live'));
+          // the flight needs both the globe and the scroll engine
+          const [{ gsap, ScrollTrigger }, { startFlight }] = await Promise.all([motionLoaded, import('../globe/flight')]);
+          startFlight(globe, gsap, ScrollTrigger);
         })
         .catch(() => {
           // no WebGL, or the texture failed: the drawing stays

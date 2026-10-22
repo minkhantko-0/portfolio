@@ -69,6 +69,8 @@ const label = `Globe of the countries the work shipped to: ${route
         )
       }
     </g>
+    <!-- the plane's route, at rest: the 3D scene draws it leg by leg instead -->
+    <path d={view.routePath} stroke="var(--color-ink-soft)" stroke-opacity="0.8" stroke-width="1.8" stroke-dasharray="5 5" stroke-linecap="round" />
     <path d={view.sphere} stroke="var(--color-ink)" stroke-width="2.2" />
   </svg>
 
