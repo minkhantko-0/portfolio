@@ -133,14 +133,20 @@ const motionReady = prefersReducedMotion
       // GSAP's chunk did not arrive: the page simply stands still
     });
 
-// ---------- the 3D globe: after the hero has painted, when the browser is idle ----------
+// ---------- the 3D globe: on the visitor's first move, or well after load if they never move ----------
 // Reduced motion, Save-Data and no-WebGL visitors keep the drawn globe, which is
-// the finished composition anyway. The module (Three.js inside) is its own chunk.
+// the finished composition anyway. The module (Three.js inside) is its own chunk,
+// and parsing it plus rasterising the skin is real main-thread work, so it waits
+// for a sign of life (a scroll, a pointer, a touch, a key) rather than landing
+// in the middle of the first seconds.
 {
   const root = document.getElementById('globe');
   const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData;
   if (root && !prefersReducedMotion && !saveData) {
-    const start = () =>
+    let started = false;
+    const start = () => {
+      if (started) return;
+      started = true;
       import('../globe/scene')
         .then(({ mountGlobe }) => mountGlobe(root))
         .then(async (globe) => {
@@ -153,8 +159,15 @@ const motionReady = prefersReducedMotion
         .catch(() => {
           // no WebGL, or the texture failed: the drawing stays
         });
-    if ('requestIdleCallback' in window) requestIdleCallback(() => start(), { timeout: 2500 });
-    else setTimeout(start, 900);
+    };
+    const soon = () => ('requestIdleCallback' in window ? requestIdleCallback(() => start(), { timeout: 1500 }) : setTimeout(start, 300));
+    const signs = ['scroll', 'pointermove', 'pointerdown', 'touchstart', 'keydown'] as const;
+    const onSign = () => {
+      signs.forEach((ev) => removeEventListener(ev, onSign));
+      soon();
+    };
+    signs.forEach((ev) => addEventListener(ev, onSign, { passive: true, once: false }));
+    setTimeout(onSign, 8000);
   }
 }
 

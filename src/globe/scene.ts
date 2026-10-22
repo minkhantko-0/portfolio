@@ -142,7 +142,7 @@ export async function mountGlobe(root: HTMLElement): Promise<GlobeHandle> {
   scene.add(tilt);
 
   // ---------- the skin ----------
-  const skin = await loadGlobeSkin();
+  const skin = await loadGlobeSkin('/globe.svg', phone ? 1024 : 2048, phone ? 512 : 1024);
   const texture = new CanvasTexture(skin.canvas);
   texture.colorSpace = SRGBColorSpace;
   texture.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy());

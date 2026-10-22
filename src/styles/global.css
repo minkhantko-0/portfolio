@@ -252,15 +252,23 @@ body {
     padding-block: 2rem;
     transition: opacity var(--t-ui) ease;
   }
-  /* while the flight is live, the stop the plane is at is the lit one */
+  /* while the flight is live, the stop the plane is at is the lit one; the
+     others stay readable (ink at 70% on paper still clears 4.5:1) */
   .flight-live .chapter:not(.is-active) {
-    opacity: 0.45;
+    opacity: 0.7;
   }
 }
 
 /* the globe answers the hand once the 3D scene is live; until then it is a drawing */
 .globe {
   border-radius: 50%;
+}
+/* the scratchy-ink filter is a real paint cost on a slow phone; the rendered
+   globe keeps it (it is baked into the skin), the drawn one goes without */
+@media (max-width: 767px) {
+  #globe-svg [filter] {
+    filter: none;
+  }
 }
 .globe.is-live {
   cursor: grab;

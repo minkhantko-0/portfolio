@@ -96,7 +96,7 @@ const label = `Globe of the countries the work shipped to: ${route
               data-client={s.client}
               data-side={s.label ?? 'right'}
               {...(s.home ? { 'data-home': '' } : {})}
-              aria-label={`${s.country}: ${s.client}. Jump to this stop`}
+              aria-label={`${s.home ? 'Thailand, I’m here' : `${s.country}: ${s.client}`}. Jump to this stop`}
             >
               <span class="pin-dot" aria-hidden="true" />
               <span class="pin-label hand" aria-hidden="true">

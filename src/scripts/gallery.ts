@@ -21,11 +21,18 @@ export function initGallery() {
     track.style.transform = `translate3d(${(-p * dx).toFixed(1)}px, 0, 0)`;
   };
   const measure = () => {
+    // held only where the whole row fits under the heading; short windows keep the drag row
+    const could = wide.matches && innerHeight >= 820;
+    if (!could) {
+      root.classList.remove('is-pinned');
+      root.style.height = '';
+      track.style.transform = '';
+      return;
+    }
     root.classList.add('is-pinned'); // measure the row as it would be when pinned
     track.style.transform = '';
     dx = track.scrollWidth - track.clientWidth;
-    // held only where the whole row fits under the heading; short windows keep the drag row
-    const pin = wide.matches && innerHeight >= 820 && dx > 0 && dx < innerHeight * 3;
+    const pin = dx > 0 && dx < innerHeight * 3;
     root.classList.toggle('is-pinned', pin);
     root.style.height = pin ? `${innerHeight + dx}px` : ''; // one pixel of scroll moves the row one pixel
     if (!pin) track.style.transform = '';
