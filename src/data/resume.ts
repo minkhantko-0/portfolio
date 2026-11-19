@@ -243,6 +243,16 @@ export const projects: Project[] = [
     note: "this one’s my favourite",
   },
   {
+    name: "HollywoodPest — Entertainment News Media",
+    about:
+      "A celebrity and entertainment news site: breaking news, celebs, sports and viral stories, plus its own Originals video shows.",
+    description:
+      "Sole developer, from design to launch. An Astro site built to static pages on Cloudflare, a Sanity Studio newsroom with scheduled publishing and automatic redirects, Turnstile-protected news-tip forms, nightly backups, and structured data for Google and AI search.",
+    tech: ["Astro", "Sanity CMS", "TypeScript", "Tailwind CSS", "Cloudflare Workers", "D1", "R2", "Pagefind"],
+    link: "https://hollywoodpestmedia.com/",
+    note: "the newest one",
+  },
+  {
     name: "Benchmark — Clinical Performance Platform",
     about:
       "A clinical performance platform that lets physiotherapists objectively measure patient progress, benchmark results, and generate data-driven rehabilitation plans.",
