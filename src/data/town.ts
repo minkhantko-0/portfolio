@@ -5,7 +5,7 @@
  * .town-ground). Each building is a project; the four apps are the larger
  * ones. Positions were laid out by hand around a loop road.
  */
-export type Kind = 'tower' | 'clinic' | 'salon' | 'houses' | 'lab' | 'pavilion' | 'office' | 'hall' | 'gallery' | 'kiosk';
+export type Kind = 'tower' | 'clinic' | 'salon' | 'houses' | 'lab' | 'pavilion' | 'office' | 'hall' | 'gallery' | 'kiosk' | 'press';
 
 export interface Building {
   /** matches Project.name in resume.ts */
@@ -33,6 +33,7 @@ export const roadSpurs = ['M560 490 V600', 'M650 300 H820', 'M170 300 H0'];
 
 export const buildings: Building[] = [
   { project: 'KBZ Wiki — AI-Powered Bank Agent', key: 'kbz', kind: 'tower', label: 'KBZ Wiki', x: 360, y: 225, w: 110, d: 90, h: 190, app: 'kbz', life: 'the agent answers' },
+  { project: 'HollywoodPest — Entertainment News Media', key: 'hollywoodpest', kind: 'press', label: 'HollywoodPest', x: 596, y: 532, w: 106, d: 62, h: 74, life: 'the headlines run' },
   { project: 'MyanCare TeleHealth App', key: 'myancare', kind: 'clinic', label: 'MyanCare', x: 18, y: 130, w: 120, d: 90, h: 80, app: 'myancare', life: 'an ambulance pulls out' },
   { project: 'Magical Face Luxury Aesthetic Complex', key: 'magical', kind: 'salon', label: 'Magical Face', x: 690, y: 150, w: 100, d: 80, h: 75, app: 'magical', life: 'the door opens' },
   { project: 'Z8 Real Estate', key: 'z8', kind: 'houses', label: 'Z8', x: 690, y: 330, w: 46, d: 150, h: 34, app: 'z8', life: 'the sign swings' },
